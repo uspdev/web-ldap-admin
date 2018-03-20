@@ -7,7 +7,15 @@
 @stop
 
 @section('content')
+@include('alerts')
 
+@isset($attr['msg'])
+
+<div class="panel panel-default">
+  <div class="panel-body">{{ $attr['msg'] }}</div>
+</div>
+
+@else
     <table class="table table-striped">
         <tbody>
 
@@ -55,22 +63,30 @@
         </tbody>
     </table>
 
-<h2> Troque sua senha</h2>
+    <h2> Troque sua senha</h2>
 
-<form>
-<div class="form-group">
-  <label for="usr"> Nova senha:</label>
-  <input type="password" class="form-control" id="usr">
-</div>
+    <div class="row">
+    <div class="col-sm-3">
+        <form method="POST" action="/ldapusers">
+        @csrf
+        <div class="form-group">
+          <label for="usr"> Nova senha:</label>
+          <input type="password" class="form-control" name="senha">
+          <i> Mínimo de 8 caracteres</i>
+        </div>
 
-<div class="form-group">
-  <label for="usr"> Repetir Nova senha:</label>
-  <input type="password" class="form-control" id="usr">
-</div>
+        <div class="form-group">
+          <label for="usr"> Repetir Nova senha:</label>
+          <input type="password" class="form-control" name="repetir_senha">
+        </div>
 
-<div class="form-group">
-    <button type="submit" class="btn btn-success"> Altera senha </button>
-</div>
-</form>
+        <div class="form-group">
+            <button type="submit" class="btn btn-success"> Altera Senha </button>
+        </div>
+        </form>
+    </div>
+    </div>
+@endisset
+
 @stop
 

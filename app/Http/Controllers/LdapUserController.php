@@ -15,39 +15,72 @@ class LdapUserController extends Controller
 
     public function show(){
         $logado = \Auth::user();
+        $attr = [];
 
         if (!is_null($logado)) {
             $user = Adldap::search()->users()->find($logado->id);
             if(!is_null($user)){
 
                 // Alguns atributos    
-                $attr = [];
-
                 $attr['display_name'] = $user->getDisplayName();
 
                 $attr['email'] = $user->getEmail();
 
-                $attr['senha_alterada_em'] = $user->getPasswordLastSetDate();
+                $last = $user->getPasswordLastSetDate();
+                if(!is_null($last)) { 
+                    $last = Carbon::createFromFormat('Y-m-d H:i:s', $last)->format('d/m/Y');
+                }
+                $attr['senha_alterada_em'] = $last;
 
                 $attr['grupos'] = $user->getGroupNames();
             
                 $attr['quota'] = round($user->quota[0]/1024,2);
             
-                $attr['expira'] = $user->expirationDate();
+                $expira = $user->expirationDate();
+                if(!is_null($expira)) {
+                    $expira = Carbon::instance($expira)->format('d/m/Y');
+                }
+                $attr['expira'] = $expira;
 
                 $attr['drive'] = $user->getHomeDrive();
 
                 $attr['dir'] = $user->getHomeDirectory();
            
-                $attr['ativacao'] = Carbon::createFromFormat('YmdHis\.0\Z', $user->whencreated[0])->toDateTimeString();
-
-                return view('ldapusers.show',compact('attr'));
-     
+                $ativacao = $user->whencreated[0];
+                if(!is_null($ativacao)) {
+                    $ativacao = Carbon::createFromFormat('YmdHis\.0\Z', $ativacao)->format('d/m/Y');
+                }
+                $attr['ativacao'] = $ativacao;
             }
+            else {
+                // Será substituído pela opção "ativar conta", que criará o usuário no ldap
+                $attr['msg'] = "Conta não ativada. Envie um e-mail para suporteadm@usp.br com seu número USP para ativar sua conta no domínio da fflch";
+            } 
         }
+        return view('ldapusers.show',compact('attr'));
     }
 
-    public function mudaSenha(Request $resquest){
-    
+    public function mudaSenha(Request $request){
+
+        $request->validate([
+           'senha' => 'required|min:8',
+        ]);
+ 
+        if($request->senha != $request->repetir_senha){
+            $request->session()->flash('alert-danger', 'As senhas digitadas não são iguais, senha não alterada!');
+            return redirect('/ldapusers');          
+        }
+        
+        $logado = \Auth::user();
+
+        if (!is_null($logado)) {
+            $user = Adldap::search()->users()->find($logado->id);
+            if(!is_null($user)){
+                $user->setPassword($request->senha);
+                $user->save();
+                $request->session()->flash('alert-success', 'Senha alterada com sucesso!');
+                return redirect('/ldapusers');          
+            }
+        }
     }
 }
