@@ -43,26 +43,23 @@ class LoginController extends Controller
 
     public function redirectToProvider()
     {
-        return Socialite::driver('senhaunica')
-            ->redirect();
+        return Socialite::driver('senhaunica')->redirect();
     }
 
     public function handleProviderCallback()
     {
         $user = Socialite::driver('senhaunica')->user();
-
-        $authUser = User::where('codpes', $user->id)->first();
+        $authUser = User::where('id', $user->id)->first();
         if (!$authUser)
         {
-            User::create([
-                'name'     => $user->name,
-                'email'    => $user->email,
-                'codpes' => $user->id,
-            ]);
+            $authUser = new User;
+            $authUser->name = $user->name;
+            $authUser->email = $user->email;
+            $authUser->id = $user->id;
+            $authUser->save();
         }
         Auth::login($authUser, true);
         return redirect('/');
-
     }
 
     public function logout(Request $request) {

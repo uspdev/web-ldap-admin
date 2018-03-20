@@ -13,6 +13,8 @@
 
 Route::get('/', 'indexController@index');
 
-Route::get('login/senhaunica', 'Auth\LoginController@redirectToProvider');
+Route::get('login', 'Auth\LoginController@redirectToProvider')->name('login');
 Route::get('login/senhaunica/callback', 'Auth\LoginController@handleProviderCallback');
-Route::get('logout', 'Auth\LoginController@logout');
+Route::post('logout', 'Auth\LoginController@logout');
+
+Route::get('/ldapusers', 'LdapUserController@show');

@@ -21,7 +21,6 @@ class CreateUsersTable extends Migration
             $table->timestamps();
 
             $table->string('password')->nullable();
-            $table->string('codpes');
         });
     }
 
