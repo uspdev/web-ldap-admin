@@ -45,6 +45,11 @@
             </tr>
 
             <tr>
+                <td> <b> Grupos </b> </td>
+                <td>{{ implode(", ",$attr['grupos']) }}</td>
+            </tr>
+
+            <tr>
                 <td> <b> Conta criada em </b> </td>
                 <td>{{ $attr['ativacao'] }}</td>
             </tr>
