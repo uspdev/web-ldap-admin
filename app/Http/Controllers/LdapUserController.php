@@ -21,7 +21,22 @@ class LdapUserController extends Controller
             $user = Adldap::search()->users()->find($logado->id);
             if(!is_null($user)){
 
-                // Alguns atributos    
+                // atualiza alguns atríbutos
+                $name = trim($logado->name);
+                $name_array = explode(' ',$name);
+                $firstName = array_shift($name_array);
+                $lastName = implode(' ',$name_array);
+
+                $user->setDisplayName($name);
+                $user->setFirstName($firstName);
+                $user->setLastName($lastName);
+
+                $user->setHomeDrive(env('LDAP_HOMEDRIVE') . ':');
+                $user->setHomeDirectory('\\\\'. env('LDAP_SERVERFILE'). '\\' . $logado->id);
+                $user->setEmail($logado->email);
+                $user->save();
+
+                // retorna alguns atributos    
                 $attr['display_name'] = $user->getDisplayName();
 
                 $attr['email'] = $user->getEmail();
