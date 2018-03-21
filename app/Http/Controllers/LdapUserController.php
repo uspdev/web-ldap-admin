@@ -72,6 +72,7 @@ class LdapUserController extends Controller
                 $attr['msg'] = "Conta não ativada. Envie um e-mail para suporteadm@usp.br com seu número USP para ativar sua conta no domínio da fflch";
             } 
         }
+
         return view('ldapusers.show',compact('attr'));
     }
 
