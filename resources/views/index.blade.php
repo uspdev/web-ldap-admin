@@ -3,7 +3,6 @@
 @section('title', 'Senha FLFCH')
 
 @section('content_header')
-@include('alerts')
     <h1></h1>
 @stop
 
