@@ -9,16 +9,20 @@ class User
     public static function createOrUpdate(String $username)
     {
         $user = Adldap::search()->users()->find($username);
+        //$user = Adldap::search()->users()->find('thiago');
         if(is_null($user)){
             $user = Adldap::make()->user([
                 'cn' => $username,
             ]);
         }
+        $user->cn = $username;
+        //echo "<pre>"; var_dump($user); die();
         $user->setDisplayName('Fulano');
         $user->setFirstName('Fulano');
         $user->setLastName('Verissimo');
 
         $user->setEmail('a@kdkd.ff.f');
+        //echo "<pre>"; var_dump($user); die();
         $user->save();
 
 /*
