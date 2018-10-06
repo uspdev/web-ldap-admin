@@ -7,7 +7,7 @@ use Carbon\Carbon;
 
 class User
 {
-    public static function createOrUpdate(String $username)
+    public static function createOrUpdate(string $username, array $attr)
     {
         $user = Adldap::search()->users()->find($username);
 
@@ -22,12 +22,14 @@ class User
         // Set the user profile details.
         $user->setAccountName($username); // login no windows
 
-        $user->setDisplayName('dwqd');
-        $user->setFirstName('John');
-        $user->setLastName('Doe');
+        // nome
+        $nome_array = explode(' ',$attr['nome']);
+        $user->setDisplayName($attr['nome']);
+        $user->setFirstName(trim($nome_array[0]));
+        unset($nome_array[0]);
+        $user->setLastName(implode(' ',$nome_array));
 
-        $user->setCompany('ACME');
-        $user->setEmail('jdoe@acme.com');
+        $user->setEmail($attr['email']);
 
         // atributos para servidor de arquivos 
         //$fileserver = env('LDAP_SERVERFILE');
