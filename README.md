@@ -1,8 +1,19 @@
-# myldap
+# Cenário
 
-Install: 
+Você usa uma base ldap para controlar acesso e regras às máquinas do seu parque
+computacional. Esse sistema permite:
+
+ - Sincronizar base de dados ldap local com pessoas importadas do replicado USP
+ - Permite o próprio usuário trocar senha ldap pela web
+ - Gerenciar usuários locais no ldap que não estejam no replicado
+
+Instalação:
 
     php-ldap
+
+Compile Assets:
+
+    php artisan vendor:publish --provider="JeroenNoten\LaravelAdminLte\ServiceProvider" --tag=assets
 
 ## Dicas
 

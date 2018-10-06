@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use Adldap\Laravel\Facades\Adldap;
+use App\Ldap\User as LdapUser;
 use Carbon\Carbon;
+use Adldap\Laravel\Facades\Adldap;
 
 class LdapUserController extends Controller
 {
@@ -13,67 +14,95 @@ class LdapUserController extends Controller
        $this->middleware('auth');
     }
 
-    public function show(){
-        $logado = \Auth::user();
-        $attr = [];
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        // paginação nõa funcionou
+        //$ldapusers = Adldap::search()->users()->paginate(50)->getResults();
 
-        if (!is_null($logado)) {
-            $user = Adldap::search()->users()->find($logado->id);
-            if(!is_null($user)){
+        $ldapusers = Adldap::search()->users();
 
-                // atualiza alguns atríbutos
-                $name = trim($logado->name);
-                $name_array = explode(' ',$name);
-                $firstName = array_shift($name_array);
-                $lastName = implode(' ',$name_array);
+        // remove usuários do sistema da lista
+        $ldapusers = $ldapusers->where('samaccountname','!=','Administrator');
+        $ldapusers = $ldapusers->where('samaccountname','!=','krbtgt');
+        $ldapusers = $ldapusers->where('samaccountname','!=','Guest');
 
-                $user->setDisplayName($name);
-                $user->setFirstName($firstName);
-                $user->setLastName($lastName);
+        $ldapusers = $ldapusers->get(); 
+        //dd($ldapusers);
+        return view('ldapusers.index',compact('ldapusers'));
+    }
 
-                $user->setHomeDrive(env('LDAP_HOMEDRIVE') . ':');
-                $user->setHomeDirectory('\\\\'. env('LDAP_SERVERFILE'). '\\' . $logado->id);
-                $user->setEmail($logado->email);
-                $user->save();
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        $attr = LdapUser::createOrUpdate('dwdwq');
+        return redirect('/ldapusers');
+    }
 
-                // retorna alguns atributos    
-                $attr['display_name'] = $user->getDisplayName();
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        //
+    }
 
-                $attr['email'] = $user->getEmail();
-
-                $last = $user->getPasswordLastSetDate();
-                if(!is_null($last)) { 
-                    $last = Carbon::createFromFormat('Y-m-d H:i:s', $last)->format('d/m/Y');
-                }
-                $attr['senha_alterada_em'] = $last;
-
-                $attr['grupos'] = $user->getGroupNames();
-            
-                $attr['quota'] = round($user->quota[0]/1024,2);
-            
-                $expira = $user->expirationDate();
-                if(!is_null($expira)) {
-                    $expira = Carbon::instance($expira)->format('d/m/Y');
-                }
-                $attr['expira'] = $expira;
-
-                $attr['drive'] = $user->getHomeDrive();
-
-                $attr['dir'] = $user->getHomeDirectory();
-           
-                $ativacao = $user->whencreated[0];
-                if(!is_null($ativacao)) {
-                    $ativacao = Carbon::createFromFormat('YmdHis\.0\Z', $ativacao)->format('d/m/Y');
-                }
-                $attr['ativacao'] = $ativacao;
-            }
-            else {
-                // Será substituído pela opção "ativar conta", que criará o usuário no ldap
-                $attr['msg'] = "Conta não ativada. Envie um e-mail para suporteadm@usp.br com seu número USP para ativar sua conta no domínio da fflch";
-            } 
-        }
-
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        $attr = LdapUser::show($id);
         return view('ldapusers.show',compact('attr'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        $attr = LdapUser::delete($id);
+        return redirect('/ldapusers');
     }
 
     public function mudaSenha(Request $request){
@@ -90,13 +119,9 @@ class LdapUserController extends Controller
         $logado = \Auth::user();
 
         if (!is_null($logado)) {
-            $user = Adldap::search()->users()->find($logado->id);
-            if(!is_null($user)){
-                $user->setPassword($request->senha);
-                $user->save();
-                $request->session()->flash('alert-success', 'Senha alterada com sucesso!');
-                return redirect('/ldapusers');          
-            }
+            LdapUser::changePassword($logado->id,$request->senha);
+            $request->session()->flash('alert-success', 'Senha alterada com sucesso!');
+            return redirect('/ldapusers');          
         }
     }
 }
