@@ -1,7 +1,10 @@
 # Cenário
 
 Você usa uma base ldap para controlar acesso e regras às máquinas do seu parque
-computacional. Esse sistema permite:
+computacional. Mas sabendo que a base de usuários já existe no seu banco de dados replicado,
+manter suas base assíncrona se torna uma dor de cabeça.
+
+Esse sistema permite:
 
  - Sincronizar base de dados ldap local com pessoas importadas do replicado USP
  - Permite o próprio usuário trocar senha ldap pela web
