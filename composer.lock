@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a0d73c8c6a4f6b0f3b0cea3f88d6587b",
+    "content-hash": "24c2f5c5d40b5274049c24f06f29b608",
     "packages": [
         {
             "name": "adldap2/adldap2",
@@ -1828,37 +1828,6 @@
             "time": "2017-11-20T08:42:57+00:00"
         },
         {
-            "name": "socialiteproviders/senhaunica",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/uspdev/SenhaunicaSocialite.git",
-                "reference": "3f815efee5fe7f85bca93bcbee1c2045324e325b"
-            },
-            "require": {
-                "laravel/socialite": "^3.0",
-                "php": ">=5.5.9",
-                "socialiteproviders/manager": "^3.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "SocialiteProviders\\Senhaunica\\": "src/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Thiago Gomes Veríssimo",
-                    "email": "thiago.verissimo@usp.br"
-                }
-            ],
-            "description": "Senhaunica OAuth1 Provider for Laravel Socialite",
-            "time": "2018-03-12T22:57:02+00:00"
-        },
-        {
             "name": "swiftmailer/swiftmailer",
             "version": "v6.0.2",
             "source": {
@@ -2765,6 +2734,46 @@
             "description": "CssToInlineStyles is a class that enables you to convert HTML-pages/files into HTML-pages/files with inline styles. This is very useful when you're sending emails.",
             "homepage": "https://github.com/tijsverkoyen/CssToInlineStyles",
             "time": "2017-11-27T11:13:29+00:00"
+        },
+        {
+            "name": "uspdev/senhaunica-socialite",
+            "version": "v2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/uspdev/senhaunica-socialite.git",
+                "reference": "875757afac2256015eb4f194468ef0bffa5f14b8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/uspdev/senhaunica-socialite/zipball/875757afac2256015eb4f194468ef0bffa5f14b8",
+                "reference": "875757afac2256015eb4f194468ef0bffa5f14b8",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/socialite": "^3.0",
+                "php": ">=5.5.9",
+                "socialiteproviders/manager": "^3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Uspdev\\SenhaunicaSocialite\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Thiago Gomes Verissimo",
+                    "email": "thiago.verissimo@usp.br",
+                    "homepage": "https://github.com/thiagogomesverissimo"
+                }
+            ],
+            "description": "Senhaunica OAuth1 Provider for Laravel Socialite",
+            "homepage": "https://github.com/uspdev/SenhaunicaSocialite",
+            "time": "2018-04-18T17:16:29+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -4469,6 +4478,37 @@
             "time": "2016-10-03T07:35:21+00:00"
         },
         {
+            "name": "socialiteproviders/senhaunica",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/uspdev/SenhaunicaSocialite.git",
+                "reference": "3f815efee5fe7f85bca93bcbee1c2045324e325b"
+            },
+            "require": {
+                "laravel/socialite": "^3.0",
+                "php": ">=5.5.9",
+                "socialiteproviders/manager": "^3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "SocialiteProviders\\Senhaunica\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Thiago Gomes Veríssimo",
+                    "email": "thiago.verissimo@usp.br"
+                }
+            ],
+            "description": "Senhaunica OAuth1 Provider for Laravel Socialite",
+            "time": "2018-03-12T22:57:02+00:00"
+        },
+        {
             "name": "symfony/thanks",
             "version": "v1.0.6",
             "source": {
@@ -4604,9 +4644,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "socialiteproviders/senhaunica": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

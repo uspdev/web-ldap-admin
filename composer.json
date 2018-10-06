@@ -11,7 +11,7 @@
         "jeroennoten/laravel-adminlte": "^1.23",
         "laravel/framework": "5.6.*",
         "laravel/tinker": "~1.0",
-        "socialiteproviders/senhaunica": "dev-master"
+        "uspdev/senhaunica-socialite": "^2.0"
     },
     "require-dev": {
         "filp/whoops": "~2.0",
@@ -59,11 +59,5 @@
         "optimize-autoloader": true
     },
     "minimum-stability": "dev",
-    "prefer-stable": true,
-    "repositories": {
-        "SenhaunicaSocialite": {
-            "type": "git",
-            "url": "https://github.com/uspdev/SenhaunicaSocialite.git"
-        }
-    }
+    "prefer-stable": true
 }
