@@ -8,6 +8,10 @@ use App\Ldap\User as LdapUser;
 use Carbon\Carbon;
 use Adldap\Laravel\Facades\Adldap;
 
+use Uspdev\Replicado\Pessoa;
+use Uspdev\Replicado\Graduacao;
+use Uspdev\Replicado\Posgraduacao;
+
 class LdapUserController extends Controller
 {
     public function __construct() {
@@ -21,7 +25,7 @@ class LdapUserController extends Controller
      */
     public function index()
     {
-        // paginação nõa funcionou
+        // paginação não funcionou
         //$ldapusers = Adldap::search()->users()->paginate(50)->getResults();
 
         $ldapusers = Adldap::search()->users();
@@ -43,7 +47,14 @@ class LdapUserController extends Controller
      */
     public function create()
     {
-        $attr = LdapUser::createOrUpdate('dwdwq');
+        $docentes = Pessoa::docentesAtivos(8);
+        foreach($docentes as $docente) {
+            LdapUser::createOrUpdate($docente['codpes'], [
+                'nome' => $docente['nompes'],
+                'email' => $docente['codema']
+            ]);
+        }
+        
         return redirect('/ldapusers');
     }
 

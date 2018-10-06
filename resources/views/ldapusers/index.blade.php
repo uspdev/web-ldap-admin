@@ -15,13 +15,13 @@
         <tbody>
             @foreach($ldapusers as $ldapuser)
             <tr>
-                <td><a href="ldapusers/{{$ldapuser->samaccountname[0]}}"> {{ $ldapuser->samaccountname[0] }}</a></td>
+                <td><a href="/ldapusers/{{$ldapuser->samaccountname[0]}}"> {{ $ldapuser->samaccountname[0] }}</a></td>
                 
                 <td>
                     <a href="#" class="btn btn-warning">Editar</a>
                 </td>
                 <td>
-                    <form action="ldapusers/{{$ldapuser->samaccountname[0]}}" method="post">
+                    <form action="/ldapusers/{{$ldapuser->samaccountname[0]}}" method="post">
                       {{csrf_field()}} {{ method_field('delete') }}
                       <button class="delete-item btn btn-danger" type="submit">Deletar</button>
                   </form>
