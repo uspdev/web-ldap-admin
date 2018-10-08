@@ -7,19 +7,34 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>username</th>
+                <th>Número USP</th>
                 <th>status</th>
                 <th colspan="2">Ações</th>
             </tr>
         </thead>
         <tbody>
             @foreach($ldapusers as $ldapuser)
-            <tr>
+            <tr> 
                 <td><a href="/ldapusers/{{$ldapuser->samaccountname[0]}}"> {{ $ldapuser->samaccountname[0] }}</a></td>
-                
                 <td>
-                    <a href="#" class="btn btn-warning">Editar</a>
+                    @if($ldapuser->useraccountcontrol[0] == 512)
+                      <form action="/ldapusers/{{$ldapuser->samaccountname[0]}}" method="post">
+                        {{csrf_field()}} 
+                        {{ method_field('patch') }}
+                        <input type="hidden" name="status" value="disable">
+                        <button class="btn btn-warning" type="submit">Desativar</button>
+                      </form>
+                    @else
+                      <form action="/ldapusers/{{$ldapuser->samaccountname[0]}}" method="post">
+                        {{csrf_field()}} 
+                        {{ method_field('patch') }}
+                        <input type="hidden" name="status" value="enable">
+                        <button class="btn btn-info" type="submit">Ativar</button>
+                      </form>
+                    @endif
+
                 </td>
+                
                 <td>
                     <form action="/ldapusers/{{$ldapuser->samaccountname[0]}}" method="post">
                       {{csrf_field()}} {{ method_field('delete') }}
