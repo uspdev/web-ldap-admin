@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Ldap\User as LdapUser;
+use App\Ldap\Group as LdapGroup;
 use Carbon\Carbon;
 use Adldap\Laravel\Facades\Adldap;
 
@@ -47,12 +48,14 @@ class LdapUserController extends Controller
      */
     public function create()
     {
+
         $docentes = Pessoa::docentesAtivos(8);
         foreach($docentes as $docente) {
             LdapUser::createOrUpdate($docente['codpes'], [
                 'nome' => $docente['nompes'],
                 'email' => $docente['codema']
-            ]);
+            ],
+            'docentes');
         }
         
         return redirect('/ldapusers');
@@ -88,8 +91,7 @@ class LdapUserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-    {
-        //
+    {       
     }
 
     /**
@@ -101,7 +103,37 @@ class LdapUserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        // troca de senha
+        if(!is_null($request->senha)) {
+            $request->validate([
+               'senha' => 'required|min:8',
+            ]);
+     
+            if($request->senha != $request->repetir_senha){
+                $request->session()->flash('alert-danger', 'As senhas digitadas não são iguais, senha não alterada!');
+                return redirect('/ldapusers/' . $id);    
+            }
+            
+            LdapUser::changePassword($id,$request->senha);
+            $request->session()->flash('alert-success', 'Senha alterada com sucesso!');
+            return redirect('/ldapusers/' . $id);          
+        }
+
+        // status
+        if(!is_null($request->status)) {
+
+            if($request->status == 'disable') {
+                LdapUser::disable($id);
+                $request->session()->flash('alert-success', 'Usuário Desabilitado');
+                return redirect('/ldapusers/');
+            }
+
+            if($request->status == 'enable') {
+                LdapUser::enable($id);
+                $request->session()->flash('alert-success', 'Usuário Habilitado');
+                return redirect('/ldapusers/');
+            }                     
+        }
     }
 
     /**
@@ -114,25 +146,5 @@ class LdapUserController extends Controller
     {
         $attr = LdapUser::delete($id);
         return redirect('/ldapusers');
-    }
-
-    public function mudaSenha(Request $request){
-
-        $request->validate([
-           'senha' => 'required|min:8',
-        ]);
- 
-        if($request->senha != $request->repetir_senha){
-            $request->session()->flash('alert-danger', 'As senhas digitadas não são iguais, senha não alterada!');
-            return redirect('/ldapusers');          
-        }
-        
-        $logado = \Auth::user();
-
-        if (!is_null($logado)) {
-            LdapUser::changePassword($logado->id,$request->senha);
-            $request->session()->flash('alert-success', 'Senha alterada com sucesso!');
-            return redirect('/ldapusers');          
-        }
     }
 }

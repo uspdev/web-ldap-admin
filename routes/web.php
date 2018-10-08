@@ -17,7 +17,5 @@ Route::get('login', 'Auth\LoginController@redirectToProvider')->name('login');
 Route::get('callback', 'Auth\LoginController@handleProviderCallback');
 Route::post('logout', 'Auth\LoginController@logout');
 
-# Rotas para o usuário logado mudar atributos ldap
+# ldapusers
 Route::resource('ldapusers', 'LdapUserController');
-
-Route::post('/ldapusers', 'LdapUserController@mudaSenha');
