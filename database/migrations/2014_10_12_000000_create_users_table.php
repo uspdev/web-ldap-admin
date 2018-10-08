@@ -19,7 +19,7 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->rememberToken();
             $table->timestamps();
-
+            $table->string('username_senhaunica')->nullable();
             $table->string('password')->nullable();
         });
     }

@@ -13,6 +13,8 @@ use Uspdev\Replicado\Pessoa;
 use Uspdev\Replicado\Graduacao;
 use Uspdev\Replicado\Posgraduacao;
 
+use App\Policies\LdapUserPolicy;
+
 class LdapUserController extends Controller
 {
     public function __construct() {
@@ -80,6 +82,7 @@ class LdapUserController extends Controller
      */
     public function show($id)
     {
+        $this->authorize('ldapusers.show', $id);
         $attr = LdapUser::show($id);
         return view('ldapusers.show',compact('attr'));
     }
@@ -103,6 +106,9 @@ class LdapUserController extends Controller
      */
     public function update(Request $request, $id)
     {
+
+        $this->authorize('ldapusers.update', $id);
+
         // troca de senha
         if(!is_null($request->senha)) {
             $request->validate([
@@ -142,9 +148,11 @@ class LdapUserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        $attr = LdapUser::delete($id);
+        //$attr = LdapUser::delete($id);
+
+        $request->session()->flash('alert-danger', 'Atenção: Delete desabilitado por enquanto!!!');
         return redirect('/ldapusers');
     }
 }
