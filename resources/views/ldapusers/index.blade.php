@@ -3,11 +3,14 @@
 @section('content')
 @include('alerts')
 
+<a href="/ldapusers/create" class="btn btn-success">Sincronizar</a>
+
 <div class="table-responsive">
     <table class="table table-striped">
         <thead>
             <tr>
                 <th>Número USP</th>
+                <th>grupos</th>
                 <th>status</th>
                 <th colspan="2">Ações</th>
             </tr>
@@ -16,6 +19,14 @@
             @foreach($ldapusers as $ldapuser)
             <tr> 
                 <td><a href="/ldapusers/{{$ldapuser->samaccountname[0]}}"> {{ $ldapuser->samaccountname[0] }}</a></td>
+                <td><?php 
+                        $grupos = array_diff($ldapuser->getGroupNames(),['Domain Users']);
+                        $grupos = implode(', ',$grupos);
+
+                    ?>
+                    {{ $grupos }}
+                </td>
+
                 <td>
                     @if($ldapuser->useraccountcontrol[0] == 512)
                       <form action="/ldapusers/{{$ldapuser->samaccountname[0]}}" method="post">
@@ -49,3 +60,14 @@
 </div>
 
 @endsection
+
+@section('js')
+    @parent
+    <script type="text/javascript">
+        $(function () {
+            $(".delete-item").on("click", function(){
+                return confirm("Tem certeza?");
+            });
+        });
+    </script>
+@stop

@@ -11,36 +11,23 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Número USP</th>
-                <th>status</th>
+                <th>Código</th>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Existe no Ldap?</th>
                 <th colspan="2">Ações</th>
             </tr>
         </thead>
         <tbody>
             @foreach($externos as $externo)
             <tr> 
-                <td><a href="/externos/{{$externo->samaccountname[0]}}"> {{ $externo->samaccountname[0] }}</a></td>
-                <td>
-                    @if($externo->useraccountcontrol[0] == 512)
-                      <form action="/externos/{{$externo->samaccountname[0]}}" method="post">
-                        {{csrf_field()}} 
-                        {{ method_field('patch') }}
-                        <input type="hidden" name="status" value="disable">
-                        <button class="btn btn-warning" type="submit">Desativar</button>
-                      </form>
-                    @else
-                      <form action="/externos/{{$externo->samaccountname[0]}}" method="post">
-                        {{csrf_field()}} 
-                        {{ method_field('patch') }}
-                        <input type="hidden" name="status" value="enable">
-                        <button class="btn btn-info" type="submit">Ativar</button>
-                      </form>
-                    @endif
-
-                </td>
+                <td><a href="/ldapusers/e{{ $externo->id  }}"> e{{ $externo->id }}</a></td>
+                <td>{{ $externo->nome }}</td>
+                <td>{{ $externo->email }}</td>
+                <td><b>{{ $externo->ldap }}</b></td>
                 
                 <td>
-                    <form action="/externos/{{$externo->samaccountname[0]}}" method="post">
+                    <form action="/externos/{{$externo->id}}" method="post">
                       {{csrf_field()}} {{ method_field('delete') }}
                       <button class="delete-item btn btn-danger" type="submit">Deletar</button>
                   </form>
@@ -53,3 +40,14 @@
 </div>
 
 @endsection
+
+@section('js')
+    @parent
+    <script type="text/javascript">
+        $(function () {
+            $(".delete-item").on("click", function(){
+                return confirm("Tem certeza?");
+            });
+        });
+    </script>
+@stop

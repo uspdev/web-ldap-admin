@@ -110,11 +110,11 @@ return [
     'menu' => [
         'Restrito',
         [
-            'text' => 'Usuários Replicado',
+            'text' => 'Pessoas Replicado',
             'url'  => '/ldapusers',
         ],
         [
-            'text' => 'Usuários Externos',
+            'text' => 'Pessoas Externas',
             'url'  => '/externos',
         ],
     ],

@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Externo;
 use Illuminate\Http\Request;
 
+use Adldap\Laravel\Facades\Adldap;
 use App\Ldap\User as LdapUser;
 use App\Ldap\Group as LdapGroup;
 use Carbon\Carbon;
+
+use App\Rules\LdapEmailRule;
 
 class ExternoController extends Controller
 {
@@ -25,6 +28,16 @@ class ExternoController extends Controller
     public function index()
     {
         $externos = Externo::all();
+        
+        // verifica se usuário existe no ldap
+        foreach($externos as $externo) {
+            $check = Adldap::search()->users()->find('e'.$externo->id);
+            if(is_null($check)){
+                $externo['ldap'] = 'não';        
+            } else {
+                $externo['ldap'] = 'sim'; 
+            }
+        }
         return view('externos.index')->with('externos', $externos);
     }
 
@@ -48,15 +61,14 @@ class ExternoController extends Controller
     {
         // Validações
         $request->validate([
-            'nome'      => 'required',
-            'email'      => 'required|email',
+            'nome'      => 'required|regex:/(^([a-zA-Z]+))/u',
+            'email'      => ['required','email', new LdapEmailRule],
         ]);
 
         $externo = new Externo;
         $externo->nome = $request->nome;
         $externo->email = $request->email;
         $externo->motivo = $request->motivo;
-
         $externo->save();
 
         // Falta enviar a data de vencimento para desabilitar no ldap
@@ -66,8 +78,8 @@ class ExternoController extends Controller
         ],
         'externos');
 
-        $request->session()->flash('alert-success', 'Rede cadastrada com sucesso!');
-        return redirect("/externos/{$externo->id}");
+        $request->session()->flash('alert-success', 'Usuário cadastrado com sucesso!');
+        return redirect("/ldapusers/e{$externo->id}");
     }
 
     /**
@@ -78,7 +90,7 @@ class ExternoController extends Controller
      */
     public function show(Externo $externo)
     {
-        //
+        return redirect("/ldapusers/e{$externo->id}");
     }
 
     /**
@@ -110,8 +122,15 @@ class ExternoController extends Controller
      * @param  \App\Externo  $externo
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Externo $externo)
+    public function destroy(Request $request,Externo $externo)
     {
-        //
+        // deleta no ldap
+        $attr = LdapUser::delete('e'.$externo->id);
+
+        // deleta localmente
+        $externo->delete();
+
+        $request->session()->flash('alert-danger', 'Usuário(a) deletado localmente e do ldap');
+        return redirect('/externos');
     }
 }
