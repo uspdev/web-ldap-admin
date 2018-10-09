@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'title' => 'Senhas',
+    'title' => env('APP_NAME'),
 
     'title_prefix' => '',
 
@@ -30,9 +30,9 @@ return [
     |
     */
 
-    'logo' => '<b>Senha</b>FFLCH',
+    'logo' => env('APP_NAME'),
 
-    'logo_mini' => '<b>Senh</b>A',
+    'logo_mini' => '',
 
     /*
     |--------------------------------------------------------------------------
@@ -110,8 +110,12 @@ return [
     'menu' => [
         'Restrito',
         [
-            'text' => 'Meus dados',
+            'text' => 'Usuários Replicado',
             'url'  => '/ldapusers',
+        ],
+        [
+            'text' => 'Usuários Externos',
+            'url'  => '/externos',
         ],
     ],
 

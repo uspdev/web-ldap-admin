@@ -36,5 +36,6 @@ class Group
             }
         }
         $group->addMember($user);
+        $group->save();
     }
 }

@@ -40,13 +40,14 @@ class User
         //$user->setHomeDrive($fileserver . ':');
         //$user->setHomeDirectory('\\\\'. $fileserver. '\\' . $username);
 
+        // save
+        $user->save();
+
         // Adiciona a um grupo
         if( !is_null($groupname)){
             LdapGroup::addMember($user,$groupname);
         }
         
-        // save
-        $user->save();
         return $user;
     }
     

@@ -50,7 +50,7 @@ class LdapUserPolicy
      * @param  \App\LdapUser  $ldapUser
      * @return mixed
      */
-    public function update(User $user)
+    public function update(User $user, $id)
     {
         $owner = $user->username_senhaunica === $id;
         return $owner || $this->is_superAdmin ;
