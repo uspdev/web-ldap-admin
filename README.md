@@ -25,4 +25,8 @@ para isso:
 
     #/etc/ldap/ldap.conf
     TLS_REQCERT ALLOW
+
+Como rodar filas sem limite de tempo:
+
+    php artisan queue:listen --timeout=0
  

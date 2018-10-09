@@ -3,11 +3,37 @@
 @section('content')
 @include('alerts')
 
+<a href="/ldapusers/create" class="btn btn-success">Sincronizar com replicado</a>
+<br><br>
+
+<div class="panel panel-default">
+  <div class="panel-heading">Filtros</div>
+  <div class="panel-body">
+
+    <form method="get" action="/ldapusers">
+        <div>
+            <label class="checkbox-inline"><input type="checkbox" name="vencidos" value="true">Vencidos</label>
+            <label class="checkbox-inline"><input type="checkbox" name="naoalocados" value="true">Não Alocados</label>
+        </div>
+        <br>
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="MacAddress..." name="macaddress">
+            <span class="input-group-btn">
+                <button type="submit" class="btn btn-success"> Buscar </button>
+            </span>
+        </div><!-- /input-group -->
+    </form>
+
+
+  </div>
+</div>
+
 <div class="table-responsive">
     <table class="table table-striped">
         <thead>
             <tr>
                 <th>Número USP</th>
+                <th>grupos</th>
                 <th>status</th>
                 <th colspan="2">Ações</th>
             </tr>
@@ -16,6 +42,14 @@
             @foreach($ldapusers as $ldapuser)
             <tr> 
                 <td><a href="/ldapusers/{{$ldapuser->samaccountname[0]}}"> {{ $ldapuser->samaccountname[0] }}</a></td>
+                <td><?php 
+                        $grupos = array_diff($ldapuser->getGroupNames(),['Domain Users']);
+                        $grupos = implode(', ',$grupos);
+
+                    ?>
+                    {{ $grupos }}
+                </td>
+
                 <td>
                     @if($ldapuser->useraccountcontrol[0] == 512)
                       <form action="/ldapusers/{{$ldapuser->samaccountname[0]}}" method="post">
@@ -49,3 +83,14 @@
 </div>
 
 @endsection
+
+@section('js')
+    @parent
+    <script type="text/javascript">
+        $(function () {
+            $(".delete-item").on("click", function(){
+                return confirm("Tem certeza?");
+            });
+        });
+    </script>
+@stop

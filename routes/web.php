@@ -19,3 +19,4 @@ Route::post('logout', 'Auth\LoginController@logout');
 
 # ldapusers
 Route::resource('ldapusers', 'LdapUserController');
+Route::resource('externos', 'ExternoController');

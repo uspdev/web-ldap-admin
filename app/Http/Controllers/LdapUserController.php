@@ -9,6 +9,11 @@ use App\Ldap\Group as LdapGroup;
 use Carbon\Carbon;
 use Adldap\Laravel\Facades\Adldap;
 
+use App\Policies\LdapUserPolicy;
+
+use App\Jobs\SincronizaReplicado;
+
+
 use Uspdev\Replicado\Pessoa;
 use Uspdev\Replicado\Graduacao;
 use Uspdev\Replicado\Posgraduacao;
@@ -24,8 +29,12 @@ class LdapUserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+
+        // Filtrar por grupo
+        // $externos = Adldap::search()->groups()->find('externos');
+
         // paginação não funcionou
         //$ldapusers = Adldap::search()->users()->paginate(50)->getResults();
 
@@ -46,18 +55,11 @@ class LdapUserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
+        SincronizaReplicado::dispatch();
 
-        $docentes = Pessoa::docentesAtivos(8);
-        foreach($docentes as $docente) {
-            LdapUser::createOrUpdate($docente['codpes'], [
-                'nome' => $docente['nompes'],
-                'email' => $docente['codema']
-            ],
-            'docentes');
-        }
-        
+        $request->session()->flash('alert-info', 'Sincronização em andamento');
         return redirect('/ldapusers');
     }
 
@@ -80,6 +82,7 @@ class LdapUserController extends Controller
      */
     public function show($id)
     {
+        //$this->authorize('ldapusers.show', $id);
         $attr = LdapUser::show($id);
         return view('ldapusers.show',compact('attr'));
     }
@@ -103,6 +106,9 @@ class LdapUserController extends Controller
      */
     public function update(Request $request, $id)
     {
+
+        //$this->authorize('ldapusers.update', $id);
+
         // troca de senha
         if(!is_null($request->senha)) {
             $request->validate([
@@ -125,13 +131,13 @@ class LdapUserController extends Controller
             if($request->status == 'disable') {
                 LdapUser::disable($id);
                 $request->session()->flash('alert-success', 'Usuário Desabilitado');
-                return redirect('/ldapusers/');
+            return redirect('/ldapusers/' . $id);  
             }
 
             if($request->status == 'enable') {
                 LdapUser::enable($id);
                 $request->session()->flash('alert-success', 'Usuário Habilitado');
-                return redirect('/ldapusers/');
+            return redirect('/ldapusers/' . $id);  
             }                     
         }
     }
@@ -142,9 +148,11 @@ class LdapUserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $attr = LdapUser::delete($id);
+
+        $request->session()->flash('alert-danger', 'Usuário(a) deletado');
         return redirect('/ldapusers');
     }
 }
