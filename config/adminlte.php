@@ -110,7 +110,11 @@ return [
     'menu' => [
         'Restrito',
         [
-            'text' => 'Pessoas Replicado',
+            'text' => 'Minha Conta',
+            'url'  => '/ldapusers/show',
+        ],
+        [
+            'text' => 'Usuários Ldap',
             'url'  => '/ldapusers',
         ],
         [

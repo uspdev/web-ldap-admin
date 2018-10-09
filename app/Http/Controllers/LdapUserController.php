@@ -9,11 +9,14 @@ use App\Ldap\Group as LdapGroup;
 use Carbon\Carbon;
 use Adldap\Laravel\Facades\Adldap;
 
+use App\Policies\LdapUserPolicy;
+
+use App\Jobs\SincronizaReplicado;
+
+
 use Uspdev\Replicado\Pessoa;
 use Uspdev\Replicado\Graduacao;
 use Uspdev\Replicado\Posgraduacao;
-
-use App\Policies\LdapUserPolicy;
 
 class LdapUserController extends Controller
 {
@@ -54,16 +57,8 @@ class LdapUserController extends Controller
      */
     public function create(Request $request)
     {
+        SincronizaReplicado::dispatch();
 
-        $docentes = Pessoa::docentesAtivos(8);
-        foreach($docentes as $docente) {
-            LdapUser::createOrUpdate($docente['codpes'], [
-                'nome' => $docente['nompes'],
-                'email' => $docente['codema']
-            ],
-            'docentes');
-        }
-        
         $request->session()->flash('alert-info', 'Sincronização em andamento');
         return redirect('/ldapusers');
     }
