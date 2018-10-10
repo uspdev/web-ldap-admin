@@ -13,7 +13,6 @@ use App\Policies\LdapUserPolicy;
 
 use App\Jobs\SincronizaReplicado;
 
-
 use Uspdev\Replicado\Pessoa;
 use Uspdev\Replicado\Graduacao;
 use Uspdev\Replicado\Posgraduacao;
@@ -31,23 +30,32 @@ class LdapUserController extends Controller
      */
     public function index(Request $request)
     {
-
-        // Filtrar por grupo
-        // $externos = Adldap::search()->groups()->find('externos');
-
-        // paginação não funcionou
-        //$ldapusers = Adldap::search()->users()->paginate(50)->getResults();
-
+        // Busca
         $ldapusers = Adldap::search()->users();
+        
+        if(!empty($request->username) && isset($request->username)){
+            $ldapusers = $ldapusers->where('samaccountname','=',$request->username);
+        }
 
-        // remove usuários do sistema da lista
+        if(!empty($request->grupos) && isset($request->grupos)){ 
+            foreach($request->grupos as $gruponame) {
+                $group = Adldap::search()->groups()->find($gruponame);
+                $ldapusers = $ldapusers->where('memberof','=',$group->getDnBuilder()->get());
+            }
+        }
+
+        // remove usuários default do sistema
         $ldapusers = $ldapusers->where('samaccountname','!=','Administrator');
         $ldapusers = $ldapusers->where('samaccountname','!=','krbtgt');
         $ldapusers = $ldapusers->where('samaccountname','!=','Guest');
 
-        $ldapusers = $ldapusers->get(); 
-        //dd($ldapusers);
-        return view('ldapusers.index',compact('ldapusers'));
+        $ldapusers = $ldapusers->get();
+
+        // Paginação não está funcionando. Blade: {{ $ldapusers->links() }}
+        //$ldapusers = $ldapusers->paginate(10);
+
+        $grupos = LdapGroup::listaGrupos();
+        return view('ldapusers.index',compact('ldapusers','grupos'));
     }
 
     /**

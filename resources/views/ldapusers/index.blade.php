@@ -12,12 +12,13 @@
 
     <form method="get" action="/ldapusers">
         <div>
-            <label class="checkbox-inline"><input type="checkbox" name="vencidos" value="true">Vencidos</label>
-            <label class="checkbox-inline"><input type="checkbox" name="naoalocados" value="true">Não Alocados</label>
+            @foreach($grupos as $grupo)
+                <label class="checkbox-inline"><input type="checkbox" name="grupos[]" value="{{$grupo}}">{{$grupo}}</label>
+            @endforeach
         </div>
         <br>
         <div class="input-group">
-            <input type="text" class="form-control" placeholder="MacAddress..." name="macaddress">
+            <input type="text" class="form-control" placeholder="busque pelo username, número USP ..." name="username">
             <span class="input-group-btn">
                 <button type="submit" class="btn btn-success"> Buscar </button>
             </span>
