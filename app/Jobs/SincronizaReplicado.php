@@ -20,6 +20,7 @@ class SincronizaReplicado implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    private $unidade;
     /**
      * Create a new job instance.
      *
@@ -27,7 +28,7 @@ class SincronizaReplicado implements ShouldQueue
      */
     public function __construct()
     {
-        //
+        $this->unidade = env('REPLICADO_UNIDADE');  
     }
 
     /**
@@ -39,33 +40,25 @@ class SincronizaReplicado implements ShouldQueue
     {
 
         // Sicroniza docentes
-        $pessoas = Pessoa::docentesAtivos(8);
-        foreach($pessoas as $pessoa) {
-            LdapUser::createOrUpdate($pessoa['codpes'], [
-                'nome' => $pessoa['nompes'],
-                'email' => $pessoa['codema']
-            ],
-            'docentes');
-        }
+        $this->sync(Pessoa::docentesAtivos($this->unidade),'docentes');
 
-        // Sicroniza alunos de graduação
-        $pessoas = Graduacao::ativos(8);
-        foreach($pessoas as $pessoa) {
-            LdapUser::createOrUpdate($pessoa['codpes'], [
-                'nome' => $pessoa['nompes'],
-                'email' => $pessoa['codema']
-            ],
-            'graduacao');
-        }
+        // Sicroniza alunos
+        $this->sync(Graduacao::ativos($this->unidade),'graduacao');
+        $this->sync(Posgraduacao::ativos($this->unidade),'pos');
 
-        // Sicroniza alunos de pós-graduacao
-        $pessoas = Posgraduacao::ativos(8);
+        // Sicroniza funcionári@s
+        $this->sync(Pessoas::servidoresAtivos($this->unidade),'servidores');
+
+    }
+
+    public function sync($pessoas,$grupo)
+    {
         foreach($pessoas as $pessoa) {
             LdapUser::createOrUpdate($pessoa['codpes'], [
                 'nome' => $pessoa['nompes'],
                 'email' => $pessoa['codema']
             ],
-            'pos');
+            $grupo);
         }
     }
 }
