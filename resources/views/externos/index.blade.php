@@ -21,7 +21,13 @@
         <tbody>
             @foreach($externos as $externo)
             <tr> 
-                <td><a href="/ldapusers/e{{ $externo->id  }}"> e{{ $externo->id }}</a></td>
+                <td>
+                    @if($externo->ldap=='sim')
+                        <a href="/ldapusers/e{{ $externo->id  }}"> e{{ $externo->id }}</a>
+                    @else
+                        e{{ $externo->id }}
+                    @endif
+                </td>
                 <td>{{ $externo->nome }}</td>
                 <td>{{ $externo->email }}</td>
                 <td><b>{{ $externo->ldap }}</b></td>

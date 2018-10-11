@@ -27,11 +27,16 @@ class User
         $user->setAccountName($username); // login no windows
 
         // nome
-        $nome_array = explode(' ',$attr['nome']);
         $user->setDisplayName($attr['nome']);
-        $user->setFirstName(trim($nome_array[0]));
-        unset($nome_array[0]);
-        $user->setLastName(implode(' ',$nome_array));
+
+        $nome_array = explode(' ',$attr['nome']);
+        if(count($nome_array)>1) {
+            $user->setFirstName(trim($nome_array[0]));
+            unset($nome_array[0]);
+            $user->setLastName(implode(' ',$nome_array));
+        } else {
+            $user->setFirstName(trim($nome_array[0]));
+        }
 
         $user->setEmail($attr['email']);
 
@@ -54,7 +59,6 @@ class User
     public static function show(String $username)
     {
         $user = Adldap::search()->users()->find($username);
-
         if(!is_null($user)){
             
             $attr = [];

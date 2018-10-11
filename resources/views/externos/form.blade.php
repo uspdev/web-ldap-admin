@@ -14,10 +14,5 @@
 </div>
 
 <div class="form-group">
-    <label for="nome">Data de vencimento</label>
-    <input type="text" class="form-control" name="vencimento" value="{{ old('vencimento')  }}" >
-</div>
-
-<div class="form-group">
   <input type="submit" class="btn btn-primary" value="Enviar Dados">
 </div>

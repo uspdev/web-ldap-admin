@@ -18,7 +18,7 @@
         </div>
         <br>
         <div class="input-group">
-            <input type="text" class="form-control" placeholder="busque pelo username, número USP ..." name="username">
+            <input type="text" class="form-control" placeholder="Buscar..." name="search">
             <span class="input-group-btn">
                 <button type="submit" class="btn btn-success"> Buscar </button>
             </span>
@@ -34,6 +34,8 @@
         <thead>
             <tr>
                 <th>Número USP</th>
+                <th>Nome</th>
+                <th>Email</th>
                 <th>grupos</th>
                 <th>status</th>
                 <th colspan="2">Ações</th>
@@ -42,11 +44,12 @@
         <tbody>
             @foreach($ldapusers as $ldapuser)
             <tr> 
-                <td><a href="/ldapusers/{{$ldapuser->samaccountname[0]}}"> {{ $ldapuser->samaccountname[0] }}</a></td>
+                <td><a href="/ldapusers/{{$ldapuser->getAccountName()}}"> {{ $ldapuser->getAccountName() }}</a></td>
+                <td> {{ $ldapuser->getDisplayName() }} </td>
+                <td> {{ $ldapuser->getEmail() }} </td>
                 <td><?php 
                         $grupos = array_diff($ldapuser->getGroupNames(),['Domain Users']);
                         $grupos = implode(', ',$grupos);
-
                     ?>
                     {{ $grupos }}
                 </td>

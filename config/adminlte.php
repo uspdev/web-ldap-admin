@@ -111,15 +111,18 @@ return [
         'Restrito',
         [
             'text' => 'Minha Conta',
-            'url'  => '/ldapusers/show',
+            'url'  => '/ldapusers/my' ,
+            'can'  => 'logado',
         ],
         [
             'text' => 'Usuários Ldap',
             'url'  => '/ldapusers',
+            'can'  => 'admin',
         ],
         [
             'text' => 'Pessoas Externas',
             'url'  => '/externos',
+            'can'  => 'admin',
         ],
     ],
 

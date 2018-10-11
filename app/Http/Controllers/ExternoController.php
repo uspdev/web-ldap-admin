@@ -17,7 +17,7 @@ class ExternoController extends Controller
 
     public function __construct()
     {
-        //$this->middleware('can:admin');
+       $this->middleware('auth');
     }
 
     /**
@@ -27,6 +27,8 @@ class ExternoController extends Controller
      */
     public function index()
     {
+        $this->authorize('admin');
+
         $externos = Externo::all();
         
         // verifica se usuário existe no ldap
@@ -48,6 +50,7 @@ class ExternoController extends Controller
      */
     public function create()
     {
+        $this->authorize('admin');
         return view('externos.create');
     }
 
@@ -59,9 +62,11 @@ class ExternoController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('admin');
+
         // Validações
         $request->validate([
-            'nome'      => 'required|regex:/(^([a-zA-Z]+))/u',
+            'nome'      => ['required'],
             'email'      => ['required','email', new LdapEmailRule],
         ]);
 
@@ -90,6 +95,7 @@ class ExternoController extends Controller
      */
     public function show(Externo $externo)
     {
+        $this->authorize('admin');
         return redirect("/ldapusers/e{$externo->id}");
     }
 
@@ -124,6 +130,8 @@ class ExternoController extends Controller
      */
     public function destroy(Request $request,Externo $externo)
     {
+        $this->authorize('admin');
+
         // deleta no ldap
         $attr = LdapUser::delete('e'.$externo->id);
 

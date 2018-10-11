@@ -34,5 +34,15 @@ class AuthServiceProvider extends ServiceProvider
             return in_array(Auth::user()->username_senhaunica, $admins_senhaunica);
 
         });
+
+        # logado 
+        Gate::define('logado', function ($user) { 
+            if($user){
+                return true;            
+            }
+            else {
+                return false;
+            }
+        });
     }
 }
