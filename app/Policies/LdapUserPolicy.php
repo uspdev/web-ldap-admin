@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\User;
 use Ldap\User as LdapUser;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -16,7 +17,7 @@ class LdapUserPolicy
 
     public function __construct()
     {
-        $this->is_superAdmin = Gate::allows('admin') ;
+        $this->is_superAdmin = Gate::allows('admin');
     }
 
     /**

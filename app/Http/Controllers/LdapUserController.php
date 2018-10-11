@@ -17,6 +17,10 @@ use Uspdev\Replicado\Pessoa;
 use Uspdev\Replicado\Graduacao;
 use Uspdev\Replicado\Posgraduacao;
 
+use App\Rules\LdapSenhaRule;
+
+use Auth;
+
 class LdapUserController extends Controller
 {
     public function __construct() {
@@ -30,11 +34,19 @@ class LdapUserController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('admin');
+
         // Busca
         $ldapusers = Adldap::search()->users();
         
-        if(!empty($request->username) && isset($request->username)){
-            $ldapusers = $ldapusers->where('samaccountname','=',$request->username);
+        if(!empty($request->search) && isset($request->search)){
+            // buscar por username ou por nome
+            $check = clone $ldapusers;
+            if(count($check->where('samaccountname','contains',$request->search)->get()) > 0) {
+                $ldapusers = $ldapusers->where('samaccountname','contains',$request->search);
+            } else {
+                $ldapusers = $ldapusers->where('displayname','contains',$request->search);
+            }
         }
 
         if(!empty($request->grupos) && isset($request->grupos)){ 
@@ -49,7 +61,7 @@ class LdapUserController extends Controller
         $ldapusers = $ldapusers->where('samaccountname','!=','krbtgt');
         $ldapusers = $ldapusers->where('samaccountname','!=','Guest');
 
-        $ldapusers = $ldapusers->get();
+        $ldapusers = $ldapusers->sortBy('displayname', 'asc')->get();
 
         // Paginação não está funcionando. Blade: {{ $ldapusers->links() }}
         //$ldapusers = $ldapusers->paginate(10);
@@ -65,8 +77,9 @@ class LdapUserController extends Controller
      */
     public function create(Request $request)
     {
-        SincronizaReplicado::dispatch();
+        $this->authorize('admin');
 
+        SincronizaReplicado::dispatch();
         $request->session()->flash('alert-info', 'Sincronização em andamento');
         return redirect('/ldapusers');
     }
@@ -90,7 +103,17 @@ class LdapUserController extends Controller
      */
     public function show($id)
     {
-        //$this->authorize('ldapusers.show', $id);
+        if($id == "my"){
+            $senhaunica = Auth::user()->username_senhaunica;
+            if(!is_null($senhaunica) && !empty($senhaunica)){
+                $id = $senhaunica;
+            } else {
+                $id = 'e'.Auth::user()->id;
+            }
+        }
+        // Depois de tratado o id, vamos ver se a pessoa em questão tem acesso a essa página
+        $this->authorize('ldapusers.view',$id);
+
         $attr = LdapUser::show($id);
         return view('ldapusers.show',compact('attr'));
     }
@@ -120,13 +143,8 @@ class LdapUserController extends Controller
         // troca de senha
         if(!is_null($request->senha)) {
             $request->validate([
-               'senha' => 'required|min:8',
+               'senha' => ['required','confirmed',new LdapSenhaRule],
             ]);
-     
-            if($request->senha != $request->repetir_senha){
-                $request->session()->flash('alert-danger', 'As senhas digitadas não são iguais, senha não alterada!');
-                return redirect('/ldapusers/' . $id);    
-            }
             
             LdapUser::changePassword($id,$request->senha);
             $request->session()->flash('alert-success', 'Senha alterada com sucesso!');
@@ -158,6 +176,8 @@ class LdapUserController extends Controller
      */
     public function destroy(Request $request, $id)
     {
+        $this->authorize('admin');
+
         $attr = LdapUser::delete($id);
 
         $request->session()->flash('alert-danger', 'Usuário(a) deletado');

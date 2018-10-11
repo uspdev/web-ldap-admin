@@ -60,7 +60,7 @@
     <h2> Editar </h2>
 
     <div class="row">
-        <div class="col-sm-3">
+        <div class="col-sm-4">
             <form method="POST" action="/ldapusers/{{ $attr['username'] }}">
                 {{csrf_field()}}
                 {{ method_field('PATCH') }}
@@ -68,12 +68,12 @@
                 <div class="form-group">
                   <label for="usr"> Nova senha:</label>
                   <input type="password" class="form-control" name="senha">
-                  <i> Mínimo de 8 caracteres</i>
+                  <i> Não deve conter seu número USP ou seu nome. Deve conter maiúsculas, minúsculas, números e caracteres especiais (@#$%). Mínimo de 8 caracteres. </i>
                 </div>
 
                 <div class="form-group">
                   <label for="usr"> Repetir Nova senha:</label>
-                  <input type="password" class="form-control" name="repetir_senha">
+                  <input type="password" class="form-control" name="senha_confirmation">
                 </div>
 
                 <div class="form-group">

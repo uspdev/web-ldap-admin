@@ -40,14 +40,20 @@ class SincronizaReplicado implements ShouldQueue
     {
 
         // Sicroniza docentes
-        $this->sync(Pessoa::docentesAtivos($this->unidade),'docentes');
-
-        // Sicroniza alunos
-        $this->sync(Graduacao::ativos($this->unidade),'graduacao');
-        $this->sync(Posgraduacao::ativos($this->unidade),'pos');
+        $this->sync(Pessoa::docentes($this->unidade),'docentes');
 
         // Sicroniza funcionári@s
-        $this->sync(Pessoas::servidoresAtivos($this->unidade),'servidores');
+        $this->sync(Pessoa::servidores($this->unidade),'servidores');
+
+        // Sicroniza estagiarios
+        $this->sync(Pessoa::estagiarios($this->unidade),'estagiarios');
+
+        // Sicroniza designados
+        $this->sync(Pessoa::designados($this->unidade),'designados');
+
+        // Sicroniza alunos
+        //$this->sync(Graduacao::ativos($this->unidade),'graduacao');
+        //$this->sync(Posgraduacao::ativos($this->unidade),'pos');
 
     }
 
