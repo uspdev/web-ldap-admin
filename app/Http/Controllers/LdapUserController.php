@@ -101,7 +101,7 @@ class LdapUserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         if($id == "my"){
             $senhaunica = Auth::user()->username_senhaunica;
@@ -115,7 +115,13 @@ class LdapUserController extends Controller
         $this->authorize('ldapusers.view',$id);
 
         $attr = LdapUser::show($id);
-        return view('ldapusers.show',compact('attr'));
+        if( $attr ) {
+            return view('ldapusers.show',compact('attr'));
+        }
+        else {
+            $request->session()->flash('alert-danger', 'Sua conta não existe no ldap. ');
+            return redirect('/');   
+        }
     }
 
     /**

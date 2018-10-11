@@ -59,12 +59,14 @@ class SincronizaReplicado implements ShouldQueue
 
     public function sync($pessoas,$grupo)
     {
-        foreach($pessoas as $pessoa) {
-            LdapUser::createOrUpdate($pessoa['codpes'], [
-                'nome' => $pessoa['nompes'],
-                'email' => $pessoa['codema']
-            ],
-            $grupo);
+        if($pessoas){
+            foreach($pessoas as $pessoa) {
+                LdapUser::createOrUpdate($pessoa['codpes'], [
+                    'nome' => $pessoa['nompes'],
+                    'email' => $pessoa['codema']
+                ],
+                $grupo);
+            }
         }
     }
 }
