@@ -17,9 +17,11 @@ class AppServiceProvider extends ServiceProvider
         // Fix para MariaDB ao rodar migrations
         Schema::defaultStringLength(191);
 
+        // Forçar https em produção
+        /*
         if (env('APP_ENV') === 'production') {
             \URL::forceScheme('https');
-        }
+        } */
     }
 
     /**
