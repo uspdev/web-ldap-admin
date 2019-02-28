@@ -10,9 +10,6 @@ class User
 {
     public static function createOrUpdate(string $username, array $attr, string $groupname = null)
     {
-#        if($username==11352491){
-#            dd($attr);
-#                }
         $user = Adldap::search()->users()->find($username);
 
         if(is_null($user)){
