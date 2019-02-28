@@ -10,6 +10,9 @@ class User
 {
     public static function createOrUpdate(string $username, array $attr, string $groupname = null)
     {
+#        if($username==11352491){
+#            dd($attr);
+#                }
         $user = Adldap::search()->users()->find($username);
 
         if(is_null($user)){
@@ -37,8 +40,7 @@ class User
         } else {
             $user->setFirstName(trim($nome_array[0]));
         }
-
-        $user->setEmail($attr['email']);
+        !empty($attr['email'])?$user->setEmail($attr['email']):NULL;
 
         // atributos para servidor de arquivos 
         //$fileserver = env('LDAP_SERVERFILE');
