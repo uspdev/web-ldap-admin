@@ -16,8 +16,7 @@ use App\Jobs\SincronizaReplicado;
 use Uspdev\Replicado\Pessoa;
 use Uspdev\Replicado\Graduacao;
 use Uspdev\Replicado\Posgraduacao;
-
-use App\Rules\LdapSenhaRule;
+use App\Rules\LdapEmailRule;
 
 use Auth;
 
@@ -78,10 +77,7 @@ class LdapUserController extends Controller
     public function create(Request $request)
     {
         $this->authorize('admin');
-
-        SincronizaReplicado::dispatch();
-        $request->session()->flash('alert-info', 'Sincronização em andamento');
-        return redirect('/ldapusers');
+        return view('ldapusers.create');
     }
 
     /**
@@ -92,7 +88,23 @@ class LdapUserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->authorize('admin');
+
+        // Validações
+        $request->validate([
+            'nome'      => ['required'],
+            'email'     => ['required','email', new LdapEmailRule],
+            'username'  => ['required','regex:/^[a-zA-Z0-9]*$/i'],
+        ]);
+
+        LdapUser::createOrUpdate($request->username, [
+            'nome'  => $request->nome,
+            'email' => $request->email
+        ],
+        ['NAOREPLICADO']);
+
+        $request->session()->flash('alert-success', 'Usuário cadastrado com sucesso!');
+        return redirect("/ldapusers/{$request->username}");
     }
 
     /**
@@ -101,27 +113,29 @@ class LdapUserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request, $id)
+    public function show(Request $request, $username)
     {
-        if($id == "my"){
-            $senhaunica = Auth::user()->username_senhaunica;
-            if(!is_null($senhaunica) && !empty($senhaunica)){
-                $id = $senhaunica;
-            } else {
-                $id = 'e'.Auth::user()->id;
-            }
-        }
-        // Depois de tratado o id, vamos ver se a pessoa em questão tem acesso a essa página
-        $this->authorize('ldapusers.view',$id);
-
-        $attr = LdapUser::show($id);
+        $this->authorize('admin');
+        $attr = LdapUser::show($username);
         if( $attr ) {
             return view('ldapusers.show',compact('attr'));
         }
-        else {
-            $request->session()->flash('alert-danger', 'Sua conta não existe no ldap. ');
-            return redirect('/');   
+        $request->session()->flash('alert-danger', 'Essa conta não existe no ldap.');
+        return redirect('/');   
+    }
+
+    public function my(Request $request)
+    {
+        // Depois de tratado o id, vamos ver se a pessoa em questão tem acesso a essa página
+        //$this->authorize('ldapusers.view',$username);
+
+        $username = Auth::user()->username;
+        $attr = LdapUser::show($username);
+        if( $attr ) {
+            return view('ldapusers.show',compact('attr'));
         }
+        $request->session()->flash('alert-danger', 'Sua conta não existe no ldap. ');
+        return redirect('/');
     }
 
     /**
@@ -141,35 +155,34 @@ class LdapUserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $username)
     {
-
         //$this->authorize('ldapusers.update', $id);
 
         // troca de senha
         if(!is_null($request->senha)) {
             $request->validate([
-               'senha' => ['required','confirmed',new LdapSenhaRule],
+               'senha' => ['required','confirmed','min:8'],
             ]);
             
-            LdapUser::changePassword($id,$request->senha);
+            LdapUser::changePassword($username,$request->senha);
             $request->session()->flash('alert-success', 'Senha alterada com sucesso!');
-            return redirect('/ldapusers/' . $id);          
+            return redirect('/');          
         }
 
         // status
         if(!is_null($request->status)) {
 
             if($request->status == 'disable') {
-                LdapUser::disable($id);
+                LdapUser::disable($username);
                 $request->session()->flash('alert-success', 'Usuário Desabilitado');
-            return redirect('/ldapusers/' . $id);  
+                return redirect('/ldapusers/');  
             }
 
             if($request->status == 'enable') {
-                LdapUser::enable($id);
+                LdapUser::enable($username);
                 $request->session()->flash('alert-success', 'Usuário Habilitado');
-            return redirect('/ldapusers/' . $id);  
+                return redirect('/ldapusers/');  
             }                     
         }
     }
@@ -180,13 +193,13 @@ class LdapUserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, $username)
     {
         $this->authorize('admin');
 
-        $attr = LdapUser::delete($id);
+        $attr = LdapUser::delete($username);
 
-        $request->session()->flash('alert-danger', 'Usuário(a) deletado');
+        $request->session()->flash('alert-danger', 'Usuário(a) '. $username .' deletado');
         return redirect('/ldapusers');
     }
 }

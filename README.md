@@ -46,7 +46,7 @@ Se a pessoa tiver algum vínculo (codigoUnidade) com a unidade (REPLICADO_UNIDAD
 o usuário é inserido no domain controller. 
 Os campos tipoVinculo e nomeAbreviadoSetor serão mapeados com grupos.
 
-
+Os usuários, após entrarem com senha única, podem trocar a senha do ldap local.
 
 ## Instalação
 

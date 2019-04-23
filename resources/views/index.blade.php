@@ -14,13 +14,5 @@
     @else
         Você ainda não fez seu login com a senha única USP <a href="/login"> Faça seu Login! </a>
     @endauth
-    <h3>Com a senha FFLCH você:</h3>
-    <ul>
-        <li>Acessa os computadores no domínio FFLCH</li>
-        <li>Gerencia os sites que você administra</li>
-        <li>Abre <a href="http://www.sisinfo.fflch.usp.br/">chamados </a> para a Seção Técnica de Informática</li>
-    </ul>
- 
-    
 @stop
 

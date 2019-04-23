@@ -20,6 +20,11 @@
         <tbody>
 
             <tr>
+                <td> <b>Username</b> </td>
+                <td>{{ $attr['username'] or '' }}</td>
+            </tr>
+
+            <tr>
                 <td> <b>Seu nome </b> </td>
                 <td>{{ $attr['display_name'] or '' }}</td>
             </tr>
@@ -68,7 +73,7 @@
                 <div class="form-group">
                   <label for="usr"> Nova senha:</label>
                   <input type="password" class="form-control" name="senha">
-                  <i> Não deve conter seu número USP ou seu nome. Deve conter maiúsculas, minúsculas, números e caracteres especiais (@#$%). Mínimo de 8 caracteres. </i>
+                  <i> Mínimo de 8 caracteres. </i>
                 </div>
 
                 <div class="form-group">

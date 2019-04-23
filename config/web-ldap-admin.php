@@ -11,6 +11,6 @@ return [
     'replicado_unidade' => env('REPLICADO_UNIDADE'),
 
     # Admins
-    'superadmins_usernames' => env('SUPERADMINS_USERNAMES'),
+    'admins' => env('ADMINS'),
 
 ];

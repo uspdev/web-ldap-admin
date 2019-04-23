@@ -1,7 +1,7 @@
 @extends('adminlte::page')
 
 @section('content_header')
-    <h1>Cadastrar visitante</h1>
+    <h1>Cadastrar usuário</h1>
 @stop
 
 @section('content')
@@ -10,9 +10,9 @@
     @include('alerts')
 
         <div class="col-md-6">
-            <form method="post" action="{{ url('externos') }}">
+            <form method="post" action="/ldapusers/">
                 {{ csrf_field() }}
-                @include('externos.form')
+                @include('ldapusers.form')
             </form>
         </div>
     </div>

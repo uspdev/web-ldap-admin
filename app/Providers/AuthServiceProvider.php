@@ -30,9 +30,8 @@ class AuthServiceProvider extends ServiceProvider
 
         # admin 
         Gate::define('admin', function ($user) {
-            $admins_senhaunica = explode(',', trim(env('SUPERADMINS_SENHAUNICA')));   
-            return in_array(Auth::user()->username_senhaunica, $admins_senhaunica);
-
+            $admins = explode(',', trim(config('web-ldap-admin.admins')));   
+            return in_array(Auth::user()->username, $admins);
         });
 
         # logado 

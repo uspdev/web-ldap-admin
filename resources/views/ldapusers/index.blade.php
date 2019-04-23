@@ -3,7 +3,7 @@
 @section('content')
 @include('alerts')
 
-<a href="/ldapusers/create" class="btn btn-success">Sincronizar com replicado</a>
+<a href="/ldapusers/create" class="btn btn-success">Criar usuário</a>
 <br><br>
 
 <div class="panel panel-default">
