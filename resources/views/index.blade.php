@@ -10,7 +10,7 @@
 @include('alerts')
     @auth
         <h3><b>Olá {{ Auth::user()->name }},</b></h3>
-        Acesse sua <a href="/ldapusers"> área restrita </a> para definir ou alterar a <i>senha FFLCH</i>
+        Acesse sua <a href="/ldapusers/my"> área restrita </a> para definir ou alterar a <i>senha FFLCH</i>
     @else
         Você ainda não fez seu login com a senha única USP <a href="/login"> Faça seu Login! </a>
     @endauth
