@@ -17,6 +17,7 @@ use Uspdev\Replicado\Pessoa;
 use Uspdev\Replicado\Graduacao;
 use Uspdev\Replicado\Posgraduacao;
 use App\Rules\LdapEmailRule;
+use App\Rules\LdapUsernameRule;
 
 use Auth;
 
@@ -94,7 +95,7 @@ class LdapUserController extends Controller
         $request->validate([
             'nome'      => ['required'],
             'email'     => ['required','email', new LdapEmailRule],
-            'username'  => ['required','regex:/^[a-zA-Z0-9]*$/i'],
+            'username'  => ['required','regex:/^[a-zA-Z0-9]*$/i', new LdapUsernameRule],
         ]);
 
         LdapUser::createOrUpdate($request->username, [
