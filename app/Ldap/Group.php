@@ -27,16 +27,20 @@ class Group
     }
 
     // recebe instâncias
-    public static function addMember($user, $groupname)
+    public static function addMember($user, $groups)
     {
-        $group = Group::createOrUpdate($groupname);
-        foreach ($group->getMemberNames() as $name) {
-            if($name == $user->getName()){
-                return true;
+        foreach($groups as $groupname) {
+            if( !is_null($groupname)){
+                $group = Group::createOrUpdate($groupname);
+                foreach ($group->getMemberNames() as $name) {
+                    if($name == $user->getName()){
+                        return true;
+                    }
+                }
+                $group->addMember($user);
+                $group->save();
             }
         }
-        $group->addMember($user);
-        $group->save();
     }
 
 

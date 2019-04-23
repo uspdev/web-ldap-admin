@@ -8,7 +8,14 @@ use App\Ldap\Group as LdapGroup;
 
 class User
 {
-    public static function createOrUpdate(string $username, array $attr, string $groupname = null)
+
+    /** Estrutura do array attr:
+      * $attr['nome']  : Nome completo
+      * $attr['email'] : Email
+      *
+      *
+      **/
+    public static function createOrUpdate(string $username, array $attr, array $groups = [])
     {
         $user = Adldap::search()->users()->find($username);
 
@@ -39,18 +46,11 @@ class User
         }
         !empty($attr['email'])?$user->setEmail($attr['email']):NULL;
 
-        // atributos para servidor de arquivos 
-        //$fileserver = env('LDAP_SERVERFILE');
-        //$user->setHomeDrive($fileserver . ':');
-        //$user->setHomeDirectory('\\\\'. $fileserver. '\\' . $username);
-
         // save
         $user->save();
 
         // Adiciona a um grupo
-        if( !is_null($groupname)){
-            LdapGroup::addMember($user,$groupname);
-        }
+        LdapGroup::addMember($user,$groups);
         
         return $user;
     }
@@ -98,11 +98,6 @@ class User
             } else {
                 $attr['status'] = 'conta desativada'; 
             }
-
-            // filerserver
-            //$attr['quota'] = round($user->quota[0]/1024,2);
-            //$attr['drive'] = $user->getHomeDrive();
-            //$attr['dir'] = $user->getHomeDirectory();
            
             return $attr;
         }

@@ -8,6 +8,7 @@ use Socialite;
 use App\User;
 use Auth;
 use Illuminate\Http\Request;
+use App\Ldap\User as LdapUser;
 
 class LoginController extends Controller
 {
@@ -46,25 +47,52 @@ class LoginController extends Controller
         return Socialite::driver('senhaunica')->redirect();
     }
 
-    public function handleProviderCallback()
+    public function handleProviderCallback(Request $request)
     {
         $userSenhaUnica = Socialite::driver('senhaunica')->user();
-        
-        # busca o usuário local
-        $user = User::where('username_senhaunica',$userSenhaUnica->codpes)->first();
-        
-        if (is_null($user)) {
-            $user = new User;
+
+        // verificar se há vínculo com a unidade
+        $tem_vinculo = false;
+        foreach($userSenhaUnica->vinculo as $vinculo) {
+            if($vinculo['codigoUnidade'] == trim(config('web-ldap-admin.replicado_unidade'))) {
+                $tem_vinculo = true;
+            }
         }
         
-        // bind do dados retornados
-        $user->username_senhaunica = $userSenhaUnica->codpes;
-        $user->email = $userSenhaUnica->email;
-        $user->name = $userSenhaUnica->nompes;
-        $user->save();
- 
-        Auth::login($user, true);
-        return redirect('/');
+        // Se tem vínculo cadastra no DC e no laravel        
+        if($tem_vinculo) {
+
+            # Cadastro do usuário no laravel
+            $user = User::where('username',$userSenhaUnica->codpes)->first();
+            if (is_null($user)) $user = new User;
+                       
+            // bind do dados retornados
+            $user->username = $userSenhaUnica->codpes;
+            $user->email = $userSenhaUnica->email;
+            $user->name = $userSenhaUnica->nompes;
+            $user->save();
+
+            # Cadastro do usuário no DC
+            foreach($userSenhaUnica->vinculo as $vinculo) {
+                if($vinculo['codigoUnidade'] == trim(config('web-ldap-admin.replicado_unidade'))) {
+                    $attr = [
+                        'nome'  => $user->name,
+                        'email' => $user->email,
+                    ];
+                    $groups = [$vinculo['nomeAbreviadoSetor'], $vinculo['tipoVinculo']];
+                    LdapUser::createOrUpdate($user->username,$attr,$groups);
+                }
+            }           
+            
+    
+     
+            Auth::login($user, true);
+            return redirect('/');
+        }
+        else {
+            $request->session()->flash('alert-danger', 'Usuário sem acesso ao sistema.');
+            return redirect('/');
+        }
     }
 
     public function logout(Request $request) {
