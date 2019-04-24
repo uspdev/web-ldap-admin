@@ -18,8 +18,8 @@ Route::get('callback', 'Auth\LoginController@handleProviderCallback');
 Route::post('logout', 'Auth\LoginController@logout');
 
 # ldapusers
-Route::get('ldapusers', 'LdapUserController@index');
 Route::post('ldapusers', 'LdapUserController@store');
+Route::get('ldapusers', 'LdapUserController@index');
 Route::get('ldapusers/my', 'LdapUserController@my');
 Route::get('ldapusers/create', 'LdapUserController@create');
 Route::patch('ldapusers/{username}', 'LdapUserController@update');
