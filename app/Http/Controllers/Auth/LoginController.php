@@ -58,7 +58,7 @@ class LoginController extends Controller
                 $tem_vinculo = true;
             }
         }
-        
+
         // Se tem vínculo cadastra no DC e no laravel        
         if($tem_vinculo) {
 

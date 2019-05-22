@@ -38,18 +38,17 @@ class SincronizaReplicado implements ShouldQueue
      */
     public function handle()
     {
-
         // Sicroniza docentes
         $this->sync(Pessoa::docentes($this->unidade),'docentes');
 
         // Sicroniza funcionári@s
-        $this->sync(Pessoa::servidores($this->unidade),'servidores');
+        //$this->sync(Pessoa::servidores($this->unidade),'servidores');
 
         // Sicroniza estagiarios
-        $this->sync(Pessoa::estagiarios($this->unidade),'estagiarios');
+        //$this->sync(Pessoa::estagiarios($this->unidade),'estagiarios');
 
         // Sicroniza designados
-        $this->sync(Pessoa::designados($this->unidade),'designados');
+        //$this->sync(Pessoa::designados($this->unidade),'designados');
 
         // Sicroniza alunos
         //$this->sync(Graduacao::ativos($this->unidade),'graduacao');
@@ -60,12 +59,12 @@ class SincronizaReplicado implements ShouldQueue
     public function sync($pessoas,$grupo)
     {
         if($pessoas){
-            foreach($pessoas as $pessoa) {
+            foreach($pessoas as $pessoa) { 
                 LdapUser::createOrUpdate($pessoa['codpes'], [
                     'nome' => $pessoa['nompes'],
                     'email' => $pessoa['codema']
                 ],
-                $grupo);
+                ['TESTE']);
             }
         }
     }

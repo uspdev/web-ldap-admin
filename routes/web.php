@@ -22,9 +22,12 @@ Route::post('ldapusers', 'LdapUserController@store');
 Route::get('ldapusers', 'LdapUserController@index');
 Route::get('ldapusers/my', 'LdapUserController@my');
 Route::get('ldapusers/create', 'LdapUserController@create');
+Route::get('ldapusers/sync', 'LdapUserController@syncReplicado');
 Route::patch('ldapusers/{username}', 'LdapUserController@update');
 Route::get('ldapusers/{username}', 'LdapUserController@show');
 Route::delete('ldapusers/{username}', 'LdapUserController@destroy');
+
+
 
 
 

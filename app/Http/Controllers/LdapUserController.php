@@ -203,4 +203,12 @@ class LdapUserController extends Controller
         $request->session()->flash('alert-danger', 'Usuário(a) '. $username .' deletado');
         return redirect('/ldapusers');
     }
+
+    public function syncReplicado(Request $request)
+    {
+        $this->authorize('admin');
+        SincronizaReplicado::dispatch();
+        $request->session()->flash('alert-success', 'Sincronização em andamento');
+        return redirect('/ldapusers');
+    }
 }
