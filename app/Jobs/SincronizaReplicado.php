@@ -39,32 +39,28 @@ class SincronizaReplicado implements ShouldQueue
     public function handle()
     {
         // Sicroniza docentes
-        $this->sync(Pessoa::docentes($this->unidade),'docentes');
+        $this->sync(Pessoa::docentes($this->unidade));
 
         // Sicroniza funcionári@s
-        //$this->sync(Pessoa::servidores($this->unidade),'servidores');
+        //$this->sync(Pessoa::servidores($this->unidade));
 
         // Sicroniza estagiarios
         //$this->sync(Pessoa::estagiarios($this->unidade),'estagiarios');
 
         // Sicroniza designados
         //$this->sync(Pessoa::designados($this->unidade),'designados');
-
-        // Sicroniza alunos
-        //$this->sync(Graduacao::ativos($this->unidade),'graduacao');
-        //$this->sync(Posgraduacao::ativos($this->unidade),'pos');
-
     }
 
-    public function sync($pessoas,$grupo)
+    public function sync($pessoas)
     {
         if($pessoas){
-            foreach($pessoas as $pessoa) { 
+            foreach($pessoas as $pessoa) {
+                $grupos = Pessoa::vinculosSiglas($pessoa['codpes'],$this->unidade);
                 LdapUser::createOrUpdate($pessoa['codpes'], [
                     'nome' => $pessoa['nompes'],
                     'email' => $pessoa['codema']
                 ],
-                ['TESTE']);
+                $grupos);
             }
         }
     }
