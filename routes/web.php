@@ -17,6 +17,9 @@ Route::get('login', 'Auth\LoginController@redirectToProvider')->name('login');
 Route::get('callback', 'Auth\LoginController@handleProviderCallback');
 Route::post('logout', 'Auth\LoginController@logout');
 
+# Temporário
+Route::get('logout', 'Auth\LoginController@logout');
+
 # ldapusers
 Route::post('ldapusers', 'LdapUserController@store');
 Route::get('ldapusers', 'LdapUserController@index');

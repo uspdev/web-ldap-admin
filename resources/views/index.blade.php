@@ -1,4 +1,4 @@
-@extends('adminlte::page')
+@extends('master')
 
 @section('title', 'USP')
 
@@ -15,4 +15,5 @@
         Você ainda não fez seu login com a senha única USP <a href="/login"> Faça seu Login! </a>
     @endauth
 @stop
+
 

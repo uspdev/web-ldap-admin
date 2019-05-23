@@ -1,4 +1,4 @@
-@extends('adminlte::page')
+@extends('master')
 
 @section('content')
 @include('alerts')
