@@ -212,9 +212,12 @@ class LdapUserController extends Controller
 
     public function syncReplicado(Request $request)
     {
-        //dd($request->type);
         $this->authorize('admin');
-        SincronizaReplicado::dispatch();
+        $this->validate($request, [
+            'type' => 'required',
+        ]);
+        
+        SincronizaReplicado::dispatch($request->type);
         $request->session()->flash('alert-success', 'Sincronização em andamento');
         return redirect('/ldapusers');
     }

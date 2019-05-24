@@ -21,14 +21,16 @@ class SincronizaReplicado implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private $unidade;
+    private $type;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(array $type)
     {
         $this->unidade = env('REPLICADO_UNIDADE');  
+        $this->type = $type;  
     }
 
     /**
@@ -38,25 +40,25 @@ class SincronizaReplicado implements ShouldQueue
      */
     public function handle()
     {
-        // Sicroniza docentes
-        $this->sync(Pessoa::docentes($this->unidade));
+        foreach($this->type as $type) {
+            if($type == 'servidores')
+                $this->sync(Pessoa::servidores($this->unidade));
 
-        // Sicroniza funcionári@s
-        //$this->sync(Pessoa::servidores($this->unidade));
+            if($type == 'docentes')
+                $this->sync(Pessoa::docentes($this->unidade));
 
-        // Sicroniza estagiarios
-        //dd(Pessoa::docentes($this->unidade));
-        //$this->sync(Pessoa::estagiarios($this->unidade));
-
-        // Sicroniza designados
-        //$this->sync(Pessoa::designados($this->unidade),'designados');
+            if($type == 'estagiarios')
+                $this->sync(Pessoa::estagiarios($this->unidade));
+        }
     }
 
     public function sync($pessoas)
     {
         if($pessoas){
             foreach($pessoas as $pessoa) {
-                $grupos = Pessoa::vinculosSiglas($pessoa['codpes'],$this->unidade);
+                $vinculos = Pessoa::vinculosSiglas($pessoa['codpes'],$this->unidade);
+                $setores = Pessoa::setoresSiglas($pessoa['codpes'],$this->unidade);
+                $grupos = array_merge($setores,$vinculos) ;
                 LdapUser::createOrUpdate($pessoa['codpes'], [
                     'nome' => $pessoa['nompes'],
                     'email' => $pessoa['codema']

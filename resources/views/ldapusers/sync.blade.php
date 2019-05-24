@@ -12,7 +12,8 @@
         <div class="col-md-6">
             <form method="post" action="/ldapusers/sync">
                 {{ csrf_field() }}
-                <input type="checkbox" name="type[]" value="servidores"> Servidores<br>
+                <input type="checkbox" name="type[]" value="servidores"> Funcionários<br>
+                <input type="checkbox" name="type[]" value="docentes"> Docentes<br>
                 <input type="checkbox" name="type[]" value="estagiarios"> Estagiários<br>            
 
                 <div class="form-group">
