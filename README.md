@@ -95,9 +95,9 @@ Instalação:
     php artisan key:generate
     php artisan migrate
 
-Compile Assets:
+Publicar Assets:
 
-    php artisan vendor:publish --provider="JeroenNoten\LaravelAdminLte\ServiceProvider" --tag=assets
+    php artisan vendor:publish --provider="Uspdev\UspTheme\ServiceProvider" --tag=assets --force
 
 ## Dicas
 
