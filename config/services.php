@@ -35,9 +35,9 @@ return [
         'secret' => env('STRIPE_SECRET'),
     ],
     'senhaunica' => [
-            'client_id' => env('SENHAUNICA_KEY'),
-                'client_secret' => env('SENHAUNICA_SECRET'),
-                'redirect' => '/',
-                ], 
-
+        'client_id' => env('SENHAUNICA_KEY'),
+        'client_secret' => env('SENHAUNICA_SECRET'),
+        'callback_id' => env('SENHAUNICA_CALLBACK_ID'),
+        'redirect' => '/',
+    ],
 ];

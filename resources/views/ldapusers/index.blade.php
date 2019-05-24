@@ -5,7 +5,7 @@
 
 <a href="/ldapusers/create" class="btn btn-success">Criar usuário não replicado</a>
 <br><br>
-<a href="/ldapusers/sync" class="btn btn-warning">Sincronizar Servidores</a>
+<a href="/ldapusers/sync" class="btn btn-warning">Sincronizar com replicado</a>
 
 <br><br>
 

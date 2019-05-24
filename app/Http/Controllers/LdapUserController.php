@@ -204,8 +204,15 @@ class LdapUserController extends Controller
         return redirect('/ldapusers');
     }
 
+    public function syncReplicadoForm(Request $request)
+    {
+        $this->authorize('admin');
+        return view('ldapusers.sync');
+    }
+
     public function syncReplicado(Request $request)
     {
+        //dd($request->type);
         $this->authorize('admin');
         SincronizaReplicado::dispatch();
         $request->session()->flash('alert-success', 'Sincronização em andamento');

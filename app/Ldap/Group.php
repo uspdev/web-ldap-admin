@@ -10,19 +10,17 @@ class Group
     public static function createOrUpdate(string $name)
     {
         $group = Adldap::search()->groups()->find($name);
-
         if(is_null($group)){
             $group = Adldap::make()->group();
 
             // define DN para esse user
             $dn = "CN={$name}," .  $group->getDnBuilder();
             $group->setDn($dn);
+            $group->setAccountName(trim($name));
+            $group->save();
         }
 
         // save
-        //$group->setAttribute('samaccountname', $name);
-        $group->setAccountName($name);
-        $group->save();
         return $group;
     }
 
@@ -31,7 +29,7 @@ class Group
     {
         foreach($groups as $groupname) {
             if( !is_null($groupname)){
-                $group = Group::createOrUpdate($groupname);
+                $group = self::createOrUpdate($groupname);
                 foreach ($group->getMemberNames() as $name) {
                     if($name == $user->getName()){
                         return true;

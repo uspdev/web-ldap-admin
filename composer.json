@@ -20,7 +20,7 @@
         "laravel/tinker": "~1.0",
         "uspdev/laravel-usp-theme": "^1.0",
         "uspdev/replicado": "dev-master",
-        "uspdev/senhaunica-socialite": "^2.0"
+        "uspdev/senhaunica-socialite": "dev-master"
     },
     "require-dev": {
         "filp/whoops": "~2.0",

@@ -13,7 +13,6 @@ class User
       * $attr['nome']  : Nome completo
       * $attr['email'] : Email
       *
-      *
       **/
     public static function createOrUpdate(string $username, array $attr, array $groups = [])
     {
