@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Socialite;
 use App\User;
+use App\Config;
 use Auth;
 use Illuminate\Http\Request;
 use App\Ldap\User as LdapUser;
@@ -88,7 +89,27 @@ class LoginController extends Controller
             return redirect('/');
         }
         else {
-            $request->session()->flash('alert-danger', 'Usuário sem acesso ao sistema.');
+
+            // Usuários sem vínculos com a unidade
+            $config = Config::all()->last();
+            if($config != null) {
+                $codpes_sem_vinculo = explode(',',$config->codpes_sem_vinculo);
+                if(in_array($userSenhaUnica->codpes,$codpes_sem_vinculo)) {
+                    $user = User::where('username',$userSenhaUnica->codpes)->first();
+                    if (is_null($user)) $user = new User;
+                    $user->username = $userSenhaUnica->codpes;
+                    $user->email = $userSenhaUnica->email;
+                    $user->name = $userSenhaUnica->nompes;
+                    $user->save();
+                    $attr = [
+                        'nome'  => $user->name,
+                        'email' => $user->email,
+                    ];
+                    LdapUser::createOrUpdate($userSenhaUnica->codpes,$attr,['SEMVINCULOUNIDADE']);
+                }
+            } else {
+                $request->session()->flash('alert-danger', 'Usuário sem acesso ao sistema.');
+            }
             return redirect('/');
         }
     }

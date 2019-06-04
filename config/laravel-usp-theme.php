@@ -17,5 +17,15 @@ return [
             'url'  => '/ldapusers',
             'can'  => 'admin',
         ],
+        [
+            'text' => 'Configurações',
+            'url'  => '/configs',
+            'can'  => 'admin',
+        ],
+        [
+            'text' => 'Solicitação de Administrador',
+            'url'  => '/ldapusers/solicita-admin',
+            'can'  => 'logado',
+        ],
     ],
 ];

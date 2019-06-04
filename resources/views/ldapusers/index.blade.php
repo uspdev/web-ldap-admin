@@ -5,9 +5,6 @@
 
 <a href="/ldapusers/create" class="btn btn-success">Criar usuário não replicado</a>
 <br><br>
-<a href="/ldapusers/sync" class="btn btn-warning">Sincronizar com replicado</a>
-
-<br><br>
 
 <div class="panel panel-default">
   <div class="panel-heading">Filtros</div>
