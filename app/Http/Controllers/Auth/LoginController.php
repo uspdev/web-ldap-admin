@@ -106,6 +106,7 @@ class LoginController extends Controller
                         'email' => $user->email,
                     ];
                     LdapUser::createOrUpdate($userSenhaUnica->codpes,$attr,['SEMVINCULOUNIDADE']);
+                    Auth::login($user, true);
                 }
             } else {
                 $request->session()->flash('alert-danger', 'Usuário sem acesso ao sistema.');
