@@ -23,6 +23,8 @@ Route::get('logout', 'Auth\LoginController@logout');
 # ldapusers
 Route::post('ldapusers', 'LdapUserController@store');
 Route::get('ldapusers', 'LdapUserController@index');
+Route::get('ldapusers/solicita-admin', 'LdapUserController@solicitaAdminForm');
+Route::post('ldapusers/solicita-admin', 'LdapUserController@solicitaAdmin');
 Route::get('ldapusers/my', 'LdapUserController@my');
 Route::get('ldapusers/create', 'LdapUserController@create');
 Route::get('ldapusers/sync', 'LdapUserController@syncReplicadoForm');
@@ -31,7 +33,9 @@ Route::patch('ldapusers/{username}', 'LdapUserController@update');
 Route::get('ldapusers/{username}', 'LdapUserController@show');
 Route::delete('ldapusers/{username}', 'LdapUserController@destroy');
 
-
+#configs
+Route::get('configs', 'ConfigController@show');
+Route::post('configs', 'ConfigController@update');
 
 
 

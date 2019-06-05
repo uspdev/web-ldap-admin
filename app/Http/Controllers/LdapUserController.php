@@ -18,6 +18,7 @@ use Uspdev\Replicado\Graduacao;
 use Uspdev\Replicado\Posgraduacao;
 use App\Rules\LdapEmailRule;
 use App\Rules\LdapUsernameRule;
+use Illuminate\Database\Eloquent\Collection;
 
 use Auth;
 
@@ -221,4 +222,26 @@ class LdapUserController extends Controller
         $request->session()->flash('alert-success', 'Sincronização em andamento');
         return redirect('/ldapusers');
     }
+
+    public function solicitaAdminForm(Request $request)
+    {
+        $this->authorize('logado');
+        $user = Auth::user();
+        $ldap_computers = Adldap::search()->computers()->get();
+        $computers = Collection::make([]);
+        foreach($ldap_computers as $computer){
+            $hostname = $computer->getDnsHostName();
+            $basedn = config('adldap.base_dn');
+            //dd($basedn);
+            //$basedn = str_replace('DC=','',config('adldap.base_dn'));
+            //$basedn = str_replace(',','\.',));
+            $hostname = str_replace(".$basedn", "", $hostname);
+            $computers->push(['hostname' => $hostname]);
+        }
+
+        return view('ldapusers.solicita-admin',compact('user','computers'));
+    }
+
+
+
 }
