@@ -22,10 +22,10 @@ return [
             'url'  => '/configs',
             'can'  => 'admin',
         ],
-        [
-            'text' => 'Solicitação de Administrador',
-            'url'  => '/ldapusers/solicita-admin',
-            'can'  => 'logado',
-        ],
+#        [
+#            'text' => 'Solicitação de Administrador',
+#            'url'  => '/ldapusers/solicita-admin',
+#            'can'  => 'logado',
+#        ],
     ],
 ];
