@@ -9,7 +9,7 @@
 @section('content')
 @include('alerts')
     @auth
-        <script>window.location = "/ldapusers/my";</script>
+        Acesse o menu acima com as opções
     @else
         Você ainda não fez seu login com a senha única USP <a href="/login"> Faça seu Login! </a>
     @endauth
