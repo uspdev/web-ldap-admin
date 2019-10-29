@@ -52,19 +52,19 @@ Os usuários, após entrarem com senha única, podem trocar a senha do ldap loca
 
 Dependências php:
 
-    version='7.2'
+    version='7.3'
     apt-get install php$version-ldap
  
 Informações no arquivo .env referente ao servidor domain controller:
 
-    ADLDAP_CONTROLLERS=dc.xurepinha.br
-    ADLDAP_PORT=636
-    ADLDAP_BASEDN='CN=Users,DC=xurepinha,DC=br'
-    ADLDAP_ADMIN_USERNAME='CN=Administrator,CN=Users,DC=xurepinha,DC=br'
-    ADLDAP_ADMIN_PASSWORD='sua-senha'
-    ADLDAP_USE_SSL=true
-    ADLDAP_USE_TLS=false
- 
+    LDAP_HOSTS=dc.xurepinha.br
+    LDAP_PORT=636
+    LDAP_BASE_DN='DC=pandora,DC=fflch,DC=usp,DC=br'
+    LDAP_USERNAME='CN=Administrator,CN=Users,DC=xurepinha,DC=br'
+    LDAP_PASSWORD='sua-senha'
+    LDAP_USE_SSL=true
+    LDAP_USE_TLS=false
+    
 Informações no arquivo .env referente ao serviço de senha única OAuth 1.0:
 
     SENHAUNICA_KEY=oh-man
@@ -80,7 +80,6 @@ Informações no arquivo .env referente ao serviço de senha única OAuth 1.0:
     REPLICADO_PASSWORD=
     REPLICADO_UNIDADE=8
 
-
 Esse sistema permite:
 
  - Sincronizar base de dados ldap local com pessoas importadas do replicado USP
@@ -89,8 +88,6 @@ Esse sistema permite:
 
 Instalação:
 
-
-
     composer install
     php artisan key:generate
     php artisan migrate
@@ -98,6 +95,8 @@ Instalação:
 Publicar Assets:
 
     php artisan vendor:publish --provider="Uspdev\UspTheme\ServiceProvider" --tag=assets --force
+    php artisan vendor:publish --provider="Adldap\Laravel\AdldapAuthServiceProvider" --tag=assets --force
+    php artisan vendor:publish --provider="Adldap\Laravel\AdldapServiceProvider" --tag=assets --force
 
 ## Dicas
 
