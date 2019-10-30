@@ -21,42 +21,42 @@
 
             <tr>
                 <td> <b>Username</b> </td>
-                <td>{{ $attr['username'] or '' }}</td>
+                <td>{{ $attr['username'] ?? '' }}</td>
             </tr>
 
             <tr>
                 <td> <b>Seu nome </b> </td>
-                <td>{{ $attr['display_name'] or '' }}</td>
+                <td>{{ $attr['display_name'] ?? '' }}</td>
             </tr>
 
             <tr>
                 <td> <b> Email</b> </td>
-                <td>{{ $attr['email'] or '' }}</td>
+                <td>{{ $attr['email'] ?? '' }}</td>
             </tr>
 
             <tr>
                 <td> <b> Grupos </b> </td>
-                <td>{{ $attr['grupos'] or '' }}</td>
+                <td>{{ $attr['grupos'] ?? '' }}</td>
             </tr>
 
             <tr>
                 <td> <b> Conta criada em </b> </td>
-                <td>{{ $attr['ativacao'] or '' }}</td>
+                <td>{{ $attr['ativacao'] ?? '' }}</td>
             </tr>
 
             <tr>
                 <td> <b> Essa conta expira em </b> </td>
-                <td>{{ $attr['expira'] or "Não expira" }}</td>
+                <td>{{ $attr['expira'] ?? "Não expira" }}</td>
             </tr>
 
             <tr>
                 <td> <b> Data da última alteração da senha </b> </td>
-                <td> {{ $attr['senha_alterada_em'] or '' }} </td>
+                <td> {{ $attr['senha_alterada_em'] ?? '' }} </td>
             </tr>
 
             <tr>
                 <td> <b> Status </b> </td>
-                <td> {{ $attr['status'] or '' }} </td>
+                <td> {{ $attr['status'] ?? '' }} </td>
             </tr>
 
         </tbody>
