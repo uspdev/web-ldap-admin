@@ -2,7 +2,7 @@
 
 return [
     # Footer theme
-    'footer' => 'ECA', # Talvez trazer a sigla da unidade a partir do codund via replicado
+    'footer' => env('FOOTER', false),
     
     # Senha única
     'senha_unica_key'           => env('SENHAUNICA_KEY', false),
