@@ -1,4 +1,4 @@
 @extends('laravel-usp-theme::master')
 @section('footer')
-    FFLCH
+    {{ config('web-ldap-admin.footer') }}
 @endsection
