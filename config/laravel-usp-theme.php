@@ -4,7 +4,7 @@ return [
     'title' => env('APP_NAME'),
     'dashboard_url' => '/',
     'logout_method' => 'GET',
-    'logout_url' => 'logout',
+    'logout_url' => '/logout',
     'login_url' => 'login',
     'menu' => [
         [
