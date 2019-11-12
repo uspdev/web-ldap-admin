@@ -10,7 +10,7 @@ class Group
     public static function createOrUpdate(string $name)
     {
         $group = Adldap::search()->groups()->find($name);
-        if(is_null($group)){
+        if (is_null($group) or $group == false) {
             $group = Adldap::make()->group();
 
             // define DN para esse user

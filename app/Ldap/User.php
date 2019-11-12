@@ -18,7 +18,7 @@ class User
     {
         $user = Adldap::search()->users()->find($username);
 
-        if(is_null($user)){
+        if (is_null($user) or $user == false) {
             $user = Adldap::make()->user();
 
             // define DN para esse user
