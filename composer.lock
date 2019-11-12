@@ -3793,7 +3793,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/uspdev/replicado.git",
-                "reference": "de27a319c6cca108bdb4baa0955901b307fb8b29"
+                "reference": "8d89e87adc113fa0bdd813a073ebc20f19c53c0d"
             },
             "require": {
                 "ext-pdo_dblib": "*",
@@ -3818,7 +3818,7 @@
             ],
             "description": "Classes PHP que consome dados do Replicado USP",
             "homepage": "https://github.com/uspdev/replicado",
-            "time": "2019-11-06T17:30:55+00:00"
+            "time": "2019-11-12T17:29:03+00:00"
         },
         {
             "name": "uspdev/senhaunica-socialite",
