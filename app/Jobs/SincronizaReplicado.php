@@ -60,7 +60,7 @@ class SincronizaReplicado implements ShouldQueue
                 $setores = Pessoa::setoresSiglas($pessoa['codpes'],$this->unidade);
                 $grupos = array_merge($setores,$vinculos) ;
                 LdapUser::createOrUpdate($pessoa['codpes'], [
-                    'nome' => $pessoa['nompes'],
+                    'nome' => $pessoa['nompesttd'],
                     'email' => $pessoa['codema']
                 ],
                 $grupos);
