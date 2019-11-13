@@ -11,6 +11,8 @@ use Auth;
 use Illuminate\Http\Request;
 use App\Ldap\User as LdapUser;
 
+use Uspdev\Replicado\Pessoa;
+
 class LoginController extends Controller
 {
     /*
@@ -70,7 +72,7 @@ class LoginController extends Controller
             // bind do dados retornados
             $user->username = $userSenhaUnica->codpes;
             $user->email = $userSenhaUnica->email;
-            $user->name = $userSenhaUnica->nompes;
+            $user->name = Pessoa::nomeCompleto($userSenhaUnica->codpes)['nompesttd'];
             $user->save();
 
             # Cadastro do usuário no DC
@@ -79,7 +81,7 @@ class LoginController extends Controller
                     $attr = [
                         'nome'  => $user->name,
                         'email' => $user->email,
-                        'setor' => $vinculo['nomeAbreviadoSetor'],
+                        'setor' => str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['nomeAbreviadoSetor']),
                     ];
                     $groups = [
                         str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['nomeAbreviadoSetor']), 
