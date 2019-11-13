@@ -79,8 +79,12 @@ class LoginController extends Controller
                     $attr = [
                         'nome'  => $user->name,
                         'email' => $user->email,
+                        'setor' => $vinculo['nomeAbreviadoSetor'],
                     ];
-                    $groups = [$vinculo['nomeAbreviadoSetor'], $vinculo['tipoVinculo']];
+                    $groups = [
+                        str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['nomeAbreviadoSetor']), 
+                        str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['tipoVinculo'])
+                    ];
                     LdapUser::createOrUpdate($user->username,$attr,$groups);
                 }
             }           
