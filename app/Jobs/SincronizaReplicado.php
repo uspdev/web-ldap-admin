@@ -56,9 +56,26 @@ class SincronizaReplicado implements ShouldQueue
                 $vinculos = Pessoa::vinculosSiglas($pessoa['codpes'],$this->unidade);
                 $setores = Pessoa::setoresSiglas($pessoa['codpes'],$this->unidade);
                 $grupos = array_merge($setores,$vinculos);
+                $vinculosRegulares = ['ALUNOGR', 'ALUNOPOS', 'ALUNOCEU', 'ALUNOEAD', 'ALUNOPD', 'SERVIDOR', 'ESTAGIARIORH'];
+                $gruposModificados = [];
+                $setoresModificados = [];
+                foreach ($vinculosRegulares as $vinculoRegular) {
+                    foreach ($grupos as $grupo) {
+                        $grupoModificado = str_replace('-' . $this->unidade, '', $grupo);
+                        if ($vinculoRegular == $grupo) {
+                            array_push($gruposModificados, $grupoModificado);
+                        }                        
+                    }
+                }
+                foreach ($setores as $setor) {
+                    $setorModificado = str_replace('-' . $this->unidade, '', $setor);
+                    array_push($setoresModificados, $setorModificado);
+                }
+                $grupos = array_merge($gruposModificados, $setoresModificados);
                 LdapUser::createOrUpdate($pessoa['codpes'], [
                     'nome' => $pessoa['nompesttd'],
-                    'email' => $pessoa['codema']
+                    'email' => $pessoa['codema'],
+                    'setor' => str_replace('-' . $this->unidade, '', $pessoa['nomabvset'])
                 ],
                 $grupos);
             }

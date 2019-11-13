@@ -45,6 +45,9 @@ class User
         }
         !empty($attr['email'])?$user->setEmail($attr['email']):NULL;
 
+        // Departamento
+        $user->setDepartment($attr['setor']);
+
         // save
         $user->save();
 
