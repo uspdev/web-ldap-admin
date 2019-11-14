@@ -11,6 +11,8 @@ use Auth;
 use Illuminate\Http\Request;
 use App\Ldap\User as LdapUser;
 
+use Uspdev\Replicado\Pessoa;
+
 class LoginController extends Controller
 {
     /*
@@ -70,17 +72,28 @@ class LoginController extends Controller
             // bind do dados retornados
             $user->username = $userSenhaUnica->codpes;
             $user->email = $userSenhaUnica->email;
-            $user->name = $userSenhaUnica->nompes;
+            $user->name = Pessoa::nomeCompleto($userSenhaUnica->codpes)['nompesttd'];
             $user->save();
 
             # Cadastro do usuário no DC
             foreach($userSenhaUnica->vinculo as $vinculo) {
+                $setor = str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['nomeAbreviadoSetor']);
+                if (empty($setor)) {
+                    $setor = $pessoa['tipvin'];
+                }
                 if($vinculo['codigoUnidade'] == trim(config('web-ldap-admin.replicado_unidade'))) {
                     $attr = [
                         'nome'  => $user->name,
                         'email' => $user->email,
+                        'setor' => $setor . ' ' . ucfirst(strtolower(str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['tipoVinculo'])))
                     ];
-                    $groups = [$vinculo['nomeAbreviadoSetor'], $vinculo['tipoVinculo']];
+                    $groups = [
+                        str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['nomeAbreviadoSetor']), 
+                        ucfirst(strtolower(str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['tipoVinculo']))),
+                        str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['nomeAbreviadoSetor']) . ' ' . 
+                        ucfirst(strtolower(str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['tipoVinculo'])))
+                    ];
+                    sort($groups);
                     LdapUser::createOrUpdate($user->username,$attr,$groups);
                 }
             }           

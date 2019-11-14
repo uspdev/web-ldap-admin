@@ -12,7 +12,7 @@ class User
     /** Estrutura do array attr:
       * $attr['nome']  : Nome completo
       * $attr['email'] : Email
-      *
+      * $attr['setor'] : Departamento
       **/
     public static function createOrUpdate(string $username, array $attr, array $groups = [])
     {
@@ -44,6 +44,9 @@ class User
             $user->setFirstName(trim($nome_array[0]));
         }
         !empty($attr['email'])?$user->setEmail($attr['email']):NULL;
+
+        // Departamento
+        $user->setDepartment($attr['setor']);
 
         // save
         $user->save();
@@ -89,6 +92,7 @@ class User
 
             // Grupos
             $grupos = array_diff($user->getGroupNames(),['Domain Users']);
+            sort($grupos);
             $attr['grupos'] = implode(', ',$grupos);
 
             // status

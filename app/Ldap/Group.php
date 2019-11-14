@@ -27,6 +27,7 @@ class Group
     // recebe instâncias
     public static function addMember($user, $groups)
     {
+        sort($groups);
         foreach($groups as $groupname) {
             if( !is_null($groupname)){
                 $group = self::createOrUpdate($groupname);
@@ -53,6 +54,7 @@ class Group
                 array_push($r,$group->getName()); 
             }
         }
+        sort($r);
         return $r;
     }
 }
