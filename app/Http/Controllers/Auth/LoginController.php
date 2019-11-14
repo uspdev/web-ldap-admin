@@ -89,6 +89,8 @@ class LoginController extends Controller
                     ];
                     $groups = [
                         str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['nomeAbreviadoSetor']), 
+                        ucfirst(strtolower(str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['tipoVinculo']))),
+                        str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['nomeAbreviadoSetor']) . ' ' . 
                         ucfirst(strtolower(str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['tipoVinculo'])))
                     ];
                     sort($groups);
