@@ -92,6 +92,7 @@ class User
 
             // Grupos
             $grupos = array_diff($user->getGroupNames(),['Domain Users']);
+            sort($grupos);
             $attr['grupos'] = implode(', ',$grupos);
 
             // status

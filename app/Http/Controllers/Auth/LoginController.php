@@ -77,16 +77,21 @@ class LoginController extends Controller
 
             # Cadastro do usuário no DC
             foreach($userSenhaUnica->vinculo as $vinculo) {
+                $setor = str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['nomeAbreviadoSetor']);
+                if (empty($setor)) {
+                    $setor = $pessoa['tipvin'];
+                }
                 if($vinculo['codigoUnidade'] == trim(config('web-ldap-admin.replicado_unidade'))) {
                     $attr = [
                         'nome'  => $user->name,
                         'email' => $user->email,
-                        'setor' => str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['nomeAbreviadoSetor']),
+                        'setor' => $setor . ' ' . ucfirst(strtolower(str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['tipoVinculo'])))
                     ];
                     $groups = [
                         str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['nomeAbreviadoSetor']), 
-                        str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['tipoVinculo'])
+                        ucfirst(strtolower(str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['tipoVinculo'])))
                     ];
+                    sort($groups);
                     LdapUser::createOrUpdate($user->username,$attr,$groups);
                 }
             }           

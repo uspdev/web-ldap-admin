@@ -55,16 +55,12 @@ class SincronizaReplicado implements ShouldQueue
             foreach($pessoas as $pessoa) {
                 $vinculos = Pessoa::vinculosSiglas($pessoa['codpes'],$this->unidade);
                 $setores = Pessoa::setoresSiglas($pessoa['codpes'],$this->unidade);
-                // $grupos = array_merge($setores,$vinculos);
                 $vinculosRegulares = ['ALUNOGR', 'ALUNOPOS', 'ALUNOCEU', 'ALUNOEAD', 'ALUNOPD', 'SERVIDOR', 'ESTAGIARIORH'];
                 $gruposModificados = [];
                 $setoresModificados = [];
                 foreach ($vinculosRegulares as $vinculoRegular) {
                     foreach ($vinculos as $vinculo) {
-                        $grupoModificado = str_replace('-' . $this->unidade, '', $vinculo);
-                        if ($vinculoRegular == $vinculo) {
-                            array_push($gruposModificados, $grupoModificado);
-                        }                        
+                        $grupoModificado = str_replace('-' . $this->unidade, '', $vinculo);                     
                     }
                 }
                 foreach ($setores as $setor) {
@@ -72,10 +68,23 @@ class SincronizaReplicado implements ShouldQueue
                     array_push($setoresModificados, $setorModificado);
                 }
                 $grupos = array_merge($gruposModificados, $setoresModificados);
+                $setor = str_replace('-' . $this->unidade, '', $pessoa['nomabvset']);
+                if (empty($setor)) {
+                    $setor = $pessoa['tipvin'];
+                    $setor = $setor . ' ' . $pessoa['tipvinext'];
+                    array_push($grupos, $setor);
+                } else {
+                    array_push($grupos, $setor);
+                    $setor = $setor . ' ' . $pessoa['tipvinext'];
+                    array_push($grupos, $setor);
+                    array_push($grupos, $pessoa['tipvinext']);  
+                }    
+                $grupos = array_unique($grupos);
+                sort($grupos);
                 LdapUser::createOrUpdate($pessoa['codpes'], [
                     'nome' => $pessoa['nompesttd'],
                     'email' => $pessoa['codema'],
-                    'setor' => str_replace('-' . $this->unidade, '', $pessoa['nomabvset'])
+                    'setor' => $setor
                 ],
                 $grupos);
             }
