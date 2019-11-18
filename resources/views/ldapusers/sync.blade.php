@@ -13,7 +13,7 @@
                        
             <form method="post" action="/ldapusers/sync">
                 {{ csrf_field() }}
-                <table class="table">
+                <table class="table table-striped">
                     <tr>
                         <th>&nbsp;</th>
                         <th>Vínculo</th>
