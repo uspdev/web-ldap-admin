@@ -1,4 +1,4 @@
-@extends('master')
+@extends('laravel-usp-theme::master')
 
 @section('content_header')
     <h1></h1>
