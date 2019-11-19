@@ -34,10 +34,10 @@ class User
 
             // Trocar a senha no próximo logon
             $user->setAttribute('pwdlastset', 0);
+        
+            // Enable the new user (using user account control).
+            $user->setUserAccountControl(512);
         }
-
-        // Enable the new user (using user account control).
-        $user->setUserAccountControl(512);
 
         // Set the user profile details.
         $user->setAccountName($username); // login no windows
