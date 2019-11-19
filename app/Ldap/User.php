@@ -6,6 +6,8 @@ use Adldap\Laravel\Facades\Adldap;
 use Carbon\Carbon;
 use App\Ldap\Group as LdapGroup;
 
+use Uspdev\Replicado\Pessoa;
+
 class User
 {
 
@@ -24,6 +26,14 @@ class User
             // define DN para esse user
             $dn = "cn={$username}," .  $user->getDnBuilder();
             $user->setDn($dn);
+            
+            // Password
+            // Senha inicial data de nascimento ddmmaaaa
+            $password = date('dmY', strtotime(Pessoa::dump($username, ['dtanas'])['dtanas']));
+            $user->setPassword($password);
+
+            // Trocar a senha no próximo logon
+            $user->setAttribute('pwdlastset', 0);
         }
 
         // Enable the new user (using user account control).
