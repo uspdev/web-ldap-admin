@@ -1,4 +1,4 @@
-@extends('master')
+@extends('laravel-usp-theme::master')
 
 @section('title', 'Meus Dados')
 

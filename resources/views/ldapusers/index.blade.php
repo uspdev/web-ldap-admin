@@ -1,4 +1,4 @@
-@extends('master')
+@extends('laravel-usp-theme::master')
 
 @section('content')
 @include('alerts')
@@ -12,9 +12,11 @@
 
     <form method="get" action="/ldapusers">
         <div>
-            @foreach($grupos as $grupo)
-                <label class="checkbox-inline"><input type="checkbox" name="grupos[]" value="{{$grupo}}">{{$grupo}}</label>
-            @endforeach
+            <select class="form-control select2" name="grupos[]" multiple="multiple">
+                @foreach($grupos as $grupo)
+                    <option value="{{$grupo}}">{{$grupo}}</option>
+                @endforeach
+            </select>
         </div>
         <br>
         <div class="input-group">
@@ -24,8 +26,6 @@
             </span>
         </div><!-- /input-group -->
     </form>
-
-
   </div>
 </div>
 
