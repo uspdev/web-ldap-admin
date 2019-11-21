@@ -38,7 +38,7 @@ class LdapUserController extends Controller
         $this->authorize('admin');
 
         // Busca
-        $ldapusers = Adldap::search()->users();
+        $ldapusers = Adldap::search()->users(); 
         
         if(!empty($request->search) && isset($request->search)){
             // buscar por username ou por nome
@@ -51,12 +51,18 @@ class LdapUserController extends Controller
         }
 
         if(!empty($request->grupos) && isset($request->grupos)){ 
-            foreach($request->grupos as $gruponame) {
-                $group = Adldap::search()->groups()->find($gruponame);
-                $ldapusers = $ldapusers->where('memberof','=',$group->getDnBuilder()->get());
-            }
-        }
-
+            if (count($request->grupos) > 1) {
+                for ($i = 0; $i < count($request->grupos); $i++) {
+                    $group = Adldap::search()->groups()->find($request->grupos[$i]);
+                    $ldapusers = $ldapusers
+                        ->orWhere('memberof', '=', $group->getDnBuilder()->get());
+                }               
+            } else {
+                $group = Adldap::search()->groups()->find($request->grupos[0]);
+                $ldapusers = $ldapusers->where('memberof','=',$group->getDnBuilder()->get());  
+            }     
+        }        
+                
         // remove usuários default do sistema
         $ldapusers = $ldapusers->where('samaccountname','!=','Administrator');
         $ldapusers = $ldapusers->where('samaccountname','!=','krbtgt');
