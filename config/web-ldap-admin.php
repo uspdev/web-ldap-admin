@@ -14,4 +14,7 @@ return [
 
     # Admins
     'admins' => env('ADMINS'),
+
+    # Paginação, quantidade de registros padrão
+    'registrosPorPagina' => env('REGISTROS_POR_PAGINA'),
 ];

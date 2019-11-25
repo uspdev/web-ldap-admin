@@ -37,8 +37,22 @@ class LdapUserController extends Controller
     {
         $this->authorize('admin');
 
+        // Registros por página
+        if (empty($request->perPage)) {
+            $perPage = config('web-ldap-admin.registrosPorPagina');
+        } else {
+            $perPage = $request->perPage;
+        }    
+        
+        // Verifica qual a página
+        if (empty($request->page)) {
+            $page = 1;
+        } else {
+            $page = $request->page;
+        }
+
         // Busca
-        $ldapusers = Adldap::search()->users(); 
+        $ldapusers = Adldap::search()->users();
         
         if(!empty($request->search) && isset($request->search)){
             // buscar por username ou por nome
@@ -49,32 +63,33 @@ class LdapUserController extends Controller
                 $ldapusers = $ldapusers->where('displayname','contains',$request->search);
             }
         }
-
+        
         if(!empty($request->grupos) && isset($request->grupos)){ 
             if (count($request->grupos) > 1) {
                 for ($i = 0; $i < count($request->grupos); $i++) {
                     $group = Adldap::search()->groups()->find($request->grupos[$i]);
-                    $ldapusers = $ldapusers
-                        ->orWhere('memberof', '=', $group->getDnBuilder()->get());
+                    $ldapusers = $ldapusers->orWhere('memberof', '=', $group->getDnBuilder()->get());
                 }               
             } else {
                 $group = Adldap::search()->groups()->find($request->grupos[0]);
                 $ldapusers = $ldapusers->where('memberof','=',$group->getDnBuilder()->get());  
             }     
-        }        
+        }    
                 
         // remove usuários default do sistema
         $ldapusers = $ldapusers->where('samaccountname','!=','Administrator');
         $ldapusers = $ldapusers->where('samaccountname','!=','krbtgt');
         $ldapusers = $ldapusers->where('samaccountname','!=','Guest');
 
-        $ldapusers = $ldapusers->sortBy('displayname', 'asc')->get();
+        // Ordenando
+        $ldapusers = $ldapusers->sortBy('displayname', 'asc');
 
-        // Paginação não está funcionando. Blade: {{ $ldapusers->links() }}
-        //$ldapusers = $ldapusers->paginate(10);
+        // Paginando
+        $ldapusers = $ldapusers->paginate($perPage, $page);
 
         $grupos = LdapGroup::listaGrupos();
-        return view('ldapusers.index',compact('ldapusers','grupos'));
+
+        return view('ldapusers.index', compact('ldapusers', 'grupos', 'request'));
     }
 
     /**
