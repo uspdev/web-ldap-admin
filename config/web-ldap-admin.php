@@ -15,6 +15,9 @@ return [
     # Admins
     'admins' => env('ADMINS'),
 
-    # Paginação, quantidade de registros padrão
-    'registrosPorPagina' => env('REGISTROS_POR_PAGINA'),
+    # Paginação, quantidade de registros padrão, 50 default
+    'registrosPorPagina' => env('REGISTROS_POR_PAGINA', 50),
+
+    # Desativar desligados (true/false defautl)
+    'desativarDesligados' => env('DESATIVAR_DESLIGADOS', false),
 ];
