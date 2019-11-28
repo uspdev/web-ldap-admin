@@ -79,19 +79,19 @@ class LoginController extends Controller
             foreach($userSenhaUnica->vinculo as $vinculo) {
                 $setor = str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['nomeAbreviadoSetor']);
                 if (empty($setor)) {
-                    $setor = $pessoa['tipvin'];
+                    $setor = $pessoa['tipvinext'];
                 }
                 if($vinculo['codigoUnidade'] == trim(config('web-ldap-admin.replicado_unidade'))) {
                     $attr = [
                         'nome'  => $user->name,
                         'email' => $user->email,
-                        'setor' => $setor . ' ' . ucfirst(strtolower(str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['tipoVinculo'])))
+                        'setor' => ucfirst(strtolower(str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['tipoVinculo']))) . ' ' . $setor 
                     ];
                     $groups = [
                         str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['nomeAbreviadoSetor']), 
                         ucfirst(strtolower(str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['tipoVinculo']))),
-                        str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['nomeAbreviadoSetor']) . ' ' . 
-                        ucfirst(strtolower(str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['tipoVinculo'])))
+                        ucfirst(strtolower(str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['tipoVinculo']))) . ' ' .
+                        str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['nomeAbreviadoSetor'])      
                     ];
                     sort($groups);
                     LdapUser::createOrUpdate($user->username,$attr,$groups);

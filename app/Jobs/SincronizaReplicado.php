@@ -70,12 +70,11 @@ class SincronizaReplicado implements ShouldQueue
                 $grupos = array_merge($gruposModificados, $setoresModificados);
                 $setor = str_replace('-' . $this->unidade, '', $pessoa['nomabvset']);
                 if (empty($setor)) {
-                    $setor = $pessoa['tipvin'];
-                    $setor = $setor . ' ' . $pessoa['tipvinext'];
+                    $setor = $pessoa['tipvinext'];
                     array_push($grupos, $setor);
                 } else {
                     array_push($grupos, $setor);
-                    $setor = $setor . ' ' . $pessoa['tipvinext'];
+                    $setor = $pessoa['tipvinext'] . ' ' . $setor;
                     array_push($grupos, $setor);
                     array_push($grupos, $pessoa['tipvinext']);  
                 }    
