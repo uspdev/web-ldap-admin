@@ -18,6 +18,6 @@ return [
     # Paginação, quantidade de registros padrão, 50 default
     'registrosPorPagina' => env('REGISTROS_POR_PAGINA', 50),
 
-    # Desativar desligados (true/false defautl)
+    # Desativar desligados (true/false default)
     'desativarDesligados' => env('DESATIVAR_DESLIGADOS', false),
 ];
