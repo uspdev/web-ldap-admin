@@ -42,6 +42,22 @@ class Group
         }
     }
 
+    public static function removeMember($user, $groups)
+    {
+        sort($groups);
+        foreach($groups as $groupname) {
+            if( !is_null($groupname)){
+                $group = self::createOrUpdate($groupname);
+                foreach ($group->getMemberNames() as $name) {
+                    if($name == $user->getName()){
+                        $group->removeMember($user);
+                        return true;
+                    }
+                }
+                $group->save();
+            }
+        }
+    }
 
     public static function listaGrupos()
     {

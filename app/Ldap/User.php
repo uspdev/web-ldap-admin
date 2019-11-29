@@ -63,7 +63,7 @@ class User
 
         // Adiciona a um grupo
         LdapGroup::addMember($user,$groups);
-        
+
         return $user;
     }
     
@@ -133,6 +133,8 @@ class User
         if(!is_null($user)){
             # https://support.microsoft.com/pt-br/help/305144/how-to-use-the-useraccountcontrol-flags-to-manipulate-user-account-pro
             $user->setUserAccountControl(2);
+            // adicionar ao grupo Desativados
+            LdapGroup::addMember($user, ['Desativados']);
             $user->save();
             return true;
         }
@@ -146,6 +148,8 @@ class User
         if(!is_null($user)){
             # https://support.microsoft.com/pt-br/help/305144/how-to-use-the-useraccountcontrol-flags-to-manipulate-user-account-pro
             $user->setUserAccountControl(512);
+            // remover do grupo Desativados
+            LdapGroup::removeMember($user, ['Desativados']);            
             $user->save();
             return true;
         }
@@ -159,6 +163,37 @@ class User
         if(!is_null($user)){
             $user->setPassword($password);
             $user->save();        
+        }
+    }
+
+    public static function getUsersGroup($grupo)
+    {
+        $group = Adldap::search()->groups()->find($grupo);
+        $ldapusers = Adldap::search()->users();
+        $ldapusers = $ldapusers->where('memberof', '=', $group->getDnBuilder()->get());
+        $ldapusers = $ldapusers->where('samaccountname','!=','Administrator');
+        $ldapusers = $ldapusers->where('samaccountname','!=','krbtgt');
+        $ldapusers = $ldapusers->where('samaccountname','!=','Guest');
+        $ldapusers = $ldapusers->sortBy('displayname', 'asc');
+        $ldapusers = $ldapusers->paginate(config('web-ldap-admin.registrosPorPagina'))->getResults();
+
+        return $ldapusers;
+    }
+
+    public static function desativarUsers($desligados)
+    {
+        foreach ($desligados as $desligado) {
+            // remover dos grupos
+            $groups = Adldap::search()->users()->find($desligado)->getGroups();
+            foreach ($groups as $group) {
+                LdapGroup::removeMember(Adldap::search()->users()->find($desligado), [$group->getCommonName()]);
+            }
+            
+            // adicionar ao grupo Desativados
+            LdapGroup::addMember(Adldap::search()->users()->find($desligado), ['Desativados']);
+            
+            // desativar conta
+            self::disable($desligado);
         }
     }
 }

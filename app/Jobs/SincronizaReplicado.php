@@ -55,42 +55,31 @@ class SincronizaReplicado implements ShouldQueue
             
             // No .env foi configurado para desativar os desligados?
             if (config('web-ldap-admin.desativarDesligados') == true) {
-                # Situações:
-                # 1) Perdeu vínculo com a unidade, remover dos grupos, adicionar ao grupo Desativados e destivar a conta. 
-                # 2) Não perdeu vínculo, mas trocou de setor, efetuar a troca de grupo.
-                
                 /**
+                 * Perdeu vínculo com a unidade, remover dos grupos, adicionar ao grupo Desativados e destivar a conta. 
                  * Para se verificar os desligados
                  * Comparar as contas do AD por grupo principal
                  * Servidor, Docente, Estagiário,
                  * Aluno de Graduação, Aluno de Pós-Graduação, Aluno de Cultura e Extensão, 
                  * Aluno Escola de Arte Dramática, Pós-doutorando
                  */   
-
-                // Identifica o grupo principal
+                // Grupo principal
                 $grupoPrincipal = $pessoas[0]['tipvinext'];
                 // Array das pessoas do replicado
                 $replicadoUsers = [];
                 foreach ($pessoas as $pessoa) {
                     array_push($replicadoUsers, $pessoa['codpes']);
                 }
-                // Array das contas no AD
-                $group = Adldap::search()->groups()->find($grupoPrincipal);
-                $ldapusers = Adldap::search()->users();
-                $ldapusers = $ldapusers->where('memberof', '=', $group->getDnBuilder()->get());
-                $ldapusers = $ldapusers->where('samaccountname','!=','Administrator');
-                $ldapusers = $ldapusers->where('samaccountname','!=','krbtgt');
-                $ldapusers = $ldapusers->where('samaccountname','!=','Guest');
-                $ldapusers = $ldapusers->sortBy('displayname', 'asc');
-                $ldapusers = $ldapusers->paginate(config('web-ldap-admin.registrosPorPagina'))->getResults();
+                // Array das contas no AD 
                 $contasAD = [];
+                $ldapusers = LdapUser::getUsersGroup($grupoPrincipal);
                 foreach ($ldapusers as $ldapuser) {
                     array_push($contasAD, $ldapuser->getAccountName());
                 }
                 // Verifica se alguma conta no AD não existe no replicado e guarda no array de desligados
                 $desligados = array_values(array_diff($contasAD, $replicadoUsers));
-                // Estas contas devem entram na situação 1 
-                // dd($desligados);
+                // Estas contas devem ser desativadas
+                LdapUser::desativarUsers($desligados);
             }
 
             foreach($pessoas as $pessoa) {
