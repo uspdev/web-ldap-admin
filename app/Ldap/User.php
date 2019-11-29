@@ -61,6 +61,12 @@ class User
         // save
         $user->save();
 
+        // remover dos grupos
+        $gruposUser = Adldap::search()->users()->find($username)->getGroups();
+        foreach ($gruposUser as $grupoUser) {
+            LdapGroup::removeMember(Adldap::search()->users()->find($username), [$grupoUser->getCommonName()]);
+        }
+
         // Adiciona a um grupo
         LdapGroup::addMember($user,$groups);
 
