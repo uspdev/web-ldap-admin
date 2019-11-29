@@ -48,10 +48,14 @@ class Group
         foreach($groups as $groupname) {
             if( !is_null($groupname)){
                 $group = self::createOrUpdate($groupname);
-                foreach ($group->getMemberNames() as $name) {
-                    if($name == $user->getName()){
-                        $group->removeMember($user);
-                        return true;
+                // Ignorar grupos
+                // Domain Admins
+                if ($groupname != 'Domain Admins') {
+                    foreach ($group->getMemberNames() as $name) {
+                        if($name == $user->getName()){
+                            $group->removeMember($user);
+                            return true;
+                        }
                     }
                 }
                 $group->save();
