@@ -59,7 +59,7 @@ class SincronizaReplicado implements ShouldQueue
                  * Perdeu vínculo com a unidade, remover dos grupos, adicionar ao grupo Desativados e destivar a conta. 
                  * Para se verificar os desligados
                  * Comparar as contas do AD por grupo principal
-                 * Servidor, Docente, Estagiário,
+                 * Servidor, Docente, Docente Aposentado, Estagiário,
                  * Aluno de Graduação, Aluno de Pós-Graduação, Aluno de Cultura e Extensão, 
                  * Aluno Escola de Arte Dramática, Pós-doutorando
                  */   
