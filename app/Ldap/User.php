@@ -174,14 +174,17 @@ class User
 
     public static function getUsersGroup($grupo)
     {
+        $ldapusers = [];
         $group = Adldap::search()->groups()->find($grupo);
-        $ldapusers = Adldap::search()->users();
-        $ldapusers = $ldapusers->where('memberof', '=', $group->getDnBuilder()->get());
-        $ldapusers = $ldapusers->where('samaccountname','!=','Administrator');
-        $ldapusers = $ldapusers->where('samaccountname','!=','krbtgt');
-        $ldapusers = $ldapusers->where('samaccountname','!=','Guest');
-        $ldapusers = $ldapusers->sortBy('displayname', 'asc');
-        $ldapusers = $ldapusers->paginate(config('web-ldap-admin.registrosPorPagina'))->getResults();
+        if ($group != false) {
+            $ldapusers = Adldap::search()->users();        
+            $ldapusers = $ldapusers->where('memberof', '=', $group->getDnBuilder()->get());
+            $ldapusers = $ldapusers->where('samaccountname','!=','Administrator');
+            $ldapusers = $ldapusers->where('samaccountname','!=','krbtgt');
+            $ldapusers = $ldapusers->where('samaccountname','!=','Guest');
+            $ldapusers = $ldapusers->sortBy('displayname', 'asc');
+            $ldapusers = $ldapusers->paginate(config('web-ldap-admin.registrosPorPagina'))->getResults();
+        }
 
         return $ldapusers;
     }
