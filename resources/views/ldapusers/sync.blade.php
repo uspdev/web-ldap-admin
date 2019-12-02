@@ -17,9 +17,8 @@
                     <tr>
                         <th>&nbsp;</th>
                         <th>Vínculo</th>
-                        <th>Replicado</th>
-                        {{-- <th>&nbsp;</th>
-                        <th>AD</th> --}}
+                        <th style="text-align: right;">Replicado</th>
+                        <th style="text-align: right;">AD</th>
                     </tr>
                     @foreach (Uspdev\Replicado\Pessoa::tiposVinculos(config('web-ldap-admin.replicado_unidade')) as $vinculo)
                     <tr>
@@ -27,8 +26,9 @@
                         <td>{{ $vinculo['tipvinext'] }}</td>
                         <td style="text-align: right;">
                             {{ count(Uspdev\Replicado\Pessoa::ativosVinculo($vinculo['tipvinext'], config('web-ldap-admin.replicado_unidade'))) }}</td>
-                        {{-- <td>>></td>
-                        <td style="text-align: right;">999</td> --}}
+                        <td style="text-align: right;">
+                            {{ count(App\Ldap\User::getUsersGroup($vinculo['tipvinext'])) }}
+                        </td>
                     </tr>
                     @endforeach                    
                 </table>
