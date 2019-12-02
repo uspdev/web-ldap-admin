@@ -40,6 +40,11 @@
             </tr>
 
             <tr>
+                <td> <b> Departamento </b> </td>
+                <td>{{ $attr['department'] ?? '' }}</td>
+            </tr>
+
+            <tr>
                 <td> <b> Conta criada em </b> </td>
                 <td>{{ $attr['ativacao'] ?? '' }}</td>
             </tr>
