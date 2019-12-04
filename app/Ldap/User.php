@@ -113,10 +113,13 @@ class User
 
             // status
             if($user->getUserAccountControl() == 512) {
-                $attr['status'] = 'conta ativada'; 
+                $attr['status'] = 'Ativada'; 
             } else {
-                $attr['status'] = 'conta desativada'; 
+                $attr['status'] = 'Desativada'; 
             }
+
+            // Department
+            $attr['department'] = $user->getDepartment();
            
             return $attr;
         }
