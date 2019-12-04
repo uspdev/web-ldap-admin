@@ -102,6 +102,11 @@ class SincronizaReplicado implements ShouldQueue
                 if (empty($setor)) {
                     $setor = $pessoa['tipvinext'];
                     array_push($grupos, $setor);
+                    if ($pessoa['tipvinext'] == 'Aluno de Graduação') {
+                        $nomabvset = Graduacao::setorAluno($pessoa['codpes'], $this->unidade)['nomabvset'];
+                        array_push($grupos, $pessoa['tipvinext'] . ' ' . $nomabvset);
+                        $setor = $pessoa['tipvinext'] . ' ' . $nomabvset;
+                    }
                 } else {
                     array_push($grupos, $setor);
                     $setor = $pessoa['tipvinext'] . ' ' . $setor;
