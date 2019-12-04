@@ -67,7 +67,7 @@ class LoginController extends Controller
 
             # Cadastro do usuário no laravel
             $user = User::where('username',$userSenhaUnica->codpes)->first();
-            if (is_null($user)) $user = new User;
+            if (is_null($user) or $user == false) $user = new User;
                        
             // bind do dados retornados
             $user->username = $userSenhaUnica->codpes;
@@ -109,7 +109,7 @@ class LoginController extends Controller
                 $codpes_sem_vinculo = explode(',',$config->codpes_sem_vinculo);
                 if(in_array($userSenhaUnica->codpes,$codpes_sem_vinculo)) {
                     $user = User::where('username',$userSenhaUnica->codpes)->first();
-                    if (is_null($user)) $user = new User;
+                    if (is_null($user) or $user == false) $user = new User;
                     $user->username = $userSenhaUnica->codpes;
                     $user->email = $userSenhaUnica->email;
                     $user->name = $userSenhaUnica->nompes;
