@@ -85,7 +85,7 @@ class SincronizaReplicado implements ShouldQueue
             foreach($pessoas as $pessoa) {
                 $vinculos = Pessoa::vinculosSiglas($pessoa['codpes'],$this->unidade);
                 $setores = Pessoa::setoresSiglas($pessoa['codpes'],$this->unidade);
-                $vinculosRegulares = ['ALUNOGR', 'ALUNOPOS', 'ALUNOCEU', 'ALUNOEAD', 'ALUNOPD', 'SERVIDOR', 'ESTAGIARIORH'];
+                $vinculosRegulares = ['ALUNOGR', 'ALUNOPOS', 'ALUNOCEU', 'ALUNOEAD', 'ALUNOPD', 'ALUNOCONVENIOINT', 'SERVIDOR', 'ESTAGIARIORH'];
                 $gruposModificados = [];
                 $setoresModificados = [];
                 foreach ($vinculosRegulares as $vinculoRegular) {
