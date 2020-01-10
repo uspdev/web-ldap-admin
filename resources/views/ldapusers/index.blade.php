@@ -92,7 +92,7 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Nº USP</th>
+                    <th>Username</th>
                     <th>Nome</th>
                     <th>Email</th>
                     <th>Grupos</th>
