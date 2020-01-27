@@ -50,9 +50,7 @@ class SincronizaReplicado implements ShouldQueue
     }
 
     public function sync($pessoas)
-    {      
-        ini_set('max_execution_time', 0);
-        
+    {       
         if ($pessoas) {
             // No .env foi configurado para desativar os desligados?
             if (config('web-ldap-admin.desativarDesligados') == true) {
