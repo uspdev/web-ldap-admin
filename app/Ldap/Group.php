@@ -27,12 +27,20 @@ class Group
     // recebe instâncias
     public static function addMember($user, $groups)
     {
+        // remover dos grupos
+        $gruposUser = Adldap::search()->users()->find($user->getName())->getGroups();
+        foreach ($gruposUser as $grupoUser) {
+            self::removeMember(Adldap::search()->users()->find($user->getName()), [$grupoUser->getCommonName()]);
+        }
+
+        // adiciona aos grupos
         sort($groups);
         foreach($groups as $groupname) {
-            if( !is_null($groupname)){
+            if (!is_null($groupname)) {
                 $group = self::createOrUpdate($groupname);
-                foreach ($group->getMemberNames() as $name) {
-                    if($name == $user->getName()){
+                $members = $group->getMembers();
+                foreach ($members as $member) {
+                    if ($member->getCommonName() == $user->getName()) {
                         return true;
                     }
                 }
@@ -46,14 +54,15 @@ class Group
     {
         sort($groups);
         foreach($groups as $groupname) {
-            if( !is_null($groupname)){
+            if (!is_null($groupname)) {
                 $group = self::createOrUpdate($groupname);
                 // Ignorar grupos
                 // Domain Admins
                 if ($groupname != 'Domain Admins') {
-                    foreach ($group->getMemberNames() as $name) {
-                        if($name == $user->getName()){
-                            $group->removeMember($user);
+                    $members = $group->getMembers();
+                    foreach ($members as $member) {
+                        if ($member->getCommonName() == $user) {
+                            $group->removeMember($member);
                             return true;
                         }
                     }
