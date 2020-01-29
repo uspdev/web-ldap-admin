@@ -50,9 +50,8 @@ class SincronizaReplicado implements ShouldQueue
     }
 
     public function sync($pessoas)
-    {
+    {       
         if ($pessoas) {
-            
             // No .env foi configurado para desativar os desligados?
             if (config('web-ldap-admin.desativarDesligados') == true) {
                 /**
@@ -61,7 +60,7 @@ class SincronizaReplicado implements ShouldQueue
                  * Comparar as contas do AD por grupo principal
                  * Servidor, Docente, Docente Aposentado, Estagiário,
                  * Aluno de Graduação, Aluno de Pós-Graduação, Aluno de Cultura e Extensão, 
-                 * Aluno Escola de Arte Dramática, Pós-doutorando
+                 * Aluno Escola de Arte Dramática, Pós-doutorando, Aluno Convênio Interc Grad
                  */   
                 // Grupo principal
                 $grupoPrincipal = $pessoas[0]['tipvinext'];
@@ -81,38 +80,18 @@ class SincronizaReplicado implements ShouldQueue
                 // Estas contas devem ser desativadas
                 LdapUser::desativarUsers($desligados);
             }
-
-            foreach($pessoas as $pessoa) {
-                $vinculos = Pessoa::vinculosSiglas($pessoa['codpes'],$this->unidade);
-                $setores = Pessoa::setoresSiglas($pessoa['codpes'],$this->unidade);
-                $vinculosRegulares = ['ALUNOGR', 'ALUNOPOS', 'ALUNOCEU', 'ALUNOEAD', 'ALUNOPD', 'SERVIDOR', 'ESTAGIARIORH'];
-                $gruposModificados = [];
-                $setoresModificados = [];
-                foreach ($vinculosRegulares as $vinculoRegular) {
-                    foreach ($vinculos as $vinculo) {
-                        $grupoModificado = str_replace('-' . $this->unidade, '', $vinculo);                     
-                    }
-                }
-                foreach ($setores as $setor) {
-                    $setorModificado = str_replace('-' . $this->unidade, '', $setor);
-                    array_push($setoresModificados, $setorModificado);
-                }
-                $grupos = array_merge($gruposModificados, $setoresModificados);
-                $setor = str_replace('-' . $this->unidade, '', $pessoa['nomabvset']);
+            foreach ($pessoas as $pessoa) {
+                $grupos = Pessoa::vinculosSetores($pessoa['codpes'], $this->unidade);
+                $setor = str_replace('-' . $this->unidade, '', $pessoa['nomabvset']);               
                 if (empty($setor)) {
                     $setor = $pessoa['tipvinext'];
-                    array_push($grupos, $setor);
                     if ($pessoa['tipvinext'] == 'Aluno de Graduação') {
                         $nomabvset = Graduacao::setorAluno($pessoa['codpes'], $this->unidade)['nomabvset'];
-                        array_push($grupos, $pessoa['tipvinext'] . ' ' . $nomabvset);
                         $setor = $pessoa['tipvinext'] . ' ' . $nomabvset;
                     }
                 } else {
-                    array_push($grupos, $setor);
                     $setor = $pessoa['tipvinext'] . ' ' . $setor;
-                    array_push($grupos, $setor);
-                    array_push($grupos, $pessoa['tipvinext']);  
-                }    
+                }
                 $grupos = array_unique($grupos);
                 sort($grupos);
                 LdapUser::createOrUpdate($pessoa['codpes'], [
@@ -120,7 +99,7 @@ class SincronizaReplicado implements ShouldQueue
                     'email' => $pessoa['codema'],
                     'setor' => $setor
                 ],
-                $grupos);
+                $grupos);    
             }
         }
     }
