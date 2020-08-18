@@ -26,7 +26,7 @@
     } 
 @endphp   
 
-<a href="/ldapusers/create" class="btn btn-success">Criar usuário não replicado</a>
+<a href="{{ url('/ldapusers/create') }}" class="btn btn-success">Criar usuário não replicado</a>
 <br><br>
 
 <div class="panel panel-default">
