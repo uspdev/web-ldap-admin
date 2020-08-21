@@ -29,7 +29,7 @@ class SincronizaReplicado implements ShouldQueue
      */
     public function __construct(array $type)
     {
-        $this->unidade = env('REPLICADO_UNIDADE');  
+        $this->unidade = env('REPLICADO_CODUNDCLG');  
         $this->type = $type;  
     }
 

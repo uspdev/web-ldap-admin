@@ -42,7 +42,7 @@ Quando o usuário fizer login no sistema usando senha única, uma array $vinculo
       "nomeAbreviadoFuncao" => "Estagiário"
     ]
 
-Se a pessoa tiver algum vínculo (codigoUnidade) com a unidade (REPLICADO_UNIDADE)
+Se a pessoa tiver algum vínculo (codigoUnidade) com a unidade
 o usuário é inserido no domain controller. 
 Os campos tipoVinculo e nomeAbreviadoSetor serão mapeados com grupos.
 
@@ -78,7 +78,7 @@ Informações no arquivo .env referente ao serviço de senha única OAuth 1.0:
     REPLICADO_DATABASE=
     REPLICADO_USERNAME=
     REPLICADO_PASSWORD=
-    REPLICADO_UNIDADE=8
+    REPLICADO_CODUNDCLG=8
 
 Esse sistema permite:
 
@@ -100,10 +100,9 @@ Publicar Assets:
 
 ## Dicas
 
-No ambiente de desenvolvimento, as vezes é necessário desativar a verificação dos certificado SSL/TLS,
-para isso: 
+No ambiente de desenvolvimento, as vezes é necessário desativar a verificação 
+dos certificado SSL/TLS, para isso, em /etc/ldap/ldap.conf manter apenas: 
 
-    #/etc/ldap/ldap.conf
     TLS_REQCERT ALLOW
 
 Como rodar filas sem limite de tempo:
