@@ -41,6 +41,6 @@ class ConfigController extends Controller
         $config->codpes_sem_vinculo = $codpes_sem_vinculo;
         $request->session()->flash('alert-info','Números USP alterados com sucesso');
         $config->save();
-        return redirect("/configs");
+        return redirect(env('APP_URL')."/configs");
     }
 }

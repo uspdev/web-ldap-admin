@@ -71,7 +71,7 @@
 
     <div class="row">
         <div class="col-sm-4">
-            <form method="POST" action="/ldapusers/{{ $attr['username'] }}">
+            <form method="POST" action="{{ url('/ldapusers/'.$attr['username']) }}">
                 {{csrf_field()}}
                 {{ method_field('PATCH') }}
 

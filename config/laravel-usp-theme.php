@@ -2,29 +2,29 @@
 
 return [
     'title' => env('APP_NAME'),
-    'dashboard_url' => '/',
+    'dashboard_url' => env('APP_URL'),
     'logout_method' => 'GET',
-    'logout_url' => '/logout',
-    'login_url' => 'login',
+    'logout_url' => env('APP_URL').'/logout',
+    'login_url' => env('APP_URL').'/login',
     'menu' => [
         [
             'text' => 'Minha Conta',
-            'url'  => '/ldapusers/my',
+            'url'  => env('APP_URL').'/ldapusers/my',
             'can'  => 'logado',
         ],
         [
             'text' => 'Usuários Ldap',
-            'url'  => '/ldapusers',
+            'url'  => env('APP_URL').'/ldapusers',
             'can'  => 'admin',
         ],
         [
             'text' => 'Configurações',
-            'url'  => '/configs',
+            'url'  => env('APP_URL').'/configs',
             'can'  => 'admin',
         ],
 #        [
 #            'text' => 'Solicitação de Administrador',
-#            'url'  => '/ldapusers/solicita-admin',
+#            'url'  => 'ldapusers/solicita-admin',
 #            'can'  => 'logado',
 #        ],
     ],
