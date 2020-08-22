@@ -12,7 +12,7 @@
     @include('alerts')
 
         <div class="col-md-6">
-            <form method="post" action="/configs">
+            <form method="post" action="{{ url('/configs') }}">
                 {{ csrf_field() }}
 
                 <div class="form-group">

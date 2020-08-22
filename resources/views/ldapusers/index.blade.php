@@ -34,7 +34,7 @@
         <strong>Filtros</strong>
     </div>
     <div class="panel-body">
-        <form method="get" action="/ldapusers?page={{ $pagCor }}&perPage{{ $ldapusers->getPerPage() }}">
+        <form method="get" action="{{ env('APP_URL') }}/ldapusers?page={{ $pagCor }}&perPage{{ $ldapusers->getPerPage() }}">
             <div>
                 <script type="text/javascript">
                     $(function () {
@@ -103,7 +103,7 @@
             <tbody>
                 @for ($i = $regIni; $i < $regFin; $i++)
                 <tr> 
-                    <td><a href="/ldapusers/{{ $ldapusers->getResults()[$i]->getAccountName() }}"> {{ $ldapusers->getResults()[$i]->getAccountName() }}</a></td>
+                    <td><a href="{{ env('APP_URL') }}/ldapusers/{{ $ldapusers->getResults()[$i]->getAccountName() }}"> {{ $ldapusers->getResults()[$i]->getAccountName() }}</a></td>
                     <td> {{ $ldapusers->getResults()[$i]->getDisplayName() }} </td>
                     <td> {{ $ldapusers->getResults()[$i]->getEmail() }} </td>
                     <td><?php 
@@ -114,14 +114,14 @@
                     </td>
                     <td>
                         @if($ldapusers->getResults()[$i]->useraccountcontrol[0] == 512)
-                          <form action="/ldapusers/{{ $ldapusers->getResults()[$i]->samaccountname[0] }}" method="post">
+                          <form action="{{ env('APP_URL') }}/ldapusers/{{ $ldapusers->getResults()[$i]->samaccountname[0] }}" method="post">
                             {{csrf_field()}} 
                             {{ method_field('patch') }}
                             <input type="hidden" name="status" value="disable">
                             <button class="btn btn-warning btn-sm" type="submit">Desativar</button>
                           </form>
                         @else
-                          <form action="/ldapusers/{{ $ldapusers->getResults()[$i]->samaccountname[0] }}" method="post">
+                          <form action="{{ env('APP_URL') }}/ldapusers/{{ $ldapusers->getResults()[$i]->samaccountname[0] }}" method="post">
                             {{csrf_field()}} 
                             {{ method_field('patch') }}
                             <input type="hidden" name="status" value="enable">
@@ -130,7 +130,7 @@
                         @endif
                     </td>
                     <td>
-                        <form action="/ldapusers/{{ $ldapusers->getResults()[$i]->samaccountname[0] }}" method="post">
+                        <form action="{{ env('APP_URL') }}/ldapusers/{{ $ldapusers->getResults()[$i]->samaccountname[0] }}" method="post">
                           {{csrf_field()}} {{ method_field('delete') }}
                           <button class="delete-item btn btn-danger btn-sm" type="submit">Deletar</button>
                       </form>
