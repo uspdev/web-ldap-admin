@@ -78,9 +78,11 @@ class LoginController extends Controller
             # Cadastro do usuário no DC
             foreach($userSenhaUnica->vinculo as $vinculo) {
                 $setor = str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['nomeAbreviadoSetor']);
+                /* Error: Se a pessoa não pertence a nenhum setor cai nesse if, mas $pessoa não foi definido...
                 if (empty($setor)) {
                     $setor = $pessoa['tipvinext'];
                 }
+                */
                 if($vinculo['codigoUnidade'] == trim(config('web-ldap-admin.replicado_unidade'))) {
                     $attr = [
                         'nome'  => $user->name,

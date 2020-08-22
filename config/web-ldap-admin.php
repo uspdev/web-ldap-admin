@@ -10,7 +10,7 @@ return [
     'senha_unica_callback_id'   => env('SENHAUNICA_CALLBACK_ID', false),
 
     # Unidades autorizadas
-    'replicado_unidade' => env('REPLICADO_UNIDADE'),
+    'replicado_unidade' => env('REPLICADO_CODUNDCLG'),
 
     # Admins
     'admins' => env('ADMINS'),
