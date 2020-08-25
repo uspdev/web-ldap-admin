@@ -11,7 +11,7 @@
 
         <div class="col-md-6">
                        
-            <form method="post" action="url('/ldapusers/sync')">
+            <form method="post" action="{{ url('/ldapusers/sync') }}">
                 {{ csrf_field() }}
                 <table class="table table-striped">
                     <tr>
