@@ -1,9 +1,16 @@
 # web-ldap-admin
 
 Sistema escrito em laravel que permite gerenciar usuários da sua
-unidade na Universidade de São Paulo em uma base local do tipo domain controller samba/ad.
-Para tal, dois serviços são necessários para rodar esse sistema: 
+unidade na Universidade de São Paulo em uma base local do tipo 
+domain controller samba/ad. Para tal, dois serviços são necessários 
+para rodar esse sistema: 
 banco de dados corporativa replicada e oauth 1.0 senha única.
+
+Esse sistema permite:
+
+ - Sincronizar base de dados ldap local com pessoas importadas do replicado USP
+ - O próprio usuário trocar senha ldap pela web
+ - Gerenciar usuários locais no ldap que não estejam no replicado
 
 Quando o usuário fizer login no sistema usando senha única, uma array $vinculo
 é retornado com a seguinte estrutura:
@@ -46,16 +53,20 @@ Se a pessoa tiver algum vínculo (codigoUnidade) com a unidade
 o usuário é inserido no domain controller. 
 Os campos tipoVinculo e nomeAbreviadoSetor serão mapeados com grupos.
 
-Os usuários, após entrarem com senha única, podem trocar a senha do ldap local.
-
 ## Instalação
 
-Dependências php:
+### Dependências php
 
     version='7.3'
     apt-get install php$version-ldap
- 
-Informações no arquivo .env referente ao servidor domain controller:
+
+### Configurações no .env
+
+Copie o arquivo .env.example para .env e faça os ajustes necessários.
+
+    cp .env.example .env
+
+Servidor domain controller:
 
     LDAP_HOSTS=dc.xurepinha.br
     LDAP_PORT=636
@@ -64,14 +75,17 @@ Informações no arquivo .env referente ao servidor domain controller:
     LDAP_PASSWORD='sua-senha'
     LDAP_USE_SSL=true
     LDAP_USE_TLS=false
+
+O LDAP_USERNAME pode ter variações. Na biblioteca adldap2 indica o uso de usuario@xurepiha.br.
+Também pode ser usado a sintaxe de domínio anterior ao AD xurepinha\\\\usuario.
     
-Informações no arquivo .env referente ao serviço de senha única OAuth 1.0:
+COnfiguração referente à OAuth1 (http://github.com/uspdev/senhaunica-socialite)
 
     SENHAUNICA_KEY=oh-man
     SENHAUNICA_SECRET=secret
     SENHAUNICA_CALLBACK_ID=100
 
-Informações no arquivo .env referente ao serviço de senha única OAuth 1.0:
+Configuração referente ao replicado (http://github.com/uspdev/replicado)
 
     REPLICADO_HOST=
     REPLICADO_PORT=
@@ -80,27 +94,22 @@ Informações no arquivo .env referente ao serviço de senha única OAuth 1.0:
     REPLICADO_PASSWORD=
     REPLICADO_CODUNDCLG=8
 
-Esse sistema permite:
-
- - Sincronizar base de dados ldap local com pessoas importadas do replicado USP
- - Permite o próprio usuário trocar senha ldap pela web
- - Gerenciar usuários locais no ldap que não estejam no replicado
-
-Instalação:
+### Dependências do composer
 
     composer install
+
+### Configurações do laravel
+
     php artisan key:generate
     php artisan migrate
 
-Publicar Assets:
+### Publicar Assets
 
     php artisan vendor:publish --provider="Uspdev\UspTheme\ServiceProvider" --tag=assets --force
-    php artisan vendor:publish --provider="Adldap\Laravel\AdldapAuthServiceProvider" --tag=assets --force
-    php artisan vendor:publish --provider="Adldap\Laravel\AdldapServiceProvider" --tag=assets --force
 
 ## Dicas
 
-No ambiente de desenvolvimento, as vezes é necessário desativar a verificação 
+No ambiente de desenvolvimento, às vezes é necessário desativar a verificação 
 dos certificado SSL/TLS, para isso, em /etc/ldap/ldap.conf manter apenas: 
 
     TLS_REQCERT ALLOW
