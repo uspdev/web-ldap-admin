@@ -5,7 +5,7 @@
 @stop
 
 @section('content')
-<a href="/ldapusers/sync" class="btn btn-warning">Sincronizar com replicado</a>
+<a href="{{ url('/ldapusers/sync') }}" class="btn btn-warning">Sincronizar com replicado</a>
 <br><br>
 
 <div class="row">

@@ -127,7 +127,7 @@ class LdapUserController extends Controller
         ['NAOREPLICADO']);
 
         $request->session()->flash('alert-success', 'Usuário cadastrado com sucesso!');
-        return redirect("/ldapusers/{$request->username}");
+        return redirect(env('APP_URL')."/ldapusers/{$request->username}");
     }
 
     /**
