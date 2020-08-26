@@ -103,10 +103,6 @@ Configuração referente ao replicado (http://github.com/uspdev/replicado)
     php artisan key:generate
     php artisan migrate
 
-### Publicar Assets
-
-    php artisan vendor:publish --provider="Uspdev\UspTheme\ServiceProvider" --tag=assets --force
-
 ## Dicas
 
 No ambiente de desenvolvimento, às vezes é necessário desativar a verificação 
@@ -118,3 +114,9 @@ Como rodar filas sem limite de tempo:
 
     php artisan queue:listen --timeout=0
  
+## Atualizações
+
+26/08/2020
+
+* Não é mais necessário publicar assets manualmente
+* Atualizado composer.lock, usando ubuntu 20.04 e php 7.4

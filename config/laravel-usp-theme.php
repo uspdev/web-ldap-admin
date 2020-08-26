@@ -1,31 +1,31 @@
 <?php
 
 return [
-    'title' => env('APP_NAME'),
-    'dashboard_url' => env('APP_URL'),
+    'title' => config('app.name'),
+    'dashboard_url' => config('app.url'),
     'logout_method' => 'GET',
-    'logout_url' => env('APP_URL').'/logout',
-    'login_url' => env('APP_URL').'/login',
+    'logout_url' => config('app.url') . '/logout',
+    'login_url' => config('app.url') . '/login',
     'menu' => [
         [
             'text' => 'Minha Conta',
-            'url'  => env('APP_URL').'/ldapusers/my',
-            'can'  => 'logado',
+            'url' => config('app.url') . '/ldapusers/my',
+            'can' => 'logado',
         ],
         [
             'text' => 'Usuários Ldap',
-            'url'  => env('APP_URL').'/ldapusers',
-            'can'  => 'admin',
+            'url' => config('app.url') . '/ldapusers',
+            'can' => 'admin',
         ],
         [
             'text' => 'Configurações',
-            'url'  => env('APP_URL').'/configs',
-            'can'  => 'admin',
+            'url' => config('app.url') . '/configs',
+            'can' => 'admin',
         ],
 #        [
-#            'text' => 'Solicitação de Administrador',
-#            'url'  => 'ldapusers/solicita-admin',
-#            'can'  => 'logado',
-#        ],
+        #            'text' => 'Solicitação de Administrador',
+        #            'url'  => config('app.url').'ldapusers/solicita-admin',
+        #            'can'  => 'logado',
+        #        ],
     ],
 ];
