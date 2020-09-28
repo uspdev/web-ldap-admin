@@ -25,11 +25,7 @@
                     <td><input type="checkbox" name="type[]" value="{{ $vinculo['tipvinext'] }}"></td>
                         <td>{{ $vinculo['tipvinext'] }}</td>
                         <td style="text-align: right;">
-                            @if (Uspdev\Replicado\Pessoa::ativosVinculo($vinculo['tipvinext'], config('web-ldap-admin.replicado_unidade')))
-                                {{ count(Uspdev\Replicado\Pessoa::ativosVinculo($vinculo['tipvinext'], config('web-ldap-admin.replicado_unidade'))) }}
-                            @else 
-                                0
-                            @endif
+                            {{ Uspdev\Replicado\Pessoa::ativosVinculo(utf8_encode($vinculo['tipvinext']), config('web-ldap-admin.replicado_unidade'), 1)[0]['total'] }}
                         </td>
                         <td style="text-align: right;">
                             {{ count(App\Ldap\User::getUsersGroup($vinculo['tipvinext'])) }}
