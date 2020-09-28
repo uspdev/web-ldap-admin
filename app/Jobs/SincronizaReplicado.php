@@ -43,7 +43,7 @@ class SincronizaReplicado implements ShouldQueue
         foreach($this->type as $type) {
             foreach (Pessoa::tiposVinculos($this->unidade) as $vinculo) {
                 if ($type == $vinculo['tipvinext']) {
-                    $this->sync(Pessoa::ativosVinculo($vinculo['tipvinext'], $this->unidade));
+                    $this->sync(Pessoa::ativosVinculo(utf8_encode($vinculo['tipvinext']), $this->unidade));
                 }   
             }             
         }
