@@ -72,7 +72,7 @@ class LoginController extends Controller
             // bind do dados retornados
             $user->username = $userSenhaUnica->codpes;
             $user->email = $userSenhaUnica->email;
-            $user->name = Pessoa::nomeCompleto($userSenhaUnica->codpes)['nompesttd'];
+            $user->name = Pessoa::nomeCompleto($userSenhaUnica->codpes);
             $user->save();
 
             # Cadastro do usuário no DC
