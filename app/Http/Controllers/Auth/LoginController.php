@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Socialite;
-use App\User;
-use App\Config;
+use App\Models\User;
+use App\Models\Config;
 use Auth;
 use Illuminate\Http\Request;
 use App\Ldap\User as LdapUser;
@@ -62,13 +62,13 @@ class LoginController extends Controller
             }
         }
 
-        // Se tem vínculo cadastra no DC e no laravel        
+        // Se tem vínculo cadastra no DC e no laravel
         if($tem_vinculo) {
 
             # Cadastro do usuário no laravel
             $user = User::where('username',$userSenhaUnica->codpes)->first();
             if (is_null($user) or $user == false) $user = new User;
-                       
+
             // bind do dados retornados
             $user->username = $userSenhaUnica->codpes;
             $user->email = $userSenhaUnica->email;
@@ -87,19 +87,19 @@ class LoginController extends Controller
                     $attr = [
                         'nome'  => $user->name,
                         'email' => $user->email,
-                        'setor' => ucfirst(strtolower(str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['tipoVinculo']))) . ' ' . $setor 
+                        'setor' => ucfirst(strtolower(str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['tipoVinculo']))) . ' ' . $setor
                     ];
                     $groups = [
-                        str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['nomeAbreviadoSetor']), 
+                        str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['nomeAbreviadoSetor']),
                         ucfirst(strtolower(str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['tipoVinculo']))),
                         ucfirst(strtolower(str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['tipoVinculo']))) . ' ' .
-                        str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['nomeAbreviadoSetor'])      
+                        str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $vinculo['nomeAbreviadoSetor'])
                     ];
                     sort($groups);
                     LdapUser::createOrUpdate($user->username,$attr,$groups);
                 }
-            }           
-            
+            }
+
             Auth::login($user, true);
             return redirect('/');
         }
