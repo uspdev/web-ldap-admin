@@ -2,7 +2,7 @@
 
 namespace App\Policies;
 
-use App\User;
+use App\Models\User;
 use Ldap\User as LdapUser;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -12,7 +12,7 @@ use Auth;
 class LdapUserPolicy
 {
     use HandlesAuthorization;
-    
+
     public $is_superAdmin;
 
     public function __construct()
