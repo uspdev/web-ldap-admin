@@ -16,10 +16,11 @@ class User
       * $attr['email'] : Email
       * $attr['setor'] : Departamento
       **/
-    public static function createOrUpdate(string $username, array $attr, array $groups = [])
+    public static function createOrUpdate(string $username, array $attr, array $groups = [], $password = null)
     {
         $user = Adldap::search()->users()->find($username);
 
+        # Novo usuário
         if (is_null($user) or $user == false) {
             $user = Adldap::make()->user();
 
@@ -28,8 +29,6 @@ class User
             $user->setDn($dn);
             
             // Password
-            // Senha inicial data de nascimento ddmmaaaa
-            $password = date('dmY', strtotime(Pessoa::dump($username, ['dtanas'])['dtanas']));
             $user->setPassword($password);
 
             // Trocar a senha no próximo logon

@@ -14,7 +14,7 @@
         "php": "^7.2.5",
         "adldap2/adldap2": "^10.3",
         "adldap2/adldap2-laravel": "6.*",
-        "doctrine/dbal": "^2.9",
+        "doctrine/dbal": "^3.0",
         "fideloper/proxy": "^4.2",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
@@ -23,9 +23,9 @@
         "laravel/tinker": "^2.0",
         "laravel/ui": "^3.1",
         "select2/select2": "^4.0",
-        "uspdev/laravel-usp-theme": "^1.0",
+        "uspdev/laravel-usp-theme": "^2.0",
         "uspdev/replicado": "^1.5",
-        "uspdev/senhaunica-socialite": "^2.0"
+        "uspdev/senhaunica-socialite": "^3.0"
     },
     "require-dev": {
         "facade/ignition": "^2.3.6",

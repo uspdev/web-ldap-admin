@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Adldap\Laravel\Facades\Adldap;
 use Carbon\Carbon;
 
-class indexController extends Controller
+class IndexController extends Controller
 {
     public function __construct() {
        $this->middleware('auth')->except(['index']);

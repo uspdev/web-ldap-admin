@@ -122,7 +122,8 @@ class LdapUserController extends Controller
 
         LdapUser::createOrUpdate($request->username, [
             'nome'  => $request->nome,
-            'email' => $request->email
+            'email' => $request->email,
+            'setor' => 'NAOREPLICADO'
         ],
         ['NAOREPLICADO']);
 
@@ -246,6 +247,9 @@ class LdapUserController extends Controller
         return redirect('/ldapusers');
     }
 
+    /**
+     * Solicitação de conta de administração local do windows
+     */
     public function solicitaAdminForm(Request $request)
     {
         $this->authorize('logado');
@@ -265,6 +269,8 @@ class LdapUserController extends Controller
         return view('ldapusers.solicita-admin',compact('user','computers'));
     }
 
-
+    public function solicitaAdmin(){
+        dd('Em Desenvolvimento');
+    }
 
 }

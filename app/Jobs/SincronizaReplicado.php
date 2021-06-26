@@ -94,12 +94,14 @@ class SincronizaReplicado implements ShouldQueue
                 }
                 $grupos = array_unique($grupos);
                 sort($grupos);
+                $password = date('dmY', strtotime(Pessoa::dump($pessoa['codpes'], ['dtanas'])['dtanas']));
                 LdapUser::createOrUpdate($pessoa['codpes'], [
                     'nome' => $pessoa['nompesttd'],
                     'email' => $pessoa['codema'],
                     'setor' => $setor
                 ],
-                $grupos);    
+                $grupos,
+                $password);    
             }
         }
     }

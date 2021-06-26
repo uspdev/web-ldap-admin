@@ -28,12 +28,6 @@ class AuthServiceProvider extends ServiceProvider
 
         Gate::resource('ldapusers', 'App\Policies\LdapUserPolicy');
 
-        # admin 
-        Gate::define('admin', function ($user) {
-            $admins = explode(',', trim(config('web-ldap-admin.admins')));   
-            return in_array(Auth::user()->username, $admins);
-        });
-
         # logado 
         Gate::define('logado', function ($user) { 
             if($user){

@@ -12,7 +12,7 @@
     @include('alerts')
 
         <div class="col-md-12">
-            <form method="post" action="{{ url('/ldapusers/sync') }}">
+            <form method="post" action="/ldapusers/solicita-admin">
                 {{ csrf_field() }}
                 <input type="checkbox" name="type[]" value="servidores">
 Eu, <b>{{ $user->name }}</b>, número USP, <b>{{ $user->username }}</b>, solicito a liberação de meu perfil como administrador temporário (1 hora)
