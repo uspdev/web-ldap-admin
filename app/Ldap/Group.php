@@ -27,6 +27,9 @@ class Group
     // recebe instâncias
     public static function addMember($user, $groups)
     {
+        //remove posições vazias
+        $groups = array_filter($groups);
+
         // remover dos grupos
         $gruposUser = Adldap::search()->users()->find($user->getName())->getGroups();
         foreach ($gruposUser as $grupoUser) {
