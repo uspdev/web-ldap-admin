@@ -9,8 +9,9 @@ class Group
 {
     public static function createOrUpdate(string $name)
     {
-        $group = Adldap::search()->groups()->find($name);
-        if (is_null($group) or $group == false) {
+        $group = Adldap::search()->groups()->where('cn','=',$name)->first();
+        
+        if (is_null($group) || $group == false) {
             $group = Adldap::make()->group();
 
             // define DN para esse user
@@ -27,51 +28,18 @@ class Group
     // recebe instâncias
     public static function addMember($user, $groups)
     {
+        $ldap_user = Adldap::search()->users()->where('cn','=',$user->getName())->first();
+
+        // Vamos remover todos grupos e adicionar apenas os necessários
+        $ldap_user->removeAllGroups();
+
         //remove posições vazias
         $groups = array_filter($groups);
 
-        // remover dos grupos
-        $gruposUser = Adldap::search()->users()->find($user->getName())->getGroups();
-        foreach ($gruposUser as $grupoUser) {
-            self::removeMember(Adldap::search()->users()->find($user->getName()), [$grupoUser->getCommonName()]);
-        }
-
-        // adiciona aos grupos
-        sort($groups);
         foreach($groups as $groupname) {
-            if (!is_null($groupname)) {
-                $group = self::createOrUpdate($groupname);
-                $members = $group->getMembers();
-                foreach ($members as $member) {
-                    if ($member->getCommonName() == $user->getName()) {
-                        return true;
-                    }
-                }
-                $group->addMember($user);
-                $group->save();
-            }
-        }
-    }
-
-    public static function removeMember($user, $groups)
-    {
-        sort($groups);
-        foreach($groups as $groupname) {
-            if (!is_null($groupname)) {
-                $group = self::createOrUpdate($groupname);
-                // Ignorar grupos
-                // Domain Admins
-                if ($groupname != 'Domain Admins') {
-                    $members = $group->getMembers();
-                    foreach ($members as $member) {
-                        if ($member->getCommonName() == $user) {
-                            $group->removeMember($member);
-                            return true;
-                        }
-                    }
-                }
-                $group->save();
-            }
+            $group = self::createOrUpdate($groupname);
+            $group->addMember($user);
+            $group->save();
         }
     }
 

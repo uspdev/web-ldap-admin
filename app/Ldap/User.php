@@ -152,8 +152,12 @@ class User
         if(!is_null($user)){
             # https://support.microsoft.com/pt-br/help/305144/how-to-use-the-useraccountcontrol-flags-to-manipulate-user-account-pro
             $user->setUserAccountControl(512);
+            
             // remover do grupo Desativados
-            LdapGroup::removeMember($user, ['Desativados']);            
+            $grupo_desativados = LdapGroup::createOrUpdate('Desativados');
+            $grupo_desativados->removeMember($user);
+
+            $group->save();            
             $user->save();
             return true;
         }
@@ -193,7 +197,7 @@ class User
             // remover dos grupos
             $groups = Adldap::search()->users()->find($desligado)->getGroups();
             foreach ($groups as $group) {
-                LdapGroup::removeMember(Adldap::search()->users()->find($desligado), [$group->getCommonName()]);
+                $group->removeMember(Adldap::search()->users()->find($desligado));
             }
             
             // adicionar ao grupo Desativados
