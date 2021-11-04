@@ -153,11 +153,12 @@ class User
             # https://support.microsoft.com/pt-br/help/305144/how-to-use-the-useraccountcontrol-flags-to-manipulate-user-account-pro
             $user->setUserAccountControl(512);
             
-            // remover do grupo Desativados
-            $grupo_desativados = LdapGroup::createOrUpdate('Desativados');
-            $grupo_desativados->removeMember($user);
+            // TODO: remover do grupo Desativados
+            /*$grupo_desativados = LdapGroup::createOrUpdate('Desativados');
+              $grupo_desativados->removeMember($user);
 
-            $group->save();            
+              $group->save();
+            */
             $user->save();
             return true;
         }
