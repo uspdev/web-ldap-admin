@@ -7,6 +7,7 @@ use Auth;
 use App\Models\Solicita;
 use App\Ldap\Group as LdapGroup;
 use Adldap\Laravel\Facades\Adldap;
+use Carbon\Carbon;
 
 class SolicitaController extends Controller
 {
@@ -17,22 +18,21 @@ class SolicitaController extends Controller
     {
         $this->authorize('logado');
         $user = Auth::user();
-        /*
-        $ldap_computers = Adldap::search()->computers()->get();
-        $computers = Collection::make([]);
+	$ldap_computers = Adldap::search()->computers()->sortBy('cn')->get();
+        $computers = [];
+
         foreach($ldap_computers as $computer){
-            $hostname = $computer->getDnsHostName();
-            $basedn = config('adldap.base_dn');
-            //dd($basedn);
-            //$basedn = str_replace('DC=','',config('adldap.base_dn'));
-            //$basedn = str_replace(',','\.',));
-            $hostname = str_replace(".$basedn", "", $hostname);
-            $computers->push(['hostname' => $hostname]);
+	    // Mostrar apenas as máquinas com login nos últimos dois dias 
+	    $carbon = Carbon::createFromTimestamp($computer->getLastLogonTimestamp()/10000000  - 11644473600);
+	    if(!is_null($computer->getOperatingSystem()) & $carbon->diffInDays(Carbon::now()) < 2 ) {
+	      array_push($computers,[
+	        'computer' => $computer->getName(),
+	        'os'       => $computer->getOperatingSystem(),
+	        'lastLogon'       => $carbon->format('d/m/Y H:i:s')
+      	      ]);
+	    }
+		
         }
-        */
-
-        $computers = ['pc1','pc2'];
-
         return view('solicita.create',[
             'computers' => $computers
         ]);
