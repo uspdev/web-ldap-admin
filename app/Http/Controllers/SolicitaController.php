@@ -18,20 +18,19 @@ class SolicitaController extends Controller
     {
         $this->authorize('logado');
         $user = Auth::user();
-	$ldap_computers = Adldap::search()->computers()->sortBy('cn')->get();
+	    $ldap_computers = Adldap::search()->computers()->sortBy('cn')->get();
         $computers = [];
 
         foreach($ldap_computers as $computer){
-	    // Mostrar apenas as máquinas com login nos últimos dois dias 
-	    $carbon = Carbon::createFromTimestamp($computer->getLastLogonTimestamp()/10000000  - 11644473600);
-	    if(!is_null($computer->getOperatingSystem()) & $carbon->diffInDays(Carbon::now()) < 2 ) {
-	      array_push($computers,[
-	        'computer' => $computer->getName(),
-	        'os'       => $computer->getOperatingSystem(),
-	        'lastLogon'       => $carbon->format('d/m/Y H:i:s')
-      	      ]);
-	    }
-		
+	        // Mostrar apenas as máquinas com login nos últimos dois dias 
+            $carbon = Carbon::createFromTimestamp($computer->getLastLogonTimestamp()/10000000  - 11644473600);
+            if(!is_null($computer->getOperatingSystem()) & $carbon->diffInDays(Carbon::now()) < 2 ) {
+            array_push($computers,[
+                'computer' => $computer->getName(),
+                'os'       => $computer->getOperatingSystem(),
+                'lastLogon'       => $carbon->format('d/m/Y H:i:s')
+                ]);
+            }
         }
         return view('solicita.create',[
             'computers' => $computers
@@ -50,6 +49,13 @@ class SolicitaController extends Controller
             'ciencia3'      => ['required'],
         ]);
 
+        if(Solicita::where('user_id', auth()->user()->id)->where('expired',false)->get()->isNotEmpty()){
+            request()->session()->flash('alert-danger',
+            'Atenção: Você já está com uma solicitação em aberto, reinicie seu computador para 
+            obter os privilégios.');
+            return redirect('/');
+        }
+
         $solicita = new Solicita;
         $solicita->expired = false;
         $solicita->justificativa = $request->justificativa;
@@ -60,10 +66,12 @@ class SolicitaController extends Controller
         $ldapuser = Adldap::search()->users()->find(auth()->user()->username);
 
         $groupname = config('web-ldap-admin.localAdminGroupLdap');
-
         $group = LdapGroup::createOrUpdate($groupname);
-        $group->addMember($ldapuser);
-        $group->save();
+
+        if(!$ldapuser->inGroup($groupname)){
+            $group->addMember($ldapuser);
+            $group->save();
+        }
 
         request()->session()->flash('alert-info',
             'Privilégio administrativo concedido no equipamento: ' . $request->computer .
