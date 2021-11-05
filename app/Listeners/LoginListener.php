@@ -41,6 +41,7 @@ class LoginListener
         }
         $password = date('dmY', strtotime(Pessoa::dump($event->user->codpes, ['dtanas'])['dtanas']));
         $groups = array_merge($vinculos, $setores);
+
         LdapUser::createOrUpdate($event->user->codpes,$attr,$groups,$password);
         Session::flash('alert-success', 'Informações sincronizadas com Sistemas Corporativos');
     }

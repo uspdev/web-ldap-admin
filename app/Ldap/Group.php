@@ -30,6 +30,12 @@ class Group
     {
         $ldap_user = Adldap::search()->users()->where('cn','=',$user->getName())->first();
 
+        $before_groups = $ldap_user->getGroupNames();
+        $notRemoveGroups = explode(',',config('web-ldap-admin.notRemoveGroups'));
+        $keep_groups = array_intersect($before_groups,$notRemoveGroups);
+
+        $groups = array_merge($keep_groups, $groups);
+
         // Vamos remover todos grupos e adicionar apenas os necessários
         $ldap_user->removeAllGroups();
 
