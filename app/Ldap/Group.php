@@ -33,8 +33,10 @@ class Group
         // Vamos remover todos grupos e adicionar apenas os necessários
         $ldap_user->removeAllGroups();
 
-        //remove posições vazias
+        //remove posições vazias, repetidas e sujas
+        $groups = array_map('trim', $groups);
         $groups = array_filter($groups);
+        $groups = array_unique($groups);
 
         foreach($groups as $groupname) {
             $group = self::createOrUpdate($groupname);

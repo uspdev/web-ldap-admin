@@ -7,6 +7,11 @@ $menu = [
         'can' => 'logado',
     ],
     [
+        'text' => 'Solicitação de Conta de Administrador',
+        'url' => config('app.url') . '/solicita',
+        'can' => 'logado',
+    ],
+    [
         'text' => 'Usuários Ldap',
         'url' => config('app.url') . '/ldapusers',
         'can' => 'admin',

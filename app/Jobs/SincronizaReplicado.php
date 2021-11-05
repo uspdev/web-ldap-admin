@@ -43,7 +43,7 @@ class SincronizaReplicado implements ShouldQueue
         foreach($this->type as $type) {
             foreach (Pessoa::tiposVinculos($this->unidade) as $vinculo) {
                 if ($type == $vinculo['tipvinext']) {
-                    $this->sync(Pessoa::ativosVinculo(utf8_encode($vinculo['tipvinext']), $this->unidade));
+                    $this->sync(Pessoa::ativosVinculo($vinculo['tipvinext'], $this->unidade));
                 }   
             }             
         }
@@ -55,7 +55,8 @@ class SincronizaReplicado implements ShouldQueue
             // No .env foi configurado para desativar os desligados?
             if (config('web-ldap-admin.desativarDesligados') == true) {
                 /**
-                 * Perdeu vínculo com a unidade, remover dos grupos, adicionar ao grupo Desativados e destivar a conta. 
+                 * Perdeu vínculo com a unidade, remover dos grupos, adicionar 
+                 * ao grupo Desativados e desativar a conta. 
                  * Para se verificar os desligados
                  * Comparar as contas do AD por grupo principal
                  * Servidor, Docente, Docente Aposentado, Estagiário,

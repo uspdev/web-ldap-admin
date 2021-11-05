@@ -20,12 +20,13 @@
                         <th style="text-align: right;">Replicado</th>
                         <th style="text-align: right;">AD</th>
                     </tr>
+
                     @foreach (Uspdev\Replicado\Pessoa::tiposVinculos(config('web-ldap-admin.replicado_unidade')) as $vinculo)
                     <tr>
                     <td><input type="checkbox" name="type[]" value="{{ $vinculo['tipvinext'] }}"></td>
                         <td>{{ $vinculo['tipvinext'] }}</td>
                         <td style="text-align: right;">
-                            {{ Uspdev\Replicado\Pessoa::ativosVinculo(utf8_encode($vinculo['tipvinext']), config('web-ldap-admin.replicado_unidade'), 1)[0]['total'] }}
+                            {{ Uspdev\Replicado\Pessoa::ativosVinculo($vinculo['tipvinext'], config('web-ldap-admin.replicado_unidade'), 1)[0]['total'] }}
                         </td>
                         <td style="text-align: right;">
                             {{ count(App\Ldap\User::getUsersGroup($vinculo['tipvinext'])) }}

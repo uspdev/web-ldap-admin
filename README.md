@@ -114,9 +114,20 @@ Como rodar filas sem limite de tempo:
 
     php artisan queue:listen --timeout=0
  
-## Atualizações
+## Códigos Úteis
 
-26/08/2020
+Ativar toda base de usuários:
 
-* Não é mais necessário publicar assets manualmente
-* Atualizado composer.lock, usando ubuntu 20.04 e php 7.4
+    php artisan tinker
+
+    $users = \Adldap\Laravel\Facades\Adldap::search()->users()->get();
+
+    foreach($users as $user) {
+        $user->setUserAccountControl(512);
+        $user->save();
+    }
+
+Rodar um job pelo tinker:
+
+    php artisan tinker
+    App\Jobs\RevokeLocalAdminGroupJob::dispatch();

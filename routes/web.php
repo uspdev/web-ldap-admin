@@ -3,6 +3,7 @@
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\LdapUserController;
 use App\Http\Controllers\ConfigController;
+use App\Http\Controllers\SolicitaController;
 
 Route::get('/', [IndexController::class, 'index']);
 
@@ -22,5 +23,5 @@ Route::get('configs', [ConfigController::class, 'show']);
 Route::post('configs', [ConfigController::class, 'update']);
 
 # Solicitação de conta de administração local do windows
-Route::get('ldapusers/solicita-admin', [LdapUserController::class, 'solicitaAdminForm']);
-Route::post('ldapusers/solicita-admin', [LdapUserController::class, 'solicitaAdmin']);
+Route::get('solicita', [SolicitaController::class, 'create']);
+Route::post('solicita', [SolicitaController::class, 'store']);

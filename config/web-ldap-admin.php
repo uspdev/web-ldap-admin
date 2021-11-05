@@ -12,4 +12,7 @@ return [
 
     # Desativar desligados (true/false default)
     'desativarDesligados' => env('DESATIVAR_DESLIGADOS', false),
+
+    'localAdminGroupLdap' => env('LOCAL_ADMIN_GROUP_LDAP', 'LOCAL_ADMIN'),
+
 ];
