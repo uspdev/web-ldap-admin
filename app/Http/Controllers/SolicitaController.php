@@ -22,9 +22,9 @@ class SolicitaController extends Controller
         $computers = [];
 
         foreach($ldap_computers as $computer){
-	        // Mostrar apenas as máquinas com login nos últimos dois dias 
+            // Mostrar apenas as máquinas com login nos últimos 120 dias 
             $carbon = Carbon::createFromTimestamp($computer->getLastLogonTimestamp()/10000000  - 11644473600);
-            if(!is_null($computer->getOperatingSystem()) & $carbon->diffInDays(Carbon::now()) < 2 ) {
+            if(!is_null($computer->getOperatingSystem()) & $carbon->diffInDays(Carbon::now()) < 120 ) {
             array_push($computers,[
                 'computer' => $computer->getName(),
                 'os'       => $computer->getOperatingSystem(),
