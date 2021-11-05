@@ -49,8 +49,9 @@
                         <select name="computer" class="form-control">
                             <option value="" selected="">-- Selecione --</option>
                             @foreach($computers as $computer)
-                                <option value="{{ $computer }}">
-                                    {{ $computer }}
+                                <option value="{{ $computer['computer'] }}">
+                                    {{ $computer['computer'] }}
+                                    ({{ $computer['os'] }})
                                 </option>   
                             @endforeach()
                         </select>
