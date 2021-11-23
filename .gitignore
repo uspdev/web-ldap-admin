@@ -15,3 +15,10 @@ yarn-error.log
 
 # pasta onde guardo coisas que ando testando
 /teste/
+
+# init lando
+.lando.yml
+# lando dockerfile php extensions
+Dockerfile.custom
+# lando php.ini
+php.ini
