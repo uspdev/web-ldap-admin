@@ -1,16 +1,22 @@
 <?php
 
+if (getenv('SOLICITA_CONTA_ADMIN') == 1) {
+    $solicitaContaAdmin = [
+        'text' => 'Solicitação de Conta de Administrador',
+        'url' => config('app.url') . '/solicita',
+        'can' => 'logado',
+    ];
+} else {
+    $solicitaContaAdmin = [];
+}
+
 $menu = [
     [
         'text' => 'Minha Conta',
         'url' => config('app.url') . '/ldapusers/my',
         'can' => 'logado',
     ],
-    [
-        'text' => 'Solicitação de Conta de Administrador',
-        'url' => config('app.url') . '/solicita',
-        'can' => 'logado',
-    ],
+    $solicitaContaAdmin,
     [
         'text' => 'Usuários Ldap',
         'url' => config('app.url') . '/ldapusers',
@@ -32,7 +38,7 @@ $right_menu = [
 return [
     'title' => config('app.name'),
 
-    # USP_THEME_SKIN deve ser colocado no .env da aplicação 
+    # USP_THEME_SKIN deve ser colocado no .env da aplicação
     'skin' => env('USP_THEME_SKIN', 'uspdev'),
 
     # chave da sessão. Troque em caso de colisão com outra variável de sessão.
