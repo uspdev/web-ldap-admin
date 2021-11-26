@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -42,8 +41,8 @@ class LdapUserController extends Controller
             $perPage = config('web-ldap-admin.registrosPorPagina');
         } else {
             $perPage = $request->perPage;
-        }    
-        
+        }
+
         // Verifica qual a página
         if (empty($request->page)) {
             $page = 1;
@@ -53,7 +52,7 @@ class LdapUserController extends Controller
 
         // Busca
         $ldapusers = Adldap::search()->users();
-        
+
         if(!empty($request->search) && isset($request->search)){
             // buscar por username ou por nome
             $check = clone $ldapusers;
@@ -63,19 +62,19 @@ class LdapUserController extends Controller
                 $ldapusers = $ldapusers->where('displayname','contains',$request->search);
             }
         }
-        
-        if(!empty($request->grupos) && isset($request->grupos)){ 
+
+        if(!empty($request->grupos) && isset($request->grupos)){
             if (count($request->grupos) > 1) {
                 for ($i = 0; $i < count($request->grupos); $i++) {
                     $group = Adldap::search()->groups()->find($request->grupos[$i]);
                     $ldapusers = $ldapusers->orWhere('memberof', '=', $group->getDnBuilder()->get());
-                }               
+                }
             } else {
                 $group = Adldap::search()->groups()->find($request->grupos[0]);
-                $ldapusers = $ldapusers->where('memberof','=',$group->getDnBuilder()->get());  
-            }     
-        }    
-                
+                $ldapusers = $ldapusers->where('memberof','=',$group->getDnBuilder()->get());
+            }
+        }
+
         // remove usuários default do sistema
         $ldapusers = $ldapusers->where('samaccountname','!=','Administrator');
         $ldapusers = $ldapusers->where('samaccountname','!=','krbtgt');
@@ -141,11 +140,12 @@ class LdapUserController extends Controller
     {
         $this->authorize('admin');
         $attr = LdapUser::show($username);
+        #dd($attr);
         if( $attr ) {
             return view('ldapusers.show',compact('attr'));
         }
         $request->session()->flash('alert-danger', 'Essa conta não existe no ldap.');
-        return redirect('/');   
+        return redirect('/');
     }
 
     public function my(Request $request)
@@ -170,7 +170,7 @@ class LdapUserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-    {       
+    {
     }
 
     /**
@@ -190,10 +190,10 @@ class LdapUserController extends Controller
             $request->validate([
                'senha' => ['required','confirmed','min:8'],
             ]);
-            
+
             LdapUser::changePassword($username,$request->senha);
             $request->session()->flash('alert-success', 'Senha alterada com sucesso!');
-            return redirect('/');          
+            return redirect('/');
         }
 
         // status
@@ -202,14 +202,14 @@ class LdapUserController extends Controller
             if($request->status == 'disable') {
                 LdapUser::disable($username);
                 $request->session()->flash('alert-success', 'Usuário Desabilitado');
-                return redirect('/ldapusers/');  
+                return redirect('/ldapusers/');
             }
 
             if($request->status == 'enable') {
                 LdapUser::enable($username);
                 $request->session()->flash('alert-success', 'Usuário Habilitado');
-                return redirect('/ldapusers/');  
-            }                     
+                return redirect('/ldapusers/');
+            }
         }
     }
 
@@ -241,7 +241,7 @@ class LdapUserController extends Controller
         $this->validate($request, [
             'type' => 'required',
         ]);
-        
+
         SincronizaReplicado::dispatch($request->type);
         $request->session()->flash('alert-success', 'Sincronização em andamento');
         return redirect('/ldapusers');

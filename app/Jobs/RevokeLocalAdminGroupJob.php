@@ -37,11 +37,11 @@ class RevokeLocalAdminGroupJob implements ShouldQueue
         # solicitações de mais de 1 hora apenas
         $solicitations = Solicita::where('expired',false)->get();
         foreach($solicitations as $solicitation){
-            
+
             $groupname = config('web-ldap-admin.localAdminGroupLdap');
             $group = LdapGroup::createOrUpdate($groupname);
-            
-            $ldapuser = Adldap::search()->users()->find($solicitation->user->username);
+
+            $ldapuser = Adldap::search()->users()->where('cn', '=', $solicitation->user->username)->first();
 
             if($ldapuser->inGroup($groupname)){
                 $ldapuser->removeGroup($group);
@@ -49,7 +49,7 @@ class RevokeLocalAdminGroupJob implements ShouldQueue
             }
             $solicitation->expired = true;
             $solicitation->save();
-            
+
         }
     }
 }

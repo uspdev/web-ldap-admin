@@ -27,7 +27,7 @@ class LdapUsernameRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        $user = Adldap::search()->users()->find($value);
+        $user = Adldap::search()->users()->where('cn', '=', $value)->first();
 
         return empty($user);
     }
