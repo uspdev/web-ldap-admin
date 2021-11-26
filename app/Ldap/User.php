@@ -18,7 +18,7 @@ class User
       **/
     public static function createOrUpdate(string $username, array $attr, array $groups = [], $password = null)
     {
-        $user = Adldap::search()->users()->find($username);
+        $user = Adldap::search()->where('cn', '=', $username)->first();
 
         # Novo usuário
         if (is_null($user) or $user == false) {
@@ -27,13 +27,13 @@ class User
             // define DN para esse user
             $dn = "cn={$username}," .  $user->getDnBuilder();
             $user->setDn($dn);
-            
+
             // Password
             $user->setPassword($password);
 
             // Trocar a senha no próximo logon
             $user->setAttribute('pwdlastset', 0);
-        
+
             // Enable the new user (using user account control).
             $user->setUserAccountControl(512);
         }
@@ -58,7 +58,7 @@ class User
         if(!empty($attr['setor'])){
             $user->setDepartment($attr['setor']);
         }
-        
+
         // save
         $user->save();
 
@@ -67,14 +67,15 @@ class User
 
         return $user;
     }
-    
+
     public static function show(String $username)
     {
-        $user = Adldap::search()->users()->find($username);
+
+        $user = Adldap::search()->where('cn', '=', $username)->first();
         if(!is_null($user)){
-            
+
             $attr = [];
-  
+
             // Nome e email
             $attr['username'] = $username;
             $attr['display_name'] = $user->getDisplayName();
@@ -89,7 +90,7 @@ class User
 
             // última senha alterada
             $last = $user->getPasswordLastSetDate();
-            if(!is_null($last)) { 
+            if(!is_null($last)) {
                 $last = Carbon::createFromFormat('Y-m-d H:i:s', $last)->format('d/m/Y');
             }
             $attr['senha_alterada_em'] = $last;
@@ -108,14 +109,14 @@ class User
 
             // status
             if($user->getUserAccountControl() == 512) {
-                $attr['status'] = 'Ativada'; 
+                $attr['status'] = 'Ativada';
             } else {
-                $attr['status'] = 'Desativada'; 
+                $attr['status'] = 'Desativada';
             }
 
             // Department
             $attr['department'] = $user->getDepartment();
-           
+
             return $attr;
         }
         return false;
@@ -123,7 +124,7 @@ class User
 
     public static function delete(String $username)
     {
-        $user = Adldap::search()->users()->find($username);
+        $user = Adldap::search()->where('cn', '=', $username)->first();
         if(!is_null($user)){
             $user->delete();
             return true;
@@ -133,7 +134,7 @@ class User
 
     public static function disable(String $username)
     {
-        $user = Adldap::search()->users()->find($username);
+        $user = Adldap::search()->where('cn', '=', $username)->first();
         if(!is_null($user)){
             # https://support.microsoft.com/pt-br/help/305144/how-to-use-the-useraccountcontrol-flags-to-manipulate-user-account-pro
             $user->setUserAccountControl(2);
@@ -147,12 +148,12 @@ class User
 
     public static function enable(String $username)
     {
-        $user = Adldap::search()->users()->find($username);
+        $user = Adldap::search()->where('cn', '=', $username)->first();
 
         if(!is_null($user)){
             # https://support.microsoft.com/pt-br/help/305144/how-to-use-the-useraccountcontrol-flags-to-manipulate-user-account-pro
             $user->setUserAccountControl(512);
-            
+
             // TODO: remover do grupo Desativados
             /*$grupo_desativados = LdapGroup::createOrUpdate('Desativados');
               $grupo_desativados->removeMember($user);
@@ -168,10 +169,10 @@ class User
     public static function changePassword($username, String $password)
     {
         // TODO: verificar se a conta está ativada antes de trocar senha
-        $user = Adldap::search()->users()->find($username);
+        $user = Adldap::search()->where('cn', '=', $username)->first();
         if(!is_null($user)){
             $user->setPassword($password);
-            $user->save();        
+            $user->save();
         }
     }
 
@@ -180,7 +181,7 @@ class User
         $ldapusers = [];
         $group = Adldap::search()->groups()->find($grupo);
         if ($group != false) {
-            $ldapusers = Adldap::search()->users();        
+            $ldapusers = Adldap::search()->users();
             $ldapusers = $ldapusers->where('memberof', '=', $group->getDnBuilder()->get());
             $ldapusers = $ldapusers->where('samaccountname','!=','Administrator');
             $ldapusers = $ldapusers->where('samaccountname','!=','krbtgt');
@@ -196,14 +197,15 @@ class User
     {
         foreach ($desligados as $desligado) {
             // remover dos grupos
-            $groups = Adldap::search()->users()->find($desligado)->getGroups();
+            $user = Adldap::search()->users()->where('cn', '=', $desligado)->first();
+            $groups = $user->getGroups();
             foreach ($groups as $group) {
-                $group->removeMember(Adldap::search()->users()->find($desligado));
+                $group->removeMember($user);
             }
-            
+
             // adicionar ao grupo Desativados
-            LdapGroup::addMember(Adldap::search()->users()->find($desligado), ['Desativados']);
-            
+            LdapGroup::addMember($user, ['Desativados']);
+
             // desativar conta
             self::disable($desligado);
         }

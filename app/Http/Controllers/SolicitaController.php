@@ -18,11 +18,11 @@ class SolicitaController extends Controller
     {
         $this->authorize('logado');
         $user = Auth::user();
-	    $ldap_computers = Adldap::search()->computers()->sortBy('cn')->get();
+        $ldap_computers = Adldap::search()->computers()->sortBy('cn')->get();
         $computers = [];
 
         foreach($ldap_computers as $computer){
-            // Mostrar apenas as máquinas com login nos últimos 120 dias 
+            // Mostrar apenas as máquinas com login nos últimos 120 dias
             $carbon = Carbon::createFromTimestamp($computer->getLastLogonTimestamp()/10000000  - 11644473600);
             if(!is_null($computer->getOperatingSystem()) & $carbon->diffInDays(Carbon::now()) < 120 ) {
             array_push($computers,[
@@ -40,7 +40,7 @@ class SolicitaController extends Controller
     public function store(Request $request){
 
         $this->authorize('logado');
-        
+
         $request->validate([
             'computer'      => ['required'],
             'justificativa' => ['required'],
@@ -51,7 +51,7 @@ class SolicitaController extends Controller
 
         if(Solicita::where('user_id', auth()->user()->id)->where('expired',false)->get()->isNotEmpty()){
             request()->session()->flash('alert-danger',
-            'Atenção: Você já está com uma solicitação em aberto, reinicie seu computador para 
+            'Atenção: Você já está com uma solicitação em aberto, reinicie seu computador para
             obter os privilégios.');
             return redirect('/');
         }
@@ -63,7 +63,7 @@ class SolicitaController extends Controller
         $solicita->user_id = auth()->user()->id;
         $solicita->save();
 
-        $ldapuser = Adldap::search()->users()->find(auth()->user()->username);
+        $ldapuser = Adldap::search()->users()->where('cn', '=', auth()->user()->username)->first();
 
         $groupname = config('web-ldap-admin.localAdminGroupLdap');
         $group = LdapGroup::createOrUpdate($groupname);
@@ -75,9 +75,9 @@ class SolicitaController extends Controller
 
         request()->session()->flash('alert-info',
             'Privilégio administrativo concedido no equipamento: ' . $request->computer .
-            '.  Reinicie o computador para que os privilégios possam ser carregados. 
+            '.  Reinicie o computador para que os privilégios possam ser carregados.
             Lembre-se que as permissões duram apenas 1 hora.');
-        
+
         return redirect('/');
     }
 }
