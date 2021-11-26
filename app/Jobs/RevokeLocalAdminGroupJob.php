@@ -41,7 +41,7 @@ class RevokeLocalAdminGroupJob implements ShouldQueue
             $groupname = config('web-ldap-admin.localAdminGroupLdap');
             $group = LdapGroup::createOrUpdate($groupname);
 
-            $ldapuser = Adldap::search()->users()->where('cn', '=', $solicitation->user->username);
+            $ldapuser = Adldap::search()->users()->where('cn', '=', $solicitation->user->username)->first();
 
             if($ldapuser->inGroup($groupname)){
                 $ldapuser->removeGroup($group);
