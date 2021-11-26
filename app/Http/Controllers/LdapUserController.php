@@ -140,7 +140,6 @@ class LdapUserController extends Controller
     {
         $this->authorize('admin');
         $attr = LdapUser::show($username);
-        #dd($attr);
         if( $attr ) {
             return view('ldapusers.show',compact('attr'));
         }
