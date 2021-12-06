@@ -4,7 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
-use Auth;
+use Illuminate\Support\Facades\Auth;
+use Uspdev\Replicado\Pessoa;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -28,14 +29,9 @@ class AuthServiceProvider extends ServiceProvider
 
         Gate::resource('ldapusers', 'App\Policies\LdapUserPolicy');
 
-        # logado 
-        Gate::define('logado', function ($user) { 
-            if($user){
-                return true;            
-            }
-            else {
-                return false;
-            }
+        // gate para servidor
+        Gate::define('servidor', function ($servidor) {
+            return in_array('SERVIDOR', Pessoa::obterSiglasVinculosAtivos(Auth::user()->codpes));
         });
     }
 }

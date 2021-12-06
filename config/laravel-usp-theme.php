@@ -1,22 +1,14 @@
 <?php
 
-if (getenv('SOLICITA_CONTA_ADMIN') == 1) {
-    $solicitaContaAdmin = [
-        'text' => 'Solicitação de Conta de Administrador',
-        'url' => config('app.url') . '/solicita',
-        'can' => 'logado',
-    ];
-} else {
-    $solicitaContaAdmin = [];
-}
-
 $menu = [
     [
         'text' => 'Minha Conta',
         'url' => config('app.url') . '/ldapusers/my',
-        'can' => 'logado',
+        'can' => 'user',
     ],
-    $solicitaContaAdmin,
+    [
+        'key' => 'solicitaContaAdmin', # menu dinâmico solicita conta admin
+    ],
     [
         'text' => 'Usuários Ldap',
         'url' => config('app.url') . '/ldapusers',
@@ -26,14 +18,16 @@ $menu = [
 
 $right_menu = [
     [
+        'key' => 'senhaunica-socialite',
+    ],
+    [
         'text' => '<i class="fas fa-cog"></i>',
         'title' => 'Configurações',
-        'target' => '_blank',
         'url' => config('app.url') . '/configs',
         'align' => 'right',
+        'can' => 'admin',
     ],
 ];
-
 
 return [
     'title' => config('app.name'),
