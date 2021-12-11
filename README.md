@@ -94,6 +94,10 @@ Configuração referente ao replicado (http://github.com/uspdev/replicado)
     REPLICADO_PASSWORD=
     REPLICADO_CODUNDCLG=8
 
+Configuração referente ao processo de sincronização de dados do usuário durante o login no sistema (0 = desativado / 1 = ativado)
+
+    SINC_LDAP_LOGIN=1
+    
 ### Dependências do composer
 
     composer install
