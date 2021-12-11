@@ -29,21 +29,24 @@ class LoginListener
             auth()->logout();
         }
 
-        $attr = [
-            'nome'  => $event->user->name,
-            'email' => $event->user->email,
-            'setor' => ''
-        ];
-
-        $setores = Pessoa::obterSiglasSetoresAtivos($event->user->codpes);
-        if($setores){
-            $attr['setor'] = $setores[0]; # Não é a melhor escolha
+        if (config('web-ldap-admin.sincLdapLogin') == 1) {
+        
+            $attr = [
+                'nome'  => $event->user->name,
+                'email' => $event->user->email,
+                'setor' => ''
+            ];
+    
+            $setores = Pessoa::obterSiglasSetoresAtivos($event->user->codpes);
+            if($setores){
+                $attr['setor'] = $setores[0]; # Não é a melhor escolha
+            }
+            $password = date('dmY', strtotime(Pessoa::dump($event->user->codpes, ['dtanas'])['dtanas']));
+            $groups = array_merge($vinculos, $setores);
+    
+            LdapUser::createOrUpdate($event->user->codpes,$attr,$groups,$password);
+            Session::flash('alert-success', 'Informações sincronizadas com Sistemas Corporativos');
         }
-        $password = date('dmY', strtotime(Pessoa::dump($event->user->codpes, ['dtanas'])['dtanas']));
-        $groups = array_merge($vinculos, $setores);
-
-        LdapUser::createOrUpdate($event->user->codpes,$attr,$groups,$password);
-        Session::flash('alert-success', 'Informações sincronizadas com Sistemas Corporativos');
     }
 
 

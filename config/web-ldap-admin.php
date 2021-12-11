@@ -19,4 +19,7 @@ return [
 
     # 0 = ninguém, 1 = todos, 2 = servidores (funcionários e docentes)
     'solicitaContaAdmin' => env('SOLICITA_CONTA_ADMIN', 0),
+    
+    # 0 = não sincroniza durante login, 1 = sincroniza durante login
+    'sincLdapLogin' => env('SINC_LDAP_LOGIN', 1),
 ];
