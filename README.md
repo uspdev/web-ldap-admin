@@ -2,9 +2,9 @@
 
 Sistema escrito em laravel que permite gerenciar usuários da sua
 unidade na Universidade de São Paulo em uma base local do tipo 
-domain controller samba/ad. Para tal, dois serviços são necessários 
-para rodar esse sistema: 
-banco de dados corporativa replicada e oauth 1.0 senha única.
+domain controller implementada em samba-ad-dc ou Active Directory. 
+Para tal, dois serviços são necessários para rodar esse sistema: 
+banco de dados corporativa replicada (sybase ou mssql) e tokens do OAuth 1 para senha única.
 
 Esse sistema permite:
 
