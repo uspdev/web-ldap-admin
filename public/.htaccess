@@ -4,6 +4,11 @@
     </IfModule>
 
     RewriteEngine On
+    
+    # Habilitar essa opcao caso o deploy do sistema
+    #seja realizado em um contexto e nao na raiz do dominio
+    #RewriteBase "/<CONTEXTO>/"
+    #
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
