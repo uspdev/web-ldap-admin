@@ -113,7 +113,14 @@ dos certificado SSL/TLS, para isso, em /etc/ldap/ldap.conf manter apenas:
 Como rodar filas sem limite de tempo:
 
     php artisan queue:listen --timeout=0
- 
+
+Caso o deploy do sistema seja realizado em contexto e não na raiz do domínio 
+talvez seja necessário habilitar a diretiva RewriteBase no arquivo public/.htaccess: 
+
+    RewriteEngine On
+    RewriteBase "/<CONTEXTO>/"
+    ...
+         
 ## Códigos Úteis
 
 Ativar toda base de usuários:
