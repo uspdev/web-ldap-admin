@@ -151,7 +151,7 @@ class LdapUserController extends Controller
     {
         // Depois de tratado o id, vamos ver se a pessoa em questão tem acesso a essa página
         //$this->authorize('ldapusers.view',$username);
-        $this->authorize('logado');
+        $this->authorize('user');
 
         $username = Auth::user()->username;
         $attr = LdapUser::show($username);
@@ -182,7 +182,7 @@ class LdapUserController extends Controller
     public function update(Request $request, $username)
     {
         //$this->authorize('ldapusers.update', $id);
-        $this->authorize('logado');
+        $this->authorize('user');
 
         // troca de senha
         if(!is_null($request->senha)) {
