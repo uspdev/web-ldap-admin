@@ -16,7 +16,7 @@ class SolicitaController extends Controller
      */
     public function create(Request $request)
     {
-        $this->authorize('logado');
+        $this->authorize('user');
         $user = Auth::user();
         $ldap_computers = Adldap::search()->computers()->sortBy('cn')->get();
         $computers = [];
@@ -39,7 +39,7 @@ class SolicitaController extends Controller
 
     public function store(Request $request){
 
-        $this->authorize('logado');
+        $this->authorize('user');
 
         $request->validate([
             'computer'      => ['required'],
