@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'sitename' => 'USP',
+    'sitename' => config('app.name'),
 ];
