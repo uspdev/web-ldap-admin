@@ -190,9 +190,14 @@ class LdapUserController extends Controller
                'senha' => ['required','confirmed','min:8'],
             ]);
 
-            LdapUser::changePassword($username,$request->senha);
-            $request->session()->flash('alert-success', 'Senha alterada com sucesso!');
-            return redirect('/');
+            if (LdapUser::changePassword($username,$request->senha)) {
+                $request->session()->flash('alert-success', 'Senha alterada com sucesso!');
+                return redirect('/');
+            } else {
+                $request->session()->flash('alert-danger', 
+                    'Não foi possível alterar a senha da sua conta! Consulte a política de senha de seu servidor.');
+                return redirect('/ldapusers/my');
+            }            
         }
 
         // status
