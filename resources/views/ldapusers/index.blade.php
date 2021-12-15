@@ -113,7 +113,7 @@
                         {{ $grupos }}
                     </td>
                     <td>
-                        @if($ldapusers->getResults()[$i]->useraccountcontrol[0] == 512)
+                        @if($ldapusers->getResults()[$i]->isEnabled())
                           <form action="{{ env('APP_URL') }}/ldapusers/{{ $ldapusers->getResults()[$i]->samaccountname[0] }}" method="post">
                             {{csrf_field()}} 
                             {{ method_field('patch') }}

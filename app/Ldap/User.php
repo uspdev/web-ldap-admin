@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use App\Ldap\Group as LdapGroup;
 
 use Uspdev\Replicado\Pessoa;
+use Adldap\Models\Attributes\AccountControl;
 
 class User
 {
@@ -35,7 +36,7 @@ class User
             $user->setAttribute('pwdlastset', 0);
 
             // Enable the new user (using user account control).
-            $user->setUserAccountControl(512);
+            $user->setUserAccountControl(AccountControl::NORMAL_ACCOUNT);
         }
 
         // Set the user profile details.
@@ -108,7 +109,7 @@ class User
             $attr['grupos'] = implode(', ',$grupos);
 
             // status
-            if($user->getUserAccountControl() == 512) {
+            if($user->isEnabled()) {
                 $attr['status'] = 'Ativada';
             } else {
                 $attr['status'] = 'Desativada';
@@ -137,7 +138,7 @@ class User
         $user = Adldap::search()->where('cn', '=', $username)->first();
         if(!is_null($user)){
             # https://support.microsoft.com/pt-br/help/305144/how-to-use-the-useraccountcontrol-flags-to-manipulate-user-account-pro
-            $user->setUserAccountControl(2);
+            $user->setUserAccountControl(AccountControl::ACCOUNTDISABLE);
             // adicionar ao grupo Desativados
             LdapGroup::addMember($user, ['Desativados']);
             $user->save();
@@ -152,7 +153,7 @@ class User
 
         if(!is_null($user)){
             # https://support.microsoft.com/pt-br/help/305144/how-to-use-the-useraccountcontrol-flags-to-manipulate-user-account-pro
-            $user->setUserAccountControl(512);
+            $user->setUserAccountControl(AccountControl::NORMAL_ACCOUNT);
 
             // TODO: remover do grupo Desativados
             /*$grupo_desativados = LdapGroup::createOrUpdate('Desativados');
