@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use App\Ldap\Group as LdapGroup;
 
 use Uspdev\Replicado\Pessoa;
+use Adldap\Models\Attributes\AccountControl;
 
 class User
 {
@@ -168,8 +169,7 @@ class User
 
     public static function changePassword($username, String $password)
     {
-        // TODO: verificar se a conta está ativada antes de trocar senha
-        $user = Adldap::search()->where('cn', '=', $username)->first();
+        $user = Adldap::search()->where('cn', '=', $username)->whereEnabled()->first();
         if(!is_null($user)){
             $user->setPassword($password);
             $user->save();
