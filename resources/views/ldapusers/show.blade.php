@@ -67,31 +67,33 @@
         </tbody>
     </table>
 
-    <h2> Editar </h2>
-
-    <div class="row">
-        <div class="col-sm-4">
-            <form method="POST" action="{{ url('/ldapusers/'.$attr['username']) }}">
-                {{csrf_field()}}
-                {{ method_field('PATCH') }}
-
-                <div class="form-group">
-                  <label for="usr"> Nova senha:</label>
-                  <input type="password" class="form-control" name="senha">
-                  <i> Mínimo de 8 caracteres. </i>
-                </div>
-
-                <div class="form-group">
-                  <label for="usr"> Repetir Nova senha:</label>
-                  <input type="password" class="form-control" name="senha_confirmation">
-                </div>
-
-                <div class="form-group">
-                    <button type="submit" class="btn btn-success"> Altera Senha </button>
-                </div>
-            </form>
+	@if ($attr['status'] == 'Ativada')
+        <h2> Editar </h2>
+    
+        <div class="row">
+            <div class="col-sm-4">
+                <form method="POST" action="{{ url('/ldapusers/'.$attr['username']) }}">
+                    {{csrf_field()}}
+                    {{ method_field('PATCH') }}
+    
+                    <div class="form-group">
+                      <label for="usr"> Nova senha:</label>
+                      <input type="password" class="form-control" name="senha">
+                      <i> Mínimo de 8 caracteres. </i>
+                    </div>
+    
+                    <div class="form-group">
+                      <label for="usr"> Repetir Nova senha:</label>
+                      <input type="password" class="form-control" name="senha_confirmation">
+                    </div>
+    
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success"> Altera Senha </button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
+    @endif
 @endisset
 
 @stop
