@@ -1,6 +1,6 @@
 @extends('laravel-usp-theme::master')
 
-@section('title', 'USP')
+@section('title', config('app.name'))
 
 @section('content_header')
     <h1></h1>
