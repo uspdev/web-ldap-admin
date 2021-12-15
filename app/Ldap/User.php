@@ -167,14 +167,21 @@ class User
         return false;
     }
 
-    public static function changePassword($username, String $password)
+    public static function changePassword($username, String $password) : bool
     {
+        $result= true;
         $user = Adldap::search()->where('cn', '=', $username)->whereEnabled()->first();
         if(!is_null($user)){
             $user->setPassword($password);
-            $user->save();
+            
+            try {
+                $user->save();
+            } catch(\ErrorException $e) {
+                $result = false;
+            }
         }
-    }
+        return($result);
+    }    
 
     public static function getUsersGroup($grupo)
     {
