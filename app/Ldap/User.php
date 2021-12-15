@@ -138,7 +138,7 @@ class User
         $user = Adldap::search()->where('cn', '=', $username)->first();
         if(!is_null($user)){
             # https://support.microsoft.com/pt-br/help/305144/how-to-use-the-useraccountcontrol-flags-to-manipulate-user-account-pro
-            $user->setUserAccountControl(2);
+            $user->setUserAccountControl(AccountControl::ACCOUNTDISABLE);
             // adicionar ao grupo Desativados
             LdapGroup::addMember($user, ['Desativados']);
             $user->save();
