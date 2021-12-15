@@ -134,7 +134,7 @@ Ativar toda base de usuários:
     $users = \Adldap\Laravel\Facades\Adldap::search()->users()->get();
 
     foreach($users as $user) {
-        $user->setUserAccountControl(512);
+        $user->setUserAccountControl(AccountControl::NORMAL_ACCOUNT);
         $user->save();
     }
 
