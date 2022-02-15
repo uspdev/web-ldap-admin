@@ -27,6 +27,7 @@ class User
 
             // define DN para esse user
             $dn = "cn={$username}," .  $user->getDnBuilder();
+
             $user->setDn($dn);
 
             // Password
@@ -65,6 +66,12 @@ class User
 
         // Adiciona a um grupo
         LdapGroup::addMember($user, $groups);
+
+        // Busca a OU padrão informada no .env
+        $ou = Adldap::search()->ous()->find(config('web-ldap-admin.ouDefault'));
+        // Move o usuário para a OU padrão somente se ela existir,
+        // do contrário deixa o usuário na raiz
+        $user->move($ou);
 
         return $user;
     }
@@ -173,7 +180,7 @@ class User
         $user = Adldap::search()->where('cn', '=', $username)->whereEnabled()->first();
         if(!is_null($user)){
             $user->setPassword($password);
-            
+
             try {
                 $user->save();
             } catch(\ErrorException $e) {
@@ -181,7 +188,7 @@ class User
             }
         }
         return($result);
-    }    
+    }
 
     public static function getUsersGroup($grupo)
     {

@@ -22,3 +22,6 @@ yarn-error.log
 Dockerfile.custom
 # lando php.ini
 php.ini
+
+# vim bkp
+*.*~

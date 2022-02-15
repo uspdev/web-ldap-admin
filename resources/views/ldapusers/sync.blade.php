@@ -10,7 +10,7 @@
     @include('alerts')
 
         <div class="col-md-6">
-                       
+
             <form method="post" action="{{ url('/ldapusers/sync') }}">
                 {{ csrf_field() }}
                 <table class="table table-striped">
@@ -18,21 +18,29 @@
                         <th>&nbsp;</th>
                         <th>Vínculo</th>
                         <th style="text-align: right;">Replicado</th>
-                        <th style="text-align: right;">AD</th>
-                    </tr>
-
+                        <th style="text-align: right;">{{ config('web-ldap-admin.ouDefault') }}</th>
+		            </tr>
                     @foreach (Uspdev\Replicado\Pessoa::tiposVinculos(config('web-ldap-admin.replicado_unidade')) as $vinculo)
+		    	        @php
+                            $countReplicado = Uspdev\Replicado\Pessoa::ativosVinculo($vinculo['tipvinext'], config('web-ldap-admin.replicado_unidade'), 1)[0]['total'];
+                            $countAD = count(App\Ldap\User::getUsersGroup($vinculo['tipvinext']));
+			                if ($countAD < $countReplicado) {
+			                    $styleColor = '#f00';
+                            } else {
+			                    $styleColor = '#000';
+                            }
+			            @endphp
                     <tr>
-                    <td><input type="checkbox" name="type[]" value="{{ $vinculo['tipvinext'] }}"></td>
+                        <td><input type="checkbox" name="type[]" value="{{ $vinculo['tipvinext'] }}"></td>
                         <td>{{ $vinculo['tipvinext'] }}</td>
                         <td style="text-align: right;">
-                            {{ Uspdev\Replicado\Pessoa::ativosVinculo($vinculo['tipvinext'], config('web-ldap-admin.replicado_unidade'), 1)[0]['total'] }}
-                        </td>
-                        <td style="text-align: right;">
-                            {{ count(App\Ldap\User::getUsersGroup($vinculo['tipvinext'])) }}
+                            {{ $countReplicado }}
+			            </td>
+                        <td style="text-align: right; color: {{ $styleColor }}">
+                            {{ $countAD }}
                         </td>
                     </tr>
-                    @endforeach                    
+                    @endforeach
                 </table>
 
                 <div class="form-group">
