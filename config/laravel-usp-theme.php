@@ -2,7 +2,7 @@
 
 $menu = [
     [
-        'text' => 'Minha Conta',
+        'text' => 'Minha Conta (trocar senha da rede)',
         'url' => config('app.url') . '/ldapusers/my',
         'can' => 'user',
     ],
@@ -17,11 +17,11 @@ $menu = [
 ];
 
 $right_menu = [
-    [
+    /*[
         'key' => 'senhaunica-socialite',
-    ],
+    ],*/
     [
-        'text' => '<i class="fas fa-cog"></i>',
+        'text' => '<i class="fas fa-cog"></i> Sincronizar ' . env('LDAP_OU_DEFAULT'),
         'title' => 'Configurações',
         'url' => config('app.url') . '/configs',
         'align' => 'right',

@@ -10,7 +10,7 @@ class Group
     public static function createOrUpdate(string $name)
     {
         $group = Adldap::search()->groups()->where('cn','=',$name)->first();
-        
+
         if (is_null($group) || $group == false) {
             $group = Adldap::make()->group();
 
@@ -18,10 +18,16 @@ class Group
             $dn = "CN={$name}," .  $group->getDnBuilder();
             $group->setDn($dn);
             $group->setAccountName(trim($name));
+            // save
             $group->save();
+
+            // Busca a OU padrão informada no .env
+            $ou = Adldap::search()->ous()->find(config('web-ldap-admin.ouDefault'));
+            // Move o grupo para a OU padrão somente se ela existir,
+            // do contrário deixa o grupo na raiz
+            $group->move($ou);
         }
 
-        // save
         return $group;
     }
 
@@ -59,7 +65,7 @@ class Group
         $groups = Adldap::search()->groups()->get();
         foreach($groups as $group) {
             if(empty(trim($group->getDescription()))){
-                array_push($r,$group->getName()); 
+                array_push($r,$group->getName());
             }
         }
         sort($r);
