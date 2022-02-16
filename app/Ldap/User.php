@@ -79,7 +79,7 @@ class User
     public static function show(String $username)
     {
 
-        $user = Adldap::search()->where('cn', '=', $username)->first();
+        $user = Adldap::search()->users()->where('cn', '=', $username)->first();
         if(!is_null($user)){
 
             $attr = [];
