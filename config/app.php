@@ -65,7 +65,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'America/Sao_Paulo',
 
     /*
     |--------------------------------------------------------------------------
@@ -78,8 +78,8 @@ return [
     |
     */
 
-    'locale' => 'en',
-
+    'locale' => 'pt-BR',
+    'faker_locale' => 'pt-BR',
     /*
     |--------------------------------------------------------------------------
     | Application Fallback Locale

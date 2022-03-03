@@ -3,41 +3,36 @@
 namespace App\Ldap;
 
 use Adldap\Laravel\Facades\Adldap;
-use Carbon\Carbon;
-use App\Ldap\Group as LdapGroup;
-
-use Uspdev\Replicado\Pessoa;
 use Adldap\Models\Attributes\AccountControl;
+use App\Ldap\Group as LdapGroup;
+use Carbon\Carbon;
 
 class User
 {
 
     /** Estrutura do array attr:
-      * $attr['nome']  : Nome completo
-      * $attr['email'] : Email
-      * $attr['setor'] : Departamento
-      **/
+     * $attr['nome']  : Nome completo
+     * $attr['email'] : Email
+     * $attr['setor'] : Departamento
+     **/
     public static function createOrUpdate(string $username, array $attr, array $groups = [], $password = null)
     {
-        $user = Adldap::search()->where('cn', '=', $username)->first();
+
+        $password = $password == null ? 'TrocaXr123!()' : '';
+
+        $user = SELF::obterUserPorUsername($username);
 
         # Novo usuário
         if (is_null($user) or $user == false) {
             $user = Adldap::make()->user();
 
             // define DN para esse user
-            $dn = "cn={$username}," .  $user->getDnBuilder();
+            $user->setDn('cn=' . $username . ',cn=Users,' . $user->getDnBuilder());
 
-            $user->setDn($dn);
-
-            // Password
             $user->setPassword($password);
-
-            // Trocar a senha no próximo logon
-            $user->setAttribute('pwdlastset', 0);
-
-            // Enable the new user (using user account control).
-            $user->setUserAccountControl(AccountControl::NORMAL_ACCOUNT);
+            $user->setAttribute('pwdlastset', 0); // Trocar a senha no próximo logon
+            $user->setUserAccountControl(AccountControl::NORMAL_ACCOUNT); // Enable the new user (using user account control).
+            $user->setAccountExpiry(SELF::expiryDays());
         }
 
         // Set the user profile details.
@@ -46,18 +41,22 @@ class User
         // nome
         $user->setDisplayName($attr['nome']);
 
-        $nome_array = explode(' ',$attr['nome']);
-        if(count($nome_array)>1) {
+        // atribuindo nome e sobrenome
+        $nome_array = explode(' ', $attr['nome']);
+        if (count($nome_array) > 1) {
             $user->setFirstName(trim($nome_array[0]));
             unset($nome_array[0]);
-            $user->setLastName(implode(' ',$nome_array));
+            $user->setLastName(implode(' ', $nome_array));
         } else {
             $user->setFirstName(trim($nome_array[0]));
         }
-        !empty($attr['email'])?$user->setEmail($attr['email']):NULL;
+
+        if (!empty($attr['email'])) {
+            $user->setEmail($attr['email']);
+        }
 
         // Departamento
-        if(!empty($attr['setor'])){
+        if (!empty($attr['setor'])) {
             $user->setDepartment($attr['setor']);
         }
 
@@ -76,64 +75,103 @@ class User
         return $user;
     }
 
-    public static function show(String $username)
+    /**
+     * Retorna o número de dias para expirar a conta com base no config
+     */
+    public static function expiryDays()
+    {
+        if (config('web-ldap-admin.expirarEm') == 0) {
+            return null;
+        } else {
+            return now()->addDays(config('web-ldap-admin.expirarEm'))->timestamp;
+        }
+    }
+
+    /**
+     * Obtém uma instância de usuário com busca pelo codpes
+     */
+    public static function obterUserPorCodpes($codpes)
+    {
+        if (config('web-ldap-admin.campoCodpes') == 'Telephone') {
+            return Adldap::search()->users()->findBy('telephoneNumber', $codpes);
+        }
+        if (config('web-ldap-admin.campoCodpes') == 'username') {
+            return Adldap::search()->users()->where('cn', '=', $codpes)->first();
+        }
+        return null;
+    }
+
+    /**
+     * Obtém uma instância de usuário com busca pelo username
+     */
+    public static function obterUserPorUsername($username)
+    {
+        return $user = Adldap::search()->users()->where('cn', '=', $username)->first();
+    }
+
+    public static function show($user)
     {
 
-        $user = Adldap::search()->users()->where('cn', '=', $username)->first();
-        if(!is_null($user)){
+        $attr = [];
 
-            $attr = [];
+        // Nome e email
+        $attr['username'] = $user->getAccountName();
+        $attr['display_name'] = $user->getDisplayName();
+        $attr['email'] = $user->getEmail();
+        $attr['description'] = $user->getDescription();
+        $attr['codpes'] = SELF::obterCodpes($user);
 
-            // Nome e email
-            $attr['username'] = $username;
-            $attr['display_name'] = $user->getDisplayName();
-            $attr['email'] = $user->getEmail();
-
-            // Data da criação da conta
-            $ativacao = $user->whencreated[0];
-            if(!is_null($ativacao)) {
-                $ativacao = Carbon::createFromFormat('YmdHis\.0\Z', $ativacao)->format('d/m/Y');
-            }
-            $attr['ativacao'] = $ativacao;
-
-            // última senha alterada
-            $last = $user->getPasswordLastSetDate();
-            if(!is_null($last)) {
-                $last = Carbon::createFromFormat('Y-m-d H:i:s', $last)->format('d/m/Y');
-            }
-            $attr['senha_alterada_em'] = $last;
-
-            // Data da expiração da conta
-            $expira = $user->expirationDate();
-            if(!is_null($expira)) {
-                $expira = Carbon::instance($expira)->format('d/m/Y');
-            }
-            $attr['expira'] = $expira;
-
-            // Grupos
-            $grupos = array_diff($user->getGroupNames(),['Domain Users']);
-            sort($grupos);
-            $attr['grupos'] = implode(', ',$grupos);
-
-            // status
-            if($user->isEnabled()) {
-                $attr['status'] = 'Ativada';
-            } else {
-                $attr['status'] = 'Desativada';
-            }
-
-            // Department
-            $attr['department'] = $user->getDepartment();
-
-            return $attr;
+        // Data da criação da conta
+        $ativacao = $user->whencreated[0];
+        if (!is_null($ativacao)) {
+            $ativacao = Carbon::createFromFormat('YmdHis\.0\Z', $ativacao)->subHours(3)->format('d/m/Y H:i:s');
         }
-        return false;
+        $attr['ativacao'] = $ativacao;
+
+        // última senha alterada
+        $last = $user->getPasswordLastSetDate();
+        if (!is_null($last)) {
+            $last = Carbon::createFromFormat('Y-m-d H:i:s', $last)->format('d/m/Y H:i:s');
+        }
+        $attr['senha_alterada_em'] = $last;
+
+        // Data da expiração da conta
+        $expira = $user->expirationDate();
+        if (!is_null($expira)) {
+            $expira = Carbon::instance($expira)->format('d/m/Y');
+        }
+        $attr['expira'] = $expira;
+
+        // Grupos
+        $grupos = array_diff($user->getGroupNames(), ['Domain Users']);
+        sort($grupos);
+        $attr['grupos'] = implode(', ', $grupos);
+
+        // Department
+        $attr['department'] = $user->getDepartment();
+
+        return $attr;
+    }
+
+    /**
+     * Retorna o codpes do usuário ldap
+     * 
+     * O codpes pode ser o username ou o telephone e é setado no config
+     */
+    public static function obterCodpes($user)
+    {
+        if (config('web-ldap-admin.campoCodpes') == 'Telephone') {
+            return $user->getTelephoneNumber();
+        }
+        if (config('web-ldap-admin.campoCodpes') == 'Username') {
+            return $user->getAccountName();
+        }
     }
 
     public static function delete(String $username)
     {
-        $user = Adldap::search()->where('cn', '=', $username)->first();
-        if(!is_null($user)){
+        $user = SELF::obterUserPorUsername($username);
+        if (!is_null($user)) {
             $user->delete();
             return true;
         }
@@ -142,12 +180,12 @@ class User
 
     public static function disable(String $username)
     {
-        $user = Adldap::search()->where('cn', '=', $username)->first();
-        if(!is_null($user)){
+        $user = SELF::obterUserPorUsername($username);
+        if (!is_null($user)) {
             # https://support.microsoft.com/pt-br/help/305144/how-to-use-the-useraccountcontrol-flags-to-manipulate-user-account-pro
             $user->setUserAccountControl(AccountControl::ACCOUNTDISABLE);
             // adicionar ao grupo Desativados
-            LdapGroup::addMember($user, ['Desativados']);
+            // LdapGroup::addMember($user, ['Desativados']);
             $user->save();
             return true;
         }
@@ -156,38 +194,44 @@ class User
 
     public static function enable(String $username)
     {
-        $user = Adldap::search()->where('cn', '=', $username)->first();
+        $user = SELF::obterUserPorUsername($username);
 
-        if(!is_null($user)){
+        if (!is_null($user)) {
             # https://support.microsoft.com/pt-br/help/305144/how-to-use-the-useraccountcontrol-flags-to-manipulate-user-account-pro
             $user->setUserAccountControl(AccountControl::NORMAL_ACCOUNT);
 
             // TODO: remover do grupo Desativados
-            /*$grupo_desativados = LdapGroup::createOrUpdate('Desativados');
-              $grupo_desativados->removeMember($user);
+            // $grupo_desativados = LdapGroup::createOrUpdate('Desativados');
+            // $grupo_desativados->removeMember($user);
 
-              $group->save();
-            */
+            // $group->save();
+            
             $user->save();
             return true;
         }
         return false;
     }
 
-    public static function changePassword($username, String $password) : bool
+    public static function changePassword($username, String $password): bool
     {
-        $result= true;
-        $user = Adldap::search()->where('cn', '=', $username)->whereEnabled()->first();
-        if(!is_null($user)){
-            $user->setPassword($password);
-
-            try {
-                $user->save();
-            } catch(\ErrorException $e) {
-                $result = false;
-            }
+        $user = SELF::obterUserPorUsername($username);
+        if (is_null($user)) {
+            return false;
         }
-        return($result);
+
+        $user->setPassword($password);
+
+        // tem de verificar a lógica de se ao trocar a senha o usuário vai ter prazo de expiração
+        $user->setAccountExpiry(SELF::expiryDays());
+        $user->save();
+
+        // try {
+        //     $user->save();
+        //     $result = true;
+        // } catch (\ErrorException $e) {
+        //     $result = false;
+        // }
+        return true;
     }
 
     public static function getUsersGroup($grupo)
@@ -197,9 +241,9 @@ class User
         if ($group != false) {
             $ldapusers = Adldap::search()->users();
             $ldapusers = $ldapusers->where('memberof', '=', $group->getDnBuilder()->get());
-            $ldapusers = $ldapusers->where('samaccountname','!=','Administrator');
-            $ldapusers = $ldapusers->where('samaccountname','!=','krbtgt');
-            $ldapusers = $ldapusers->where('samaccountname','!=','Guest');
+            $ldapusers = $ldapusers->where('samaccountname', '!=', 'Administrator');
+            $ldapusers = $ldapusers->where('samaccountname', '!=', 'krbtgt');
+            $ldapusers = $ldapusers->where('samaccountname', '!=', 'Guest');
             $ldapusers = $ldapusers->sortBy('displayname', 'asc');
             $ldapusers = $ldapusers->paginate(config('web-ldap-admin.registrosPorPagina'))->getResults();
         }
@@ -211,7 +255,7 @@ class User
     {
         foreach ($desligados as $desligado) {
             // remover dos grupos
-            $user = Adldap::search()->users()->where('cn', '=', $desligado)->first();
+            $user = SELF::obterUserPorUsername($username);
             $groups = $user->getGroups();
             foreach ($groups as $group) {
                 $group->removeMember($user);
@@ -224,4 +268,5 @@ class User
             self::disable($desligado);
         }
     }
+
 }

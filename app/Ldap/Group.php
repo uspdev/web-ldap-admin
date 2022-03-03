@@ -3,19 +3,18 @@
 namespace App\Ldap;
 
 use Adldap\Laravel\Facades\Adldap;
-use Carbon\Carbon;
 
 class Group
 {
     public static function createOrUpdate(string $name)
     {
-        $group = Adldap::search()->groups()->where('cn','=',$name)->first();
+        $group = Adldap::search()->groups()->where('cn', '=', $name)->first();
 
         if (is_null($group) || $group == false) {
             $group = Adldap::make()->group();
 
-            // define DN para esse user
-            $dn = "CN={$name}," .  $group->getDnBuilder();
+            // define DN para esse grupo
+            $dn = "CN={$name},cn=Users," . $group->getDnBuilder();
             $group->setDn($dn);
             $group->setAccountName(trim($name));
             // save
@@ -31,14 +30,21 @@ class Group
         return $group;
     }
 
-    // recebe instâncias
-    public static function addMember($user, $groups)
+    /**
+     * Adiciona usuários à grupos, cria grupo se necessário
+     *
+     * @param \Adldap\Models\User $user
+     * @param Array $group
+     * @return Null
+     */
+    public static function addMember(\Adldap\Models\User $user, array $groups)
     {
-        $ldap_user = Adldap::search()->users()->where('cn','=',$user->getName())->first();
+        $ldap_user = Adldap::search()->users()->where('cn', '=', $user->getName())->first();
+        $ldap_user = $user;
 
         $before_groups = $ldap_user->getGroupNames();
-        $notRemoveGroups = explode(',',config('web-ldap-admin.notRemoveGroups'));
-        $keep_groups = array_intersect($before_groups,$notRemoveGroups);
+        $notRemoveGroups = explode(',', config('web-ldap-admin.notRemoveGroups'));
+        $keep_groups = array_intersect($before_groups, $notRemoveGroups);
 
         $groups = array_merge($keep_groups, $groups);
 
@@ -50,7 +56,7 @@ class Group
         $groups = array_filter($groups);
         $groups = array_unique($groups);
 
-        foreach($groups as $groupname) {
+        foreach ($groups as $groupname) {
             $group = self::createOrUpdate($groupname);
             $group->addMember($user);
             $group->save();
@@ -63,10 +69,10 @@ class Group
         // assim, por hora, vou assumir que os grupos criado pelo laravel estão sem descrição
         $r = [];
         $groups = Adldap::search()->groups()->get();
-        foreach($groups as $group) {
-            if(empty(trim($group->getDescription()))){
-                array_push($r,$group->getName());
-            }
+        foreach ($groups as $group) {
+            //if(empty(trim($group->getDescription()))){
+            array_push($r, $group->getName());
+            //}
         }
         sort($r);
         return $r;

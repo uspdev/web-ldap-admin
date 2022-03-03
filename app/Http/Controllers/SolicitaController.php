@@ -17,6 +17,10 @@ class SolicitaController extends Controller
     public function create(Request $request)
     {
         $this->authorize('user');
+
+        // a url ativa não está funcionando com menu dinâmico issue #98
+        \UspTheme::activeUrl('solicita');
+
         $user = Auth::user();
         $ldap_computers = Adldap::search()->computers()->sortBy('cn')->get();
         $computers = [];
@@ -63,7 +67,7 @@ class SolicitaController extends Controller
         $solicita->user_id = auth()->user()->id;
         $solicita->save();
 
-        $ldapuser = Adldap::search()->users()->where('cn', '=', auth()->user()->username)->first();
+        $user = LdapUser::obterUserPorUsername(auth()->user()->username);
 
         $groupname = config('web-ldap-admin.localAdminGroupLdap');
         $group = LdapGroup::createOrUpdate($groupname);

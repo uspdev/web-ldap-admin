@@ -1,4 +1,4 @@
-@extends('laravel-usp-theme::master')
+@extends('layouts.app')
 
 @section('content_header')
     <h1>Liberação temporária de administração do computador </h1>
@@ -9,8 +9,6 @@
 <h2>Liberação temporária para administração de computador </h2>
 
 <div class="row">
-    @include('alerts')
-
         <div class="col-md-12">
             <form method="post" action="{{ url('/solicita') }}">
                 @csrf

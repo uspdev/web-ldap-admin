@@ -1,30 +1,21 @@
 <?php
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-use App\Ldap\User as LdapUser;
-use App\Ldap\Group as LdapGroup;
-use Carbon\Carbon;
 use Adldap\Laravel\Facades\Adldap;
-
-use App\Policies\LdapUserPolicy;
-
 use App\Jobs\SincronizaReplicado;
-
-use Uspdev\Replicado\Pessoa;
-use Uspdev\Replicado\Graduacao;
-use Uspdev\Replicado\Posgraduacao;
+use App\Ldap\Group as LdapGroup;
+use App\Ldap\User as LdapUser;
 use App\Rules\LdapEmailRule;
 use App\Rules\LdapUsernameRule;
-use Illuminate\Database\Eloquent\Collection;
-
 use Auth;
+use Illuminate\Http\Request;
+use Uspdev\Replicado\Posgraduacao;
 
 class LdapUserController extends Controller
 {
-    public function __construct() {
-       $this->middleware('auth');
+    public function __construct()
+    {
+        $this->middleware('auth');
     }
 
     /**
@@ -35,6 +26,7 @@ class LdapUserController extends Controller
     public function index(Request $request)
     {
         $this->authorize('admin');
+        \UspTheme::activeUrl('ldapusers');
 
         // Registros por página
         if (empty($request->perPage)) {
@@ -53,17 +45,17 @@ class LdapUserController extends Controller
         // Busca
         $ldapusers = Adldap::search()->users();
 
-        if(!empty($request->search) && isset($request->search)){
+        if (!empty($request->search) && isset($request->search)) {
             // buscar por username ou por nome
             $check = clone $ldapusers;
-            if(count($check->where('samaccountname','contains',$request->search)->get()) > 0) {
-                $ldapusers = $ldapusers->where('samaccountname','contains',$request->search);
+            if (count($check->where('samaccountname', 'contains', $request->search)->get()) > 0) {
+                $ldapusers = $ldapusers->where('samaccountname', 'contains', $request->search);
             } else {
-                $ldapusers = $ldapusers->where('displayname','contains',$request->search);
+                $ldapusers = $ldapusers->where('displayname', 'contains', $request->search);
             }
         }
 
-        if(!empty($request->grupos) && isset($request->grupos)){
+        if (!empty($request->grupos) && isset($request->grupos)) {
             if (count($request->grupos) > 1) {
                 for ($i = 0; $i < count($request->grupos); $i++) {
                     $group = Adldap::search()->groups()->find($request->grupos[$i]);
@@ -71,24 +63,29 @@ class LdapUserController extends Controller
                 }
             } else {
                 $group = Adldap::search()->groups()->find($request->grupos[0]);
-                $ldapusers = $ldapusers->where('memberof','=',$group->getDnBuilder()->get());
+                $ldapusers = $ldapusers->where('memberof', '=', $group->getDnBuilder()->get());
             }
         }
 
-        // remove usuários default do sistema
-        $ldapusers = $ldapusers->where('samaccountname','!=','Administrator');
-        $ldapusers = $ldapusers->where('samaccountname','!=','krbtgt');
-        $ldapusers = $ldapusers->where('samaccountname','!=','Guest');
+        // oculta usuários default do sistema
+        foreach (config('web-ldap-admin.ocultarUsuarios') as $usuario) {
+            $ldapusers = $ldapusers->where('samaccountname', '!=', $usuario);
+        }
 
         // Ordenando
         $ldapusers = $ldapusers->sortBy('displayname', 'asc');
 
         // Paginando
         $ldapusers = $ldapusers->paginate($perPage, $page);
+        $pagCor = $ldapusers->getCurrentPage();
+        $perPag = $ldapusers->getPerPage();
+        $totPag = $ldapusers->getPages();
+        // dd($ldapusers);
+        $ldapusers = $ldapusers->getResults();
 
         $grupos = LdapGroup::listaGrupos();
 
-        return view('ldapusers.index', compact('ldapusers', 'grupos', 'request'));
+        return view('ldapusers.index', compact('ldapusers', 'grupos', 'request', 'pagCor', 'perPag', 'totPag'));
     }
 
     /**
@@ -99,6 +96,8 @@ class LdapUserController extends Controller
     public function create(Request $request)
     {
         $this->authorize('admin');
+        \UspTheme::activeUrl('ldapusers/create');
+
         return view('ldapusers.create');
     }
 
@@ -114,20 +113,21 @@ class LdapUserController extends Controller
 
         // Validações
         $request->validate([
-            'nome'      => ['required'],
-            'email'     => ['required','email', new LdapEmailRule],
-            'username'  => ['required','regex:/^[a-zA-Z0-9]*$/i', new LdapUsernameRule],
+            'username' => ['required', 'regex:/^[a-zA-Z0-9]*$/i', new LdapUsernameRule],
+            'nome' => ['required'],
+            'email' => ['required', 'email', new LdapEmailRule],
+            //'grupo' => ['']
         ]);
 
         LdapUser::createOrUpdate($request->username, [
-            'nome'  => $request->nome,
+            'nome' => $request->nome,
             'email' => $request->email,
-            'setor' => 'NAOREPLICADO'
+            'setor' => 'NAOREPLICADO',
         ],
-        ['NAOREPLICADO']);
+            [$request->grupo, 'NAOREPLICADO']);
 
         $request->session()->flash('alert-success', 'Usuário cadastrado com sucesso!');
-        return redirect(config('app.url')."/ldapusers/{$request->username}");
+        return redirect("ldapusers/{$request->username}");
     }
 
     /**
@@ -139,27 +139,53 @@ class LdapUserController extends Controller
     public function show(Request $request, $username)
     {
         $this->authorize('admin');
-        $attr = LdapUser::show($username);
-        if( $attr ) {
-            return view('ldapusers.show',compact('attr'));
+        $user = LdapUser::obterUserPorUsername($username);
+        if (!$user) {
+            $request->session()->flash('alert-danger', "A conta $username não existe no ldap.");
+            return view('ldapusers.show-no-user');
         }
-        $request->session()->flash('alert-danger', 'Essa conta não existe no ldap.');
-        return redirect('/');
+        return SELF::showCommon($user);
     }
 
     public function my(Request $request)
     {
-        // Depois de tratado o id, vamos ver se a pessoa em questão tem acesso a essa página
-        //$this->authorize('ldapusers.view',$username);
         $this->authorize('user');
+        \UspTheme::activeUrl('ldapusers/my');
 
-        $username = Auth::user()->username;
-        $attr = LdapUser::show($username);
-        if( $attr ) {
-            return view('ldapusers.show',compact('attr'));
+        $user = LdapUser::obterUserPorCodpes(Auth::user()->codpes);
+        if (!$user) {
+            $request->session()->flash('alert-danger', 'Sua conta não existe no ldap. ');
+            return view('ldapusers.show-no-user');
         }
-        $request->session()->flash('alert-danger', 'Sua conta não existe no ldap. ');
-        return redirect('/');
+        return SELF::showCommon($user);
+    }
+
+    /**
+     * parte comum do show para show e my
+     */
+    protected function showCommon($user)
+    {
+        $attr = LdapUser::show($user);
+
+        $vinculos = [];
+        if ($codpes = LdapUser::obterCodpes($user)) {
+            $vinculos = [
+                [
+                    'tipvin' => 'ALUNOPOS',
+                    'tipvinext' => 'Aluno de pós graduação',
+                ],
+            ];
+            foreach ($vinculos as &$vinculo) {
+                switch ($vinculo['tipvin']) {
+                    case 'ALUNOPOS':
+                        $pg = Posgraduacao::obterVinculoAtivo($codpes);
+                        $vinculo = array_merge($vinculo, $pg);
+                        break;
+                }
+            }
+        }
+
+        return view('ldapusers.show', compact('attr', 'user', 'vinculos'));
     }
 
     /**
@@ -181,38 +207,37 @@ class LdapUserController extends Controller
      */
     public function update(Request $request, $username)
     {
-        //$this->authorize('ldapusers.update', $id);
         $this->authorize('user');
 
         // troca de senha
-        if(!is_null($request->senha)) {
+        if (!is_null($request->senha)) {
             $request->validate([
-               'senha' => ['required','confirmed','min:8'],
+                'senha' => ['required', 'confirmed', 'min:8'],
             ]);
 
-            if (LdapUser::changePassword($username,$request->senha)) {
+            if (LdapUser::changePassword($username, $request->senha)) {
                 $request->session()->flash('alert-success', 'Senha alterada com sucesso!');
-                return redirect('/');
             } else {
-                $request->session()->flash('alert-danger', 
+                $request->session()->flash('alert-danger',
                     'Não foi possível alterar a senha da sua conta! Consulte a política de senha de seu servidor.');
-                return redirect('/ldapusers/my');
-            }            
+            }
+
+            return redirect()->back();
         }
 
         // status
-        if(!is_null($request->status)) {
+        if (!is_null($request->status)) {
 
-            if($request->status == 'disable') {
+            if ($request->status == 'disable') {
                 LdapUser::disable($username);
-                $request->session()->flash('alert-success', 'Usuário Desabilitado');
-                return redirect('/ldapusers/');
+                $request->session()->flash('alert-success', "Usuário $username desabilitado!");
+                return redirect()->back();
             }
 
-            if($request->status == 'enable') {
+            if ($request->status == 'enable') {
                 LdapUser::enable($username);
-                $request->session()->flash('alert-success', 'Usuário Habilitado');
-                return redirect('/ldapusers/');
+                $request->session()->flash('alert-success', "Usuário $username habilitado!");
+                return redirect()->back();
             }
         }
     }
@@ -229,14 +254,21 @@ class LdapUserController extends Controller
 
         $attr = LdapUser::delete($username);
 
-        $request->session()->flash('alert-danger', 'Usuário(a) '. $username .' deletado');
-        return redirect('/ldapusers');
+        $request->session()->flash('alert-danger', 'Usuário(a) ' . $username . ' deletado');
+        return redirect()->back();
     }
 
     public function syncReplicadoForm(Request $request)
     {
         $this->authorize('admin');
-        return view('ldapusers.sync');
+
+        $vinculos = \Uspdev\Replicado\Pessoa::tiposVinculos(config('web-ldap-admin.replicado_unidade'));
+        foreach ($vinculos as &$vinculo) {
+            $vinculo['countReplicado'] = \Uspdev\Replicado\Pessoa::ativosVinculo($vinculo['tipvinext'], config('web-ldap-admin.replicado_unidade'), 1)[0]['total'];
+            $vinculo['countAD'] = count(\App\Ldap\User::getUsersGroup($vinculo['tipvinext']));
+            $vinculo['style'] = $vinculo['countAD'] < $vinculo['countReplicado'] ? 'text-danger' : '';
+        }
+        return view('ldapusers.sync', compact('vinculos'));
     }
 
     public function syncReplicado(Request $request)

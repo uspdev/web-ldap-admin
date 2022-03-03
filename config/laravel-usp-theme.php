@@ -3,7 +3,7 @@
 $menu = [
     [
         'text' => 'Minha Conta (trocar senha da rede)',
-        'url' => config('app.url') . '/ldapusers/my',
+        'url' => 'ldapusers/my',
         'can' => 'user',
     ],
     [
@@ -11,19 +11,24 @@ $menu = [
     ],
     [
         'text' => 'Usuários Ldap',
-        'url' => config('app.url') . '/ldapusers',
-        'can' => 'admin',
+        'url' => 'ldapusers',
+        'can' => 'gerente',
+    ],
+    [
+        'text' => 'Criar usuário não replicado',
+        'url' => 'ldapusers/create',
+        'can' => 'gerente',
     ]
 ];
 
 $right_menu = [
-    /*[
+    [
         'key' => 'senhaunica-socialite',
-    ],*/
+    ],
     [
         'text' => '<i class="fas fa-cog"></i> Sincronizar ' . env('LDAP_OU_DEFAULT'),
         'title' => 'Configurações',
-        'url' => config('app.url') . '/configs',
+        'url' => 'configs',
         'align' => 'right',
         'can' => 'admin',
     ],

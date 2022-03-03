@@ -1,4 +1,4 @@
-@extends('laravel-usp-theme::master')
+@extends('layouts.app')
 
 @section('content_header')
     <h1></h1>
@@ -9,8 +9,6 @@
 <br><br>
 
 <div class="row">
-    @include('alerts')
-
         <div class="col-md-6">
             <form method="post" action="{{ url('/configs') }}">
                 {{ csrf_field() }}

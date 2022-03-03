@@ -36,7 +36,7 @@ class ViewServiceProvider extends ServiceProvider
         // Menu dinâmico solicita conta admin
         $menuContaAdmin = [
             'text' => 'Solicitação de Conta de Administrador',
-            'url' => config('app.url') . '/solicita',
+            'url' => 'solicita',
             'can' => 'user',
         ];
 

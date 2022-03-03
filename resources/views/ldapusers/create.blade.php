@@ -1,4 +1,4 @@
-@extends('laravel-usp-theme::master')
+@extends('layouts.app')
 
 @section('content_header')
     <h1>Cadastrar usuário</h1>
@@ -7,8 +7,6 @@
 @section('content')
 
 <div class="row">
-    @include('alerts')
-
         <div class="col-md-6">
             <form method="post" action="{{ url('/ldapusers') }}">
                 {{ csrf_field() }}

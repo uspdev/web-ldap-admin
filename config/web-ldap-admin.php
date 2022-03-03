@@ -2,7 +2,7 @@
 
 return [
     # Footer theme
-    'footer' => env('FOOTER', false),
+    #'footer' => env('FOOTER', false),
 
     # Unidades autorizadas
     'replicado_unidade' => env('REPLICADO_CODUNDCLG'),
@@ -25,4 +25,14 @@ return [
 
     # Unidade Organizacional padrão
     'ouDefault' => env('LDAP_OU_DEFAULT', ''),
+
+    # Prazo padrão para expirar conta (dias). 0 para não expirar
+    'expirarEm' => env('EXPIRAR_EM', 365),
+
+    # Contas de usuarios ocultadas default do sistema
+    'ocultarUsuarios' => ['administrator', 'administrador', 'krbtgt', 'guest'],
+
+    # Campo LDAP que será usado como codpes
+    # Telephone, username
+    'campoCodpes' => env('CAMPO_CODPES','Telephone'), 
 ];
