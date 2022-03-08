@@ -9,7 +9,7 @@ banco de dados corporativa replicada (sybase ou mssql) e tokens do OAuth 1 para 
 Esse sistema permite:
 
  - Sincronizar base de dados ldap local com pessoas importadas do replicado USP
- - O próprio usuário trocar senha ldap pela web
+ - O próprio usuário pode trocar a senha ldap pela web
  - Gerenciar usuários locais no ldap que não estejam no replicado
 
 Quando o usuário fizer login no sistema usando senha única, uma array $vinculo
@@ -81,18 +81,15 @@ Servidor domain controller:
     LDAP_USE_SSL=true
     LDAP_USE_TLS=false
 
-O LDAP_USERNAME pode ter variações. Na biblioteca adldap2 indica o uso de usuario@xurepiha.br.
-Também pode ser usado a sintaxe de domínio anterior ao AD xurepinha\\\\usuario.
+O LDAP_USERNAME pode ter variações. Na biblioteca adldap2 indica o uso de usuario@xurepiha.br. Também pode ser usado a sintaxe de domínio anterior ao AD xurepinha\\\\usuario.
 
-Configuração referente ao processo de sincronização de dados do usuário durante o login no sistema:
-* 0 = desativado - não cria usuário ldap automaticamente no login
-* 1 = ativado (default) - cria usuário ldap automaticamente no login
+Configuração referente ao processo de sincronização de dados do usuário durante o login no sistema. Se **0** não cria usuário ldap automaticamente no login, se **1** (default) cria usuário ldap automaticamente no login.
 
     SINC_LDAP_LOGIN=1
 
-Configura o OU (organizational unit) padrão onde os usuários e grupos serão inseridos. É conveniente setar um valor aqui.
+Configura o OU (organizational unit) padrão onde os usuários e grupos serão inseridos. É conveniente setar um valor aqui. Se vazio vai criar na raiz do CN (conteiner).
 
-Se vazio vai criar na raiz do CN (conteiner).
+OBS.: Aparentemente estando nesta OU ou no conteiner Users padrão, o usuário consegue fazere login normalmente. Mas acho que é importante no uso de diretivas de grupos. 
 
     LDAP_OU_DEFAULT=
 
@@ -100,11 +97,11 @@ Ao criar conta nova ou trocar a senha, pode-se definir um prazo para expiração
 
     EXPIRAR_EM=0
 
-Configura em qual campo vai estar associado o codpes da pessoa. Por padrão é no campo **username** mas pode ser atribuído ao campo **telephoneNumber**. Nesse caso, na criação de novo usuário automático, o username vai ser o **email** sem caracteres especiais (somente letras e números) e sem o domínio.
+Configura em qual campo vai estar associado o codpes da pessoa. Por padrão é no campo **username** mas pode ser atribuído ao campo **telephoneNumber**. No segundo caso, na criação de novo usuário automático, o username vai ser o **email** sem caracteres especiais (somente letras e números) e sem o domínio.
 
     CAMPO_CODPES=username
     
-Depois de ajustado o .env deve criar o banco de dados local
+Depois de ajustado o .env, deve-se criar o banco de dados local.
 
     php artisan migrate
 
