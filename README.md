@@ -50,21 +50,26 @@ Quando o usuário fizer login no sistema usando senha única, uma array $vinculo
     ]
 
 Se a pessoa tiver algum vínculo (codigoUnidade) com a unidade
-o usuário é inserido no domain controller. 
-Os campos tipoVinculo e nomeAbreviadoSetor serão mapeados com grupos.
+o usuário é inserido no domain controller. Os campos tipoVinculo e nomeAbreviadoSetor serão mapeados com grupos.
 
-## Instalação
+Caso não queira inserir automaticamente a pessoa, esse recurso pode ser desabilitado no .env.
 
-### Dependências php
+## Dependências php
 
     version='7.3'
     apt-get install php$version-ldap
+
+## Instalação
+
+    git clone git@github.com/uspdev/php-ldap-admin 
+    composer install --no-dev (ambiente de produção)
 
 ### Configurações no .env
 
 Copie o arquivo .env.example para .env e faça os ajustes necessários.
 
     cp .env.example .env
+    php artisan key:generate
 
 Servidor domain controller:
 
@@ -78,33 +83,29 @@ Servidor domain controller:
 
 O LDAP_USERNAME pode ter variações. Na biblioteca adldap2 indica o uso de usuario@xurepiha.br.
 Também pode ser usado a sintaxe de domínio anterior ao AD xurepinha\\\\usuario.
-    
-COnfiguração referente à OAuth1 (http://github.com/uspdev/senhaunica-socialite)
 
-    SENHAUNICA_KEY=oh-man
-    SENHAUNICA_SECRET=secret
-    SENHAUNICA_CALLBACK_ID=100
-
-Configuração referente ao replicado (http://github.com/uspdev/replicado)
-
-    REPLICADO_HOST=
-    REPLICADO_PORT=
-    REPLICADO_DATABASE=
-    REPLICADO_USERNAME=
-    REPLICADO_PASSWORD=
-    REPLICADO_CODUNDCLG=8
-
-Configuração referente ao processo de sincronização de dados do usuário durante o login no sistema (0 = desativado / 1 = ativado)
+Configuração referente ao processo de sincronização de dados do usuário durante o login no sistema:
+* 0 = desativado - não cria usuário ldap automaticamente no login
+* 1 = ativado (default) - cria usuário ldap automaticamente no login
 
     SINC_LDAP_LOGIN=1
+
+Configura o OU (organizational unit) padrão onde os usuários e grupos serão inseridos. É conveniente setar um valor aqui.
+
+Se vazio vai criar na raiz do CN (conteiner).
+
+    LDAP_OU_DEFAULT=
+
+Ao criar conta nova ou trocar a senha, pode-se definir um prazo para expiração de senha padrão. Se 0 (default), a senha não vai expirar. O valor é em dias.
+
+    EXPIRAR_EM=0
+
+Configura em qual campo vai estar associado o codpes da pessoa. Por padrão é no campo **username** mas pode ser atribuído ao campo **telephoneNumber**. Nesse caso, na criação de novo usuário automático, o username vai ser o **email** sem caracteres especiais (somente letras e números) e sem o domínio.
+
+    CAMPO_CODPES=username
     
-### Dependências do composer
+Depois de ajustado o .env deve criar o banco de dados local
 
-    composer install
-
-### Configurações do laravel
-
-    php artisan key:generate
     php artisan migrate
 
 ## Dicas
@@ -143,16 +144,9 @@ Rodar um job pelo tinker:
     php artisan tinker
     App\Jobs\RevokeLocalAdminGroupJob::dispatch();
 
-## Nova  documentação
 
-### CAMPO_CODPES=username, telephoneNumber
+## Funcionamento dos Grupos
 
-Se username, é o comportamento atual: username = codpes
-
-Se telephoneNumber, vai atribuir o codpes no campo telephoneNumber e ao criar o usuário o login vai ser o email sem caracteres especiais: soemnte letras e números
-
-### Grupos
-
-O sistema vai adicionar o usuário ao grupo com o memo nome do vínculo. Ex.: ALUNOGR, SERVIDOR, etc.
+O sistema vai adicionar o usuário ao grupo com o mesmo nome do vínculo. Ex.: ALUNOGR, SERVIDOR, etc. Os grupos são criados automaticamente.
 
 O departamento (department) corresponde ao setor, se tiver.
