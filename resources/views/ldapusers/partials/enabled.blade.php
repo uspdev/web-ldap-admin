@@ -1,14 +1,11 @@
 <div class="dropdown">
     <a class="btn btn-sm dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown">
         @if ($user->isEnabled())
-            {{ isset($label) && $label == true ? 'Habilitado' : '' }}
             <i class="fas fa-user text-success"></i>
         @else
-            {{ isset($label) && $label == true ? 'Desabilitado' : '' }}
             <i class="fas fa-user-slash text-warning"></i>
         @endif
     </a>
-    @can('gerente')
     <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
         <form action="ldapusers/{{ $user->samaccountname[0] }}" method="post">
             @csrf
@@ -19,5 +16,4 @@
             </button>
         </form>
     </div>
-    @endcan
 </div>

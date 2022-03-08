@@ -27,12 +27,13 @@ return [
     'ouDefault' => env('LDAP_OU_DEFAULT', ''),
 
     # Prazo padrão para expirar conta (dias). 0 para não expirar
-    'expirarEm' => env('EXPIRAR_EM', 365),
+    'expirarEm' => env('EXPIRAR_EM', 0),
 
     # Contas de usuarios ocultadas default do sistema
     'ocultarUsuarios' => ['administrator', 'administrador', 'krbtgt', 'guest'],
 
     # Campo LDAP que será usado como codpes
-    # Telephone, username
-    'campoCodpes' => env('CAMPO_CODPES','Telephone'), 
+    # telephoneNumber, username
+    # vai ser aplicado strtolower então o case não importa
+    'campoCodpes' => env('CAMPO_CODPES','telephoneNumber'), 
 ];

@@ -8,16 +8,14 @@ class Group
 {
     public static function createOrUpdate(string $name)
     {
-        $group = Adldap::search()->groups()->where('cn', '=', $name)->first();
-
-        if (is_null($group) || $group == false) {
+        $group = Adldap::search()->groups()->where('cn', '=', trim($name))->first();
+        if (!$group) {
             $group = Adldap::make()->group();
+            $group->setDn("CN={$name}," . $group->getDnBuilder());
+            $group->setName(trim($name));
 
-            // define DN para esse grupo
-            $dn = "CN={$name},cn=Users," . $group->getDnBuilder();
-            $group->setDn($dn);
-            $group->setAccountName(trim($name));
-            // save
+            // vamos nomear o grupo de forma a não conflitar
+            $group->setAttribute('sAMAccountName','GRUPO-' . trim($name));
             $group->save();
 
             // Busca a OU padrão informada no .env
@@ -26,7 +24,6 @@ class Group
             // do contrário deixa o grupo na raiz
             $group->move($ou);
         }
-
         return $group;
     }
 
@@ -39,17 +36,15 @@ class Group
      */
     public static function addMember(\Adldap\Models\User $user, array $groups)
     {
-        $ldap_user = Adldap::search()->users()->where('cn', '=', $user->getName())->first();
-        $ldap_user = $user;
-
-        $before_groups = $ldap_user->getGroupNames();
+        $before_groups = $user->getGroupNames();
         $notRemoveGroups = explode(',', config('web-ldap-admin.notRemoveGroups'));
         $keep_groups = array_intersect($before_groups, $notRemoveGroups);
 
         $groups = array_merge($keep_groups, $groups);
 
         // Vamos remover todos grupos e adicionar apenas os necessários
-        $ldap_user->removeAllGroups();
+        // porque remover todos????? Não vamos mexer com os grupos existentes
+        // $user->removeAllGroups();
 
         //remove posições vazias, repetidas e sujas
         $groups = array_map('trim', $groups);
@@ -58,8 +53,9 @@ class Group
 
         foreach ($groups as $groupname) {
             $group = self::createOrUpdate($groupname);
-            $group->addMember($user);
-            $group->save();
+            if (!$user->inGroup($group)) {
+                $group->addMember($user);
+            }
         }
     }
 
@@ -67,12 +63,11 @@ class Group
     {
         // Nota: não encontrei nada que me permissite distinguir grupo do default do sistema ou não
         // assim, por hora, vou assumir que os grupos criado pelo laravel estão sem descrição
+        // adicionando iscriticalsystemobject como filtro. Melhora mas não limpa todos (Masaki)
         $r = [];
-        $groups = Adldap::search()->groups()->get();
+        $groups = Adldap::search()->groups()->where('iscriticalsystemobject','!','TRUE')->get();
         foreach ($groups as $group) {
-            //if(empty(trim($group->getDescription()))){
             array_push($r, $group->getName());
-            //}
         }
         sort($r);
         return $r;

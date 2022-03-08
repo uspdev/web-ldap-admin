@@ -2,21 +2,23 @@
 
 namespace App\Listeners;
 
+use App\Ldap\User as LdapUser;
 use Illuminate\Auth\Events\Login;
 use Session;
 use Uspdev\Replicado\Pessoa;
-use App\Ldap\User as LdapUser;
 
 class LoginListener
 {
 
-    public function __construct(){
+    public function __construct()
+    {
     }
 
-    public function handle(Login $event){
+    public function handle(Login $event)
+    {
 
         /**
-         * Manter retrocompatibilidade, pois esse sistema chamado o codpes de username
+         * Manter retrocompatibilidade, pois esse sistema chama o codpes de username
          * 25/06/2021: atualização do senhaunica-socialite para 3.x
          **/
         $event->user->username = $event->user->codpes;
@@ -24,30 +26,47 @@ class LoginListener
 
         $vinculos = Pessoa::obterSiglasVinculosAtivos($event->user->codpes);
 
-        if(empty($vinculos)){
+        if (empty($vinculos)) {
             Session::flash('alert-danger', 'Pessoa sem vínculo com essa unidade');
             auth()->logout();
         }
 
         if (config('web-ldap-admin.sincLdapLogin') == 1) {
-        
+            // vamos criar a ou atualizar a conta automaticamente no login
             $attr = [
-                'nome'  => $event->user->name,
+                //'displayname', 'mail', 'telephonenumber', 'givenname', 'description', 'department', 'sn - surname',
+                'nome' => $event->user->name,
                 'email' => $event->user->email,
-                'setor' => ''
+                'setor' => '',
             ];
-    
+
             $setores = Pessoa::obterSiglasSetoresAtivos($event->user->codpes);
-            if($setores){
+            if ($setores) {
                 $attr['setor'] = $setores[0]; # Não é a melhor escolha
             }
-            $password = date('dmY', strtotime(Pessoa::dump($event->user->codpes, ['dtanas'])['dtanas']));
+            //Não vamos setar password no login pois, ou o usuário já tem, ou vai ter de mudar pela própria interface
+            //$password = date('dmY', strtotime(Pessoa::dump($event->user->codpes, ['dtanas'])['dtanas']));
+
+            // Vincula o grupo aos setores correspondentes
             $groups = array_merge($vinculos, $setores);
-    
-            LdapUser::createOrUpdate($event->user->codpes,$attr,$groups,$password);
+
+            // setando username e codpes
+            switch (strtolower(config('web-ldap-admin.campoCodpes'))) {
+                case 'telephonenumber':
+                    $username = explode('@', $event->user->email)[0];
+                    $username = preg_replace("/[^a-zA-Z0-9]+/", "", $username); //email sem caracteres especiais
+                    $attr['telephonenumber'] = $event->user->codpes;
+                    break;
+                case 'username':
+                default:
+                    $username = $event->user->codpes;
+                    $attr['telephonenumber'] = '';
+                    break;
+            }
+
+            LdapUser::createOrUpdate($username, $attr, $groups);
             Session::flash('alert-success', 'Informações sincronizadas com Sistemas Corporativos');
         }
     }
-
 
 }
