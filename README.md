@@ -97,7 +97,7 @@ Ao criar conta nova ou trocar a senha, pode-se definir um prazo para expiração
 
     EXPIRAR_EM=0
 
-Configura em qual campo vai estar associado o codpes da pessoa. Por padrão é no campo **username** mas pode ser atribuído ao campo **telephoneNumber**. No segundo caso, na criação de novo usuário automático, o username vai ser o **email** sem caracteres especiais (somente letras e números) e sem o domínio.
+Configura em qual campo vai estar associado o codpes da pessoa. Por padrão é no campo **username** mas pode ser atribuído ao campo **telephoneNumber**. No segundo caso, na criação de novo usuário automático, o username vai ser o **email** sem caracteres especiais (somente letras e números) e sem o domínio. Se o usuário já existir o username pode ser qualquer.
 
     CAMPO_CODPES=username
     
