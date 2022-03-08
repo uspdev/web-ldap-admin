@@ -142,3 +142,17 @@ Rodar um job pelo tinker:
 
     php artisan tinker
     App\Jobs\RevokeLocalAdminGroupJob::dispatch();
+
+## Nova  documentação
+
+### CAMPO_CODPES=username, telephoneNumber
+
+Se username, é o comportamento atual: username = codpes
+
+Se telephoneNumber, vai atribuir o codpes no campo telephoneNumber e ao criar o usuário o login vai ser o email sem caracteres especiais: soemnte letras e números
+
+### Grupos
+
+O sistema vai adicionar o usuário ao grupo com o memo nome do vínculo. Ex.: ALUNOGR, SERVIDOR, etc.
+
+O departamento (department) corresponde ao setor, se tiver.
