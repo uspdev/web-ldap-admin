@@ -22,7 +22,7 @@
       @endif
 
       {{-- mensagem para o gerente avisando sobre conta ldap não vinculada ao aluno --}}
-      @if (Gate::check('gerente') && !$codpesValido)
+      @if (Gate::check('gerente') && $attr['codpes'] && !$codpesValido)
         <div class="alert alert-warning" role="alert">
           O número USP está presente mas não no campo indicado pelo config
           (campoCodpes={{ config('web-ldap-admin.campoCodpes') }}). 

@@ -181,6 +181,8 @@ class User
      * O codpes pode ser o username ou o telephonenumber e é setado no config.
      * Se não encontrar no campo apropriado faz a busca no outro campo
      * para o caso de ter mudado a regra ao longo do uso
+     * 
+     * Se não retornar codpes o status pode ser qualquer
      *
      * @param \Adldap\Models\User $user
      * @param $status Se true retorna se o codpes veio do campo correto ou não, segundo o config
