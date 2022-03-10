@@ -6,19 +6,25 @@ use Adldap\Laravel\Facades\Adldap;
 use Adldap\Models\Attributes\AccountControl;
 use App\Ldap\Group as LdapGroup;
 use Carbon\Carbon;
+use Uspdev\Utils\Generic as Utils;
 
 class User
 {
 
-    /** Estrutura do array attr:
+    /** 
+     * Cria ou atualiza os dados do usuário ldap
+     * 
+     * Este método está com mais comentários no código pois em geral 
+     * serve de entrada para novos desenvolvedores.
+     * 
+     * Estrutura do array attr:
      * $attr['nome']  : Nome completo
      * $attr['email'] : Email
      * $attr['setor'] : Departamento
      **/
     public static function createOrUpdate(string $username, array $attr, array $groups = [], $password = null)
     {
-        $password = ($password == null) ? 'TrocaXr123!()' : $password;
-
+        // vamos ver se o usuário já existe
         $user = SELF::obterUserPorUsername($username);
 
         # Novo usuário
@@ -28,10 +34,17 @@ class User
             // define DN para esse user
             $user->setDn('cn=' . $username . ',cn=Users,' . $user->getDnBuilder());
 
-            $user->setPassword($password);
-            $user->setAttribute('pwdlastset', 0); // Trocar a senha no próximo logon
-            $user->setUserAccountControl(AccountControl::NORMAL_ACCOUNT); // Enable the new user (using user account control).
-            $user->setAccountExpiry(SELF::getExpiryDays()); // para novos usuários vamos expirar senha conforme config
+            // se não for fornecido senha vamos gerar aleatório forte
+            $user->setPassword($password ?? Utils::senhaAleatoria());
+
+            // Trocar a senha no próximo logon
+            $user->setAttribute('pwdlastset', 0); 
+
+            // Enable the new user (using user account control).
+            $user->setUserAccountControl(AccountControl::NORMAL_ACCOUNT); 
+
+            // vamos expirar senha conforme config
+            $user->setAccountExpiry(SELF::getExpiryDays()); 
         }
 
         // login no windows
@@ -65,13 +78,13 @@ class User
         }
 
         $user->save();
-        //dd($user, $username, $attr, $groups, $password);
 
         // Adiciona a um ou mais grupo
         LdapGroup::addMember($user, $groups);
 
         // Busca a OU padrão informada no .env
         $ou = Adldap::search()->ous()->find(config('web-ldap-admin.ouDefault'));
+
         // Move o usuário para a OU padrão somente se ela existir,
         // do contrário deixa o usuário na raiz
         $user->move($ou);
@@ -301,5 +314,5 @@ class User
             self::disable($desligado);
         }
     }
-
+    
 }

@@ -10,6 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Uspdev\Replicado\Graduacao;
 use Uspdev\Replicado\Pessoa;
+use Uspdev\Utils\Generic as Utils;
 
 class SincronizaReplicado implements ShouldQueue
 {
@@ -76,11 +77,37 @@ class SincronizaReplicado implements ShouldQueue
                 // Estas contas devem ser desativadas
                 LdapUser::desativarUsers($desligados);
             }
+
             foreach ($pessoas as $pessoa) {
-                $username = $pessoa['codpes'];
-                //$password = date('dmY', strtotime(Pessoa::dump($pessoa['codpes'], ['dtanas'])['dtanas']));
-                $password = 'TrocaXr123!()';
-                
+                // setando username e codpes (similar loginListener)
+                switch (strtolower(config('web-ldap-admin.campoCodpes'))) {
+                    case 'telephonenumber':
+                        $username = explode('@', $pessoa['codema'])[0];
+                        $username = preg_replace("/[^a-zA-Z0-9]+/", "", $username); //email sem caracteres especiais
+                        $attr['telephonenumber'] = $pessoa['codpes'];
+                        break;
+                    case 'username':
+                    default:
+                        $username = $pessoa['codpes'];
+                        $attr['telephonenumber'] = '';
+                        break;
+                }
+
+                // setando senha
+                switch (config('web-ldap-admin.senhaPadrao')) {
+                    case 'random':
+                        $password = Utils::senhaAleatoria();
+                        break;
+
+                    case 'data_nascimento':
+                    default:
+                        $password = date('dmY', strtotime($pessoa['dtanas']));
+                        break;
+                }
+
+                // as regras de setor aqui parecem diferentes das regras de setor do loginListener
+
+                // remove o código da unidade do setor
                 $setor = str_replace('-' . $this->unidade, '', $pessoa['nomabvset']);
                 if (empty($setor)) {
                     $setor = $pessoa['tipvinext'];
@@ -91,15 +118,16 @@ class SincronizaReplicado implements ShouldQueue
                 } else {
                     $setor = $pessoa['tipvinext'] . ' ' . $setor;
                 }
+                $attr['setor'] = $setor;
 
-                $attr = [
-                    'nome' => $pessoa['nompesttd'],
-                    'email' => $pessoa['codema'],
-                    'setor' => $setor,
-                ];
+                $attr['nome'] = $pessoa['nompesttd'];
+                $attr['email'] = $pessoa['codema'];
+
+                //
                 $grupos = Pessoa::vinculosSetores($pessoa['codpes'], $this->unidade);
                 $grupos = array_unique($grupos);
                 sort($grupos);
+
                 LdapUser::createOrUpdate($username, $attr, $grupos, $password);
             }
         }

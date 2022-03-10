@@ -35,5 +35,9 @@ return [
     # Campo LDAP que será usado como codpes
     # telephoneNumber, username
     # vai ser aplicado strtolower então o case não importa
-    'campoCodpes' => env('CAMPO_CODPES','telephoneNumber'), 
+    'campoCodpes' => env('CAMPO_CODPES','username'), 
+
+    # Tipo padrão de senha
+    # data_nascimento, random
+    'senhaPadrao' => env('SENHA_PADRAO','data_nascimento'), 
 ];

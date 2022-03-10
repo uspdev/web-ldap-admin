@@ -64,12 +64,16 @@ Caso não queira inserir automaticamente a pessoa, esse recurso pode ser desabil
     git clone git@github.com/uspdev/php-ldap-admin 
     composer install --no-dev (ambiente de produção)
 
-### Configurações no .env
+## Configurações no .env
 
 Copie o arquivo .env.example para .env e faça os ajustes necessários.
 
     cp .env.example .env
     php artisan key:generate
+    # Configure o banco de dados local
+    php artisan migrate
+
+### Configurações da aplicação
 
 Servidor domain controller:
 
@@ -101,9 +105,9 @@ Configura em qual campo vai estar associado o codpes da pessoa. Por padrão é n
 
     CAMPO_CODPES=username
     
-Depois de ajustado o .env, deve-se criar o banco de dados local.
+Configura como será criado a senha padrão para os novos usuários ldap. Pode ser a **data de nascimento**(default) ou **random**. O random deve ser compatível com a diretiva de senah forte do AD.
 
-    php artisan migrate
+    SENHA_PADRAO=data_nascimento 
 
 ## Dicas
 

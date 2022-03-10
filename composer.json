@@ -25,7 +25,8 @@
         "select2/select2": "^4.0",
         "uspdev/laravel-usp-theme": "^2.0",
         "uspdev/replicado": "^1.8",
-        "uspdev/senhaunica-socialite": "^4.0"
+        "uspdev/senhaunica-socialite": "^4.0",
+        "uspdev/utils": "^1.0"
     },
     "require-dev": {
         "facade/ignition": "^2.3.6",
