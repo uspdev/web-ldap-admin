@@ -17,8 +17,7 @@ class User
      **/
     public static function createOrUpdate(string $username, array $attr, array $groups = [], $password = null)
     {
-
-        $password = $password == null ? 'TrocaXr123!()' : '';
+        $password = ($password == null) ? 'TrocaXr123!()' : $password;
 
         $user = SELF::obterUserPorUsername($username);
 
@@ -36,7 +35,7 @@ class User
         }
 
         // login no windows
-        $user->setAccountName($username); 
+        $user->setAccountName($username);
 
         // nome de exibição
         $user->setDisplayName($attr['nome']);
@@ -66,6 +65,7 @@ class User
         }
 
         $user->save();
+        //dd($user, $username, $attr, $groups, $password);
 
         // Adiciona a um ou mais grupo
         LdapGroup::addMember($user, $groups);
@@ -181,7 +181,7 @@ class User
      * O codpes pode ser o username ou o telephonenumber e é setado no config.
      * Se não encontrar no campo apropriado faz a busca no outro campo
      * para o caso de ter mudado a regra ao longo do uso
-     * 
+     *
      * Se não retornar codpes o status pode ser qualquer
      *
      * @param \Adldap\Models\User $user
