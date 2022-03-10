@@ -31,7 +31,10 @@ class AuthServiceProvider extends ServiceProvider
 
         // gate para servidor
         Gate::define('servidor', function ($servidor) {
-            return in_array('SERVIDOR', Pessoa::obterSiglasVinculosAtivos(Auth::user()->codpes));
+            $vinculos = Pessoa::obterSiglasVinculosAtivos(Auth::user()->codpes);
+            if($vinculos == null) $vinculos = [];
+
+            return in_array('SERVIDOR', $vinculos);
         });
     }
 }

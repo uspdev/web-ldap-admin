@@ -13,7 +13,7 @@ class Pessoa extends ReplicadoPessoa
     public static function obterServidorAtivo($codpes)
     {
         $sql = "SELECT * FROM VINCULOPESSOAUSP
-            WHERE codpes = :codpes
+            WHERE codpes = convert(int,:codpes)
             AND tipvin = 'SERVIDOR'
             AND dtafimvin IS NULL
         ";

@@ -6,6 +6,7 @@ use App\Ldap\User as LdapUser;
 use Illuminate\Auth\Events\Login;
 use Session;
 use Uspdev\Replicado\Pessoa;
+use App\Models\Config;
 
 class LoginListener
 {
@@ -16,6 +17,10 @@ class LoginListener
 
     public function handle(Login $event)
     {
+        // Pessoas que podem logar sem vínculo com a unidade
+        $configs = Config::latest()->first();
+        $codpes_sem_vinculo = explode(',',$configs->codpes_sem_vinculo);
+        $codpes_sem_vinculo = array_unique($codpes_sem_vinculo);
 
         /**
          * Manter retrocompatibilidade, pois esse sistema chama o codpes de username
@@ -26,7 +31,10 @@ class LoginListener
 
         $vinculos = Pessoa::obterSiglasVinculosAtivos($event->user->codpes);
 
-        if (empty($vinculos)) {
+        // Como usamos a função array_merge, as respostas nulas devem ser arrays vazios
+        if($vinculos == null) $vinculos=[];
+
+        if(empty($vinculos) & !in_array($event->user->username,$codpes_sem_vinculo)){
             Session::flash('alert-danger', 'Pessoa sem vínculo com essa unidade');
             auth()->logout();
         }
@@ -41,11 +49,14 @@ class LoginListener
             ];
 
             $setores = Pessoa::obterSiglasSetoresAtivos($event->user->codpes);
-            if ($setores) {
+            if(!empty($setores)){
                 $attr['setor'] = $setores[0]; # Não é a melhor escolha
             }
             //Não vamos setar password no login pois, ou o usuário já tem, ou vai ter de mudar pela própria interface
             //$password = date('dmY', strtotime(Pessoa::dump($event->user->codpes, ['dtanas'])['dtanas']));
+
+            // Como usamos a função array_merge, as respostas nulas devem ser arrays vazios
+            if($setores == null) $setores = []; 
 
             // Vincula o grupo aos setores correspondentes
             $groups = array_merge($vinculos, $setores);

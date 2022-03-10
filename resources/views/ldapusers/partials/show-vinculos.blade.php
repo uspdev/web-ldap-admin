@@ -1,8 +1,9 @@
 @forelse ($vinculos as $vinculo)
+
   @switch($vinculo['tipvin'])
   
     @case('ALUNOPOS')
-      <h4>Vínculo: {{ $vinculo['tipvinext'] }}</h4>
+      <h4>Vínculo: {{ $vinculo['tipvin'] }}</h4>
       <table class="table table-sm table-striped ml-2">
         <tr>
           <td>Orientador</td>
@@ -24,7 +25,7 @@
     @break
 
     @case('SERVIDOR')
-      <h4>Vínculo: {{ $vinculo['tipvinext'] }}</h4>
+      <h4>Vínculo: {{ $vinculo['tipvin'] }}</h4>
       <table class="table table-sm table-striped ml-2">
         <tr>
           <td>Início</td>
