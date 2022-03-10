@@ -2,19 +2,14 @@
 
 namespace App\Jobs;
 
+use App\Ldap\User as LdapUser;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-
-use Uspdev\Replicado\Pessoa;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Uspdev\Replicado\Graduacao;
-use Uspdev\Replicado\Posgraduacao;
-
-use App\Ldap\User as LdapUser;
-use App\Ldap\Group as LdapGroup;
-use Adldap\Laravel\Facades\Adldap;
+use Uspdev\Replicado\Pessoa;
 
 class SincronizaReplicado implements ShouldQueue
 {
@@ -29,8 +24,8 @@ class SincronizaReplicado implements ShouldQueue
      */
     public function __construct(array $type)
     {
-        $this->unidade = env('REPLICADO_CODUNDCLG');  
-        $this->type = $type;  
+        $this->unidade = env('REPLICADO_CODUNDCLG');
+        $this->type = $type;
     }
 
     /**
@@ -40,29 +35,29 @@ class SincronizaReplicado implements ShouldQueue
      */
     public function handle()
     {
-        foreach($this->type as $type) {
+        foreach ($this->type as $type) {
             foreach (Pessoa::tiposVinculos($this->unidade) as $vinculo) {
                 if ($type == $vinculo['tipvinext']) {
                     $this->sync(Pessoa::ativosVinculo($vinculo['tipvinext'], $this->unidade));
-                }   
-            }             
+                }
+            }
         }
     }
 
     public function sync($pessoas)
-    {       
+    {
         if ($pessoas) {
             // No .env foi configurado para desativar os desligados?
             if (config('web-ldap-admin.desativarDesligados') == true) {
                 /**
-                 * Perdeu vínculo com a unidade, remover dos grupos, adicionar 
-                 * ao grupo Desativados e desativar a conta. 
+                 * Perdeu vínculo com a unidade, remover dos grupos, adicionar
+                 * ao grupo Desativados e desativar a conta.
                  * Para se verificar os desligados
                  * Comparar as contas do AD por grupo principal
                  * Servidor, Docente, Docente Aposentado, Estagiário,
-                 * Aluno de Graduação, Aluno de Pós-Graduação, Aluno de Cultura e Extensão, 
+                 * Aluno de Graduação, Aluno de Pós-Graduação, Aluno de Cultura e Extensão,
                  * Aluno Escola de Arte Dramática, Pós-doutorando, Aluno Convênio Interc Grad
-                 */   
+                 */
                 // Grupo principal
                 $grupoPrincipal = $pessoas[0]['tipvinext'];
                 // Array das pessoas do replicado
@@ -70,7 +65,7 @@ class SincronizaReplicado implements ShouldQueue
                 foreach ($pessoas as $pessoa) {
                     array_push($replicadoUsers, $pessoa['codpes']);
                 }
-                // Array das contas no AD 
+                // Array das contas no AD
                 $contasAD = [];
                 $ldapusers = LdapUser::getUsersGroup($grupoPrincipal);
                 foreach ($ldapusers as $ldapuser) {
@@ -82,8 +77,11 @@ class SincronizaReplicado implements ShouldQueue
                 LdapUser::desativarUsers($desligados);
             }
             foreach ($pessoas as $pessoa) {
-                $grupos = Pessoa::vinculosSetores($pessoa['codpes'], $this->unidade);
-                $setor = str_replace('-' . $this->unidade, '', $pessoa['nomabvset']);               
+                $username = $pessoa['codpes'];
+                //$password = date('dmY', strtotime(Pessoa::dump($pessoa['codpes'], ['dtanas'])['dtanas']));
+                $password = 'TrocaXr123!()';
+                
+                $setor = str_replace('-' . $this->unidade, '', $pessoa['nomabvset']);
                 if (empty($setor)) {
                     $setor = $pessoa['tipvinext'];
                     if ($pessoa['tipvinext'] == 'Aluno de Graduação') {
@@ -93,16 +91,16 @@ class SincronizaReplicado implements ShouldQueue
                 } else {
                     $setor = $pessoa['tipvinext'] . ' ' . $setor;
                 }
-                $grupos = array_unique($grupos);
-                sort($grupos);
-                $password = date('dmY', strtotime(Pessoa::dump($pessoa['codpes'], ['dtanas'])['dtanas']));
-                LdapUser::createOrUpdate($pessoa['codpes'], [
+
+                $attr = [
                     'nome' => $pessoa['nompesttd'],
                     'email' => $pessoa['codema'],
-                    'setor' => $setor
-                ],
-                $grupos,
-                $password);    
+                    'setor' => $setor,
+                ];
+                $grupos = Pessoa::vinculosSetores($pessoa['codpes'], $this->unidade);
+                $grupos = array_unique($grupos);
+                sort($grupos);
+                LdapUser::createOrUpdate($username, $attr, $grupos, $password);
             }
         }
     }
