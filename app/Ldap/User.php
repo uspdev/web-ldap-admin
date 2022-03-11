@@ -141,7 +141,7 @@ class User
      */
     public static function obterUserPorUsername($username)
     {
-        return $user = Adldap::search()->users()->where('cn', '=', $username)->first();
+        return Adldap::search()->users()->where('cn', '=', $username)->first();
     }
 
     public static function show($user)
