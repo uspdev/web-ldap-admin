@@ -47,6 +47,9 @@ class LoginListener
         }
 
         if (config('web-ldap-admin.sincLdapLogin') == 1) {
+
+            // criarOuAtulizarPorCodpes($event->user->codpes, $event->user)
+
             // vamos criar ou atualizar a conta automaticamente no login
             $attr = [
                 //'displayname', 'mail', 'telephonenumber', 'givenname', 'description', 'department', 'sn - surname',

@@ -7,16 +7,18 @@ use Adldap\Models\Attributes\AccountControl;
 use App\Ldap\Group as LdapGroup;
 use Carbon\Carbon;
 use Uspdev\Utils\Generic as Utils;
+use Uspdev\Replicado\Pessoa;
+use Uspdev\Replicado\Graduacao;
 
 class User
 {
 
-    /** 
+    /**
      * Cria ou atualiza os dados do usuário ldap
-     * 
-     * Este método está com mais comentários no código pois em geral 
+     *
+     * Este método está com mais comentários no código pois em geral
      * serve de entrada para novos desenvolvedores.
-     * 
+     *
      * Estrutura do array attr:
      * $attr['nome']  : Nome completo
      * $attr['email'] : Email
@@ -38,13 +40,13 @@ class User
             $user->setPassword($password ?? Utils::senhaAleatoria());
 
             // Trocar a senha no próximo logon
-            $user->setAttribute('pwdlastset', 0); 
+            $user->setAttribute('pwdlastset', 0);
 
             // Enable the new user (using user account control).
-            $user->setUserAccountControl(AccountControl::NORMAL_ACCOUNT); 
+            $user->setUserAccountControl(AccountControl::NORMAL_ACCOUNT);
 
             // vamos expirar senha conforme config
-            $user->setAccountExpiry(SELF::getExpiryDays()); 
+            $user->setAccountExpiry(SELF::getExpiryDays());
         }
 
         // login no windows
@@ -314,5 +316,60 @@ class User
             self::disable($desligado);
         }
     }
-    
+
+    public static function criarOuAtulizarPorCodpes($codpes, $userEvent = null)
+    {
+        $pessoa = Pessoa::dump($codpes);
+        // setando username e codpes (similar loginListener)
+        switch (strtolower(config('web-ldap-admin.campoCodpes'))) {
+            case 'telephonenumber':
+                $username = explode('@', $pessoa['codema'])[0];
+                $username = preg_replace("/[^a-zA-Z0-9]+/", "", $username); //email sem caracteres especiais
+                $attr['telephonenumber'] = $pessoa['codpes'];
+                break;
+            case 'username':
+            default:
+                $username = $pessoa['codpes'];
+                $attr['telephonenumber'] = '';
+                break;
+        }
+
+        // setando senha
+        switch (config('web-ldap-admin.senhaPadrao')) {
+            case 'random':
+                $password = Utils::senhaAleatoria();
+                break;
+
+            case 'data_nascimento':
+            default:
+                $password = date('dmY', strtotime($pessoa['dtanas']));
+                break;
+        }
+
+        // as regras de setor aqui parecem diferentes das regras de setor do loginListener
+
+        // remove o código da unidade do setor
+        dd(Pessoa::vinculosSetores($codpes, config('web-ldap-admin.replicado_unidade')) );
+        $setor = str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', Pessoa::obterSiglasSetoresAtivos($codpes)[0]); # Não é a melhor opção
+        if (empty($setor)) {
+            $setor = $pessoa['tipvinext'];
+            if ($pessoa['tipvinext'] == 'Aluno de Graduação') {
+                $nomabvset = Graduacao::setorAluno($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'))['nomabvset'];
+                $setor = $pessoa['tipvinext'] . ' ' . $nomabvset;
+            }
+        } else {
+            $setor = $pessoa['tipvinext'] . ' ' . $setor;
+        }
+        $attr['setor'] = $setor;
+
+        $attr['nome'] = $pessoa['nompesttd'];
+        $attr['email'] = $pessoa['codema'];
+
+        //
+        $grupos = Pessoa::vinculosSetores($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'));
+        $grupos = array_unique($grupos);
+        sort($grupos);
+
+        self::createOrUpdate($username, $attr, $grupos, $password);
+    }
 }

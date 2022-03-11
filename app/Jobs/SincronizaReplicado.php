@@ -79,56 +79,58 @@ class SincronizaReplicado implements ShouldQueue
             }
 
             foreach ($pessoas as $pessoa) {
-                // setando username e codpes (similar loginListener)
-                switch (strtolower(config('web-ldap-admin.campoCodpes'))) {
-                    case 'telephonenumber':
-                        $username = explode('@', $pessoa['codema'])[0];
-                        $username = preg_replace("/[^a-zA-Z0-9]+/", "", $username); //email sem caracteres especiais
-                        $attr['telephonenumber'] = $pessoa['codpes'];
-                        break;
-                    case 'username':
-                    default:
-                        $username = $pessoa['codpes'];
-                        $attr['telephonenumber'] = '';
-                        break;
-                }
+                // // setando username e codpes (similar loginListener)
+                // switch (strtolower(config('web-ldap-admin.campoCodpes'))) {
+                //     case 'telephonenumber':
+                //         $username = explode('@', $pessoa['codema'])[0];
+                //         $username = preg_replace("/[^a-zA-Z0-9]+/", "", $username); //email sem caracteres especiais
+                //         $attr['telephonenumber'] = $pessoa['codpes'];
+                //         break;
+                //     case 'username':
+                //     default:
+                //         $username = $pessoa['codpes'];
+                //         $attr['telephonenumber'] = '';
+                //         break;
+                // }
 
-                // setando senha
-                switch (config('web-ldap-admin.senhaPadrao')) {
-                    case 'random':
-                        $password = Utils::senhaAleatoria();
-                        break;
+                // // setando senha
+                // switch (config('web-ldap-admin.senhaPadrao')) {
+                //     case 'random':
+                //         $password = Utils::senhaAleatoria();
+                //         break;
 
-                    case 'data_nascimento':
-                    default:
-                        $password = date('dmY', strtotime($pessoa['dtanas']));
-                        break;
-                }
+                //     case 'data_nascimento':
+                //     default:
+                //         $password = date('dmY', strtotime($pessoa['dtanas']));
+                //         break;
+                // }
 
-                // as regras de setor aqui parecem diferentes das regras de setor do loginListener
+                // // as regras de setor aqui parecem diferentes das regras de setor do loginListener
 
-                // remove o código da unidade do setor
-                $setor = str_replace('-' . $this->unidade, '', $pessoa['nomabvset']);
-                if (empty($setor)) {
-                    $setor = $pessoa['tipvinext'];
-                    if ($pessoa['tipvinext'] == 'Aluno de Graduação') {
-                        $nomabvset = Graduacao::setorAluno($pessoa['codpes'], $this->unidade)['nomabvset'];
-                        $setor = $pessoa['tipvinext'] . ' ' . $nomabvset;
-                    }
-                } else {
-                    $setor = $pessoa['tipvinext'] . ' ' . $setor;
-                }
-                $attr['setor'] = $setor;
+                // // remove o código da unidade do setor
+                // $setor = str_replace('-' . $this->unidade, '', $pessoa['nomabvset']);
+                // if (empty($setor)) {
+                //     $setor = $pessoa['tipvinext'];
+                //     if ($pessoa['tipvinext'] == 'Aluno de Graduação') {
+                //         $nomabvset = Graduacao::setorAluno($pessoa['codpes'], $this->unidade)['nomabvset'];
+                //         $setor = $pessoa['tipvinext'] . ' ' . $nomabvset;
+                //     }
+                // } else {
+                //     $setor = $pessoa['tipvinext'] . ' ' . $setor;
+                // }
+                // $attr['setor'] = $setor;
 
-                $attr['nome'] = $pessoa['nompesttd'];
-                $attr['email'] = $pessoa['codema'];
+                // $attr['nome'] = $pessoa['nompesttd'];
+                // $attr['email'] = $pessoa['codema'];
 
-                //
-                $grupos = Pessoa::vinculosSetores($pessoa['codpes'], $this->unidade);
-                $grupos = array_unique($grupos);
-                sort($grupos);
+                // //
+                // $grupos = Pessoa::vinculosSetores($pessoa['codpes'], $this->unidade);
+                // $grupos = array_unique($grupos);
+                // sort($grupos);
 
-                LdapUser::createOrUpdate($username, $attr, $grupos, $password);
+                // LdapUser::createOrUpdate($username, $attr, $grupos, $password);
+
+                LdapUser::criarOuAtulizarPorCodpes($pessoa['codpes']);
             }
         }
     }
