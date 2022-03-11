@@ -111,6 +111,8 @@ Configura como será criado a senha padrão para os novos usuários ldap. Pode s
 
 ## Dicas
 
+Nessa aplicação, SENHAUNICA_ADMINS pode gerenciar usuários, SENHAUNICA_GERENTES pode realizar as operações em geral e usuários comuns podem alterar suas respectivas senhas.
+
 No ambiente de desenvolvimento, às vezes é necessário desativar a verificação 
 dos certificado SSL/TLS, para isso, em /etc/ldap/ldap.conf manter apenas: 
 
