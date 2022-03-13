@@ -317,9 +317,14 @@ class User
         }
     }
 
-    public static function criarOuAtulizarPorCodpes($codpes, $userEvent = null)
+    /**
+     * Cria ou atualiza recebendo o array da pessoa
+     *
+     * @param array $pessoa
+     * @author Alessandro Costa de Oliveira 11/03/2022
+     */    
+    public static function criarOuAtulizarPorArray($pessoa)
     {
-        $pessoa = Pessoa::dump($codpes);
         // setando username e codpes (similar loginListener)
         switch (strtolower(config('web-ldap-admin.campoCodpes'))) {
             case 'telephonenumber':
