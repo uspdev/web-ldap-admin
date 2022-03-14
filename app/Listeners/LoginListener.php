@@ -37,29 +37,28 @@ class LoginListener
 
         // Como usamos a função array_merge, as respostas nulas devem ser arrays vazios
         if ($vinculos == null) {
-            $vinculos = ['Externo']; // Quando não tem vínculo ativo e pode logar
-        }
 
-        if (empty($vinculos) & !in_array($event->user->username, $codpes_sem_vinculo)) {
-            Session::flash('alert-danger', 'Pessoa sem vínculo com essa unidade');
-            auth()->logout();
-            return redirect('/');
+            // Pessoa sem vinculo e não autorizado vai ser deslogado
+            if (!in_array($event->user->username, $codpes_sem_vinculo)) {
+                Session::flash('alert-danger', 'Pessoa sem vínculo com essa unidade');
+                auth()->logout();
+                return redirect('/');
+            }
+
+            // Pessoa não tem vínculo, mas pode logar
+            $pessoa = [
+                'codpes' => $event->user->codpes,
+                'nompesttd' => $event->user->name,
+                'codema' => $event->user->email,
+                'tipvinext' => 'Externo',
+                'dtanas' => '', # força senha inicial random
+                'nomabvset' => '', # não traz o setor por ser Externo
+            ];
         }
 
         // TODO completar os valores necessários quando a pessoa não tem vínculo, mas pode logar
         if (config('web-ldap-admin.sincLdapLogin') == 1) {
-            // Verifica se não tem vínculo, mas pode logar
-             if (in_array($event->user->username, $codpes_sem_vinculo)) {
-                $pessoa = [
-                    'codpes' => $event->user->codpes,
-                    'nompes' => $event->user->name,
-                    'nompesttd' => $event->user->name,
-                    'codema' => $event->user->email,
-                    'tipvinext' => 'Externo',
-                    'dtanas' => '', # força senha inicial random
-                    'nomabvset' => '' # não traz o setor por ser Externo
-                ];
-            } else {
+            if (!isset($pessoa)) {
                 // Com vínculo ativo ('ALUNOGR', 'ALUNOPOS', 'ALUNOCEU', 'ALUNOEAD', 'ALUNOPD', 'ALUNOCONVENIOINT', 'SERVIDOR', 'ESTAGIARIORH')
                 // TODO precisa melhorar a criação do array pessoa para chamar o método para criar ou atualizar
                 // Principalmente se a pessoa for Servidor e também Alunode Graduação, Aluno de Pós-Graduação ou outro vínculo dos mencionados acima
