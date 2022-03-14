@@ -6,6 +6,8 @@ use Adldap\Laravel\Facades\Adldap;
 use Adldap\Models\Attributes\AccountControl;
 use App\Ldap\Group as LdapGroup;
 use Carbon\Carbon;
+use Uspdev\Replicado\Graduacao;
+use Uspdev\Replicado\Pessoa;
 use Uspdev\Utils\Generic as Utils;
 
 class User
@@ -332,4 +334,62 @@ class User
         }
     }
 
+    /**
+     * Cria ou atualiza recebendo o array da pessoa
+     *
+     * em $pessoa: codema, codpes, dtanas (tabela pessoa), nomabvset, nompesttd (dados da tabela localizapessoa)
+     *
+     * @param array $pessoa
+     * @author Alessandro Costa de Oliveira 11/03/2022
+     */
+    public static function criarOuAtulizarPorArray($pessoa)
+    {
+        // setando username e codpes (similar loginListener)
+        switch (strtolower(config('web-ldap-admin.campoCodpes'))) {
+            case 'telephonenumber':
+                $username = explode('@', $pessoa['codema'])[0];
+                $username = preg_replace("/[^a-zA-Z0-9]+/", "", $username); //email sem caracteres especiais
+                $attr['telephonenumber'] = $pessoa['codpes'];
+                break;
+            case 'username':
+            default:
+                $username = $pessoa['codpes'];
+                $attr['telephonenumber'] = '';
+                break;
+        }
+
+        // setando senha
+        switch (config('web-ldap-admin.senhaPadrao')) {
+            case 'random':
+                $password = Utils::senhaAleatoria();
+                break;
+
+            case 'data_nascimento':
+            default:
+                $password = ($pessoa['dtanas'] != '') ? date('dmY', strtotime($pessoa['dtanas'])) : Utils::senhaAleatoria();
+                break;
+        }
+
+        if ($pessoa['nomabvset']) {
+            // o setor é o vínculo estendido + setor (sem o código da unidade)
+            $setor = $pessoa['tipvinext'] . ' ' . explode('-', $pessoa['nomabvset'])[0];
+        } else {
+            $setor = $pessoa['tipvinext'];
+            if ($pessoa['tipvinext'] == 'Aluno de Graduação') {
+                $nomabvset = Graduacao::setorAluno($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'))['nomabvset'];
+                $setor = $pessoa['tipvinext'] . ' ' . $nomabvset;
+            }
+            // aqui poderia tratar os outros casos de Pós Graduação, Posdoc, etc
+        }
+        $attr['setor'] = $setor;
+
+        $attr['nome'] = $pessoa['nompesttd'];
+        $attr['email'] = $pessoa['codema'];
+
+        $grupos = ($pessoa['tipvinext'] != 'Externo') ? Pessoa::vinculosSetores($pessoa['codpes'], config('web-ldap-admin.replicado_unidade')) : [$pessoa['tipvinext']];
+        $grupos = array_unique($grupos);
+        sort($grupos);
+
+        self::createOrUpdate($username, $attr, $grupos, $password);
+    }
 }
