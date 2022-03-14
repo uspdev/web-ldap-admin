@@ -75,7 +75,7 @@
           <th>Email</th>
           <th>Descrição</th>
           <th>Grupos</th>
-          <th>Senha</th>
+          <th>Conta</th>
           <th>Status</th>
           <th>Ações</th>
         </tr>

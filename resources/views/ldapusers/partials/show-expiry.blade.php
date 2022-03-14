@@ -1,10 +1,10 @@
 <div class="btn-group">
   <button class="btn btn-sm  {{ $user->isExpired() ? 'btn-warning' : 'btn-success' }}">
     @if ($user->expirationDate())
-      {{ $user->isExpired() ? 'Senha expirada em' : 'Senha válida até' }}
+      {{ $user->isExpired() ? 'Conta expirada em' : 'Conta válida até' }}
       <Strong>{{ $user->expirationDate()->format('d/m/Y') }}</Strong>
     @else
-      Senha não expira
+      Conta não expira
     @endif
   </button>
 
