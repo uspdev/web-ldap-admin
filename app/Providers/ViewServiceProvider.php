@@ -41,7 +41,7 @@ class ViewServiceProvider extends ServiceProvider
         ];
 
         if (config('web-ldap-admin.solicitaContaAdmin') == 0) {
-            $menuContaAdmin = [];
+            $menuContaAdmin['can'] = 'nada';
         } elseif (config('web-ldap-admin.solicitaContaAdmin') == 2) {
             $menuContaAdmin['can'] = 'servidor';
         }
