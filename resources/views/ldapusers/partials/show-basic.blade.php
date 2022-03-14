@@ -20,10 +20,12 @@
       <td><b>Nro. USP</b></td>
       <td>{{ $attr['codpes'] ?? '' }}</td>
     </tr>
-    <tr>
-      <td> <b> Departamento </b> </td>
-      <td>{{ $attr['department'] ?? '' }}</td>
-    </tr>
+    @if ($attr['department'])
+      <tr>
+        <td> <b> Departamento </b> </td>
+        <td>{{ $attr['department'] }}</td>
+      </tr>
+    @endif
     <tr>
       <td> <b> Conta criada em </b> </td>
       <td>{{ $attr['ativacao'] ?? '' }}</td>
