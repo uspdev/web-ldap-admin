@@ -10,7 +10,7 @@
         <div class="col-md-6">
             <form method="post" action="{{ url('/ldapusers') }}">
                 {{ csrf_field() }}
-                @include('ldapusers.form')
+                @include('partials.ldapusers.create-form')
             </form>
         </div>
     </div>
