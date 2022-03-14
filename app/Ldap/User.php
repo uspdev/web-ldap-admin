@@ -124,6 +124,9 @@ class User
 
     /**
      * Obtém uma instância de usuário com busca pelo codpes
+     * 
+     * @param Int $codpes
+     * @return \Adldap\Models\User
      */
     public static function obterUserPorCodpes($codpes)
     {
@@ -138,12 +141,21 @@ class User
 
     /**
      * Obtém uma instância de usuário com busca pelo username
+     * 
+     * @param String $username
+     * @return \Adldap\Models\User
      */
     public static function obterUserPorUsername($username)
     {
         return Adldap::search()->users()->where('cn', '=', $username)->first();
     }
 
+    /** 
+     * Coleta atributos do usuário para serem mostrados
+     * 
+     * @param \Adldap\Models\User $user
+     * @return Array
+     */
     public static function show($user)
     {
 
