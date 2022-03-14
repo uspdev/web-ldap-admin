@@ -337,6 +337,8 @@ class User
     /**
      * Cria ou atualiza recebendo o array da pessoa
      *
+     * em $pessoa: codema, codpes, dtanas (tabela pessoa), nomabvset, nompesttd (dados da tabela localizapessoa)
+     *
      * @param array $pessoa
      * @author Alessandro Costa de Oliveira 11/03/2022
      */
@@ -368,16 +370,16 @@ class User
                 break;
         }
 
-        // remove o código da unidade do setor
-        $setor = str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $pessoa['nomabvset']);
-        if (empty($setor)) {
+        if ($pessoa['nomabvset']) {
+            // o setor é o vínculo estendido + setor (sem o código da unidade)
+            $setor = $pessoa['tipvinext'] . ' ' . explode('-', $pessoa['nomabvset'])[0];
+        } else {
             $setor = $pessoa['tipvinext'];
             if ($pessoa['tipvinext'] == 'Aluno de Graduação') {
                 $nomabvset = Graduacao::setorAluno($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'))['nomabvset'];
                 $setor = $pessoa['tipvinext'] . ' ' . $nomabvset;
             }
-        } else {
-            $setor = $pessoa['tipvinext'] . ' ' . $setor;
+            // aqui poderia tratar os outros casos de Pós Graduação, Posdoc, etc
         }
         $attr['setor'] = $setor;
 
