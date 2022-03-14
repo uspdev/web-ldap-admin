@@ -11,12 +11,12 @@ use Uspdev\Utils\Generic as Utils;
 class User
 {
 
-    /** 
+    /**
      * Cria ou atualiza os dados do usuário ldap
-     * 
-     * Este método está com mais comentários no código pois em geral 
+     *
+     * Este método está com mais comentários no código pois em geral
      * serve de entrada para novos desenvolvedores.
-     * 
+     *
      * Estrutura do array attr:
      * $attr['nome']  : Nome completo
      * $attr['email'] : Email
@@ -38,13 +38,13 @@ class User
             $user->setPassword($password ?? Utils::senhaAleatoria());
 
             // Trocar a senha no próximo logon
-            $user->setAttribute('pwdlastset', 0); 
+            $user->setAttribute('pwdlastset', 0);
 
             // Enable the new user (using user account control).
-            $user->setUserAccountControl(AccountControl::NORMAL_ACCOUNT); 
+            $user->setUserAccountControl(AccountControl::NORMAL_ACCOUNT);
 
             // vamos expirar senha conforme config
-            $user->setAccountExpiry(SELF::getExpiryDays()); 
+            $user->setAccountExpiry(SELF::getExpiryDays());
         }
 
         // login no windows
@@ -124,7 +124,7 @@ class User
 
     /**
      * Obtém uma instância de usuário com busca pelo codpes
-     * 
+     *
      * @param Int $codpes
      * @return \Adldap\Models\User
      */
@@ -141,7 +141,7 @@ class User
 
     /**
      * Obtém uma instância de usuário com busca pelo username
-     * 
+     *
      * @param String $username
      * @return \Adldap\Models\User
      */
@@ -150,9 +150,9 @@ class User
         return Adldap::search()->users()->where('cn', '=', $username)->first();
     }
 
-    /** 
+    /**
      * Coleta atributos do usuário para serem mostrados
-     * 
+     *
      * @param \Adldap\Models\User $user
      * @return Array
      */
@@ -273,7 +273,7 @@ class User
         return false;
     }
 
-    public static function changePassword($username, String $password): bool
+    public static function changePassword($username, String $password, $must_change_pwd = null): bool
     {
         $user = SELF::obterUserPorUsername($username);
         if (is_null($user)) {
@@ -283,10 +283,15 @@ class User
         $user->setPassword($password);
         $user->setAccountExpiry(SELF::getExpiryDays());
 
+        if ($must_change_pwd) {
+            $user->setEnableForcePasswordChange();
+        }
+
         try {
             $user->save();
             $result = true;
         } catch (\ErrorException $e) {
+            echo (Gate::check('gerente')) ? $e->getMessage() : null;
             $result = false;
         }
         return $result;
@@ -326,5 +331,5 @@ class User
             self::disable($desligado);
         }
     }
-    
+
 }

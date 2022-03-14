@@ -210,9 +210,10 @@ class LdapUserController extends Controller
         if (!is_null($request->senha)) {
             $request->validate([
                 'senha' => ['required', 'confirmed', 'min:8'],
+                'must_change_pwd' => ['nullable','in:1'],
             ]);
 
-            if (LdapUser::changePassword($username, $request->senha)) {
+            if (LdapUser::changePassword($username, $request->senha, $request->must_change_pwd)) {
                 $request->session()->flash('alert-success', 'Senha alterada com sucesso!');
             } else {
                 $request->session()->flash('alert-danger',

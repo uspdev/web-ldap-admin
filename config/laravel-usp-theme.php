@@ -15,7 +15,7 @@ $menu = [
         'can' => 'gerente',
     ],
     [
-        'text' => 'Criar usuário não replicado',
+        'text' => 'Criar usuário',
         'url' => 'ldapusers/create',
         'can' => 'gerente',
     ]
