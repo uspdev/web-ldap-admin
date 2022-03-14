@@ -179,11 +179,8 @@ class LdapUserController extends Controller
     {
         $attr = LdapUser::show($user);
         list($codpes, $codpesValido) = LdapUser::obterCodpes($user, true);
-        if ($codpes) {
-            $vinculos = Replicado::listarVinculos($codpes);
-        } else {
-            $vinculos = [];
-        }
+        // o $codpesValido serve para informar se o codpes extraído veio do campo indicado no config
+        $vinculos = Replicado::listarVinculosEstendidos($codpes);
 
         return view('ldapusers.show', compact('attr', 'user', 'vinculos', 'codpesValido'));
     }
@@ -281,7 +278,7 @@ class LdapUserController extends Controller
             $vinculo['countAD'] = count(\App\Ldap\User::getUsersGroup($vinculo['tipvinext']));
             $vinculo['style'] = $vinculo['countAD'] < $vinculo['countReplicado'] ? 'text-danger' : '';
         }
-        
+
         return view('ldapusers.sync', compact('vinculos'));
     }
 

@@ -7,7 +7,7 @@ use Uspdev\Replicado\Posgraduacao;
 
 class Replicado
 {
-    public static function listarVinculos($codpes)
+    public static function listarVinculosEstendidos($codpes)
     {
         $vinculos = Pessoa::listarVinculosAtivos($codpes);
         foreach ($vinculos as &$vinculo) {
