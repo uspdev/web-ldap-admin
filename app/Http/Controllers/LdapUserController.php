@@ -180,7 +180,7 @@ class LdapUserController extends Controller
         $attr = LdapUser::show($user);
         list($codpes, $codpesValido) = LdapUser::obterCodpes($user, true);
         // o $codpesValido serve para informar se o codpes extraído veio do campo indicado no config
-        $vinculos = Replicado::listarVinculosEstendidos($codpes);
+        $vinculos = $codpes ? Replicado::listarVinculosEstendidos($codpes) : [];
 
         return view('ldapusers.show', compact('attr', 'user', 'vinculos', 'codpesValido'));
     }
