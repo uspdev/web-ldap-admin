@@ -4,7 +4,10 @@
     <tr>
       <td>
         Início: {{ date_create($vinculo['dtainivin'])->format('d/m/Y') }}
-        {{ $vinculo['nomfnc'] ? ' - Função: ' . $vinculo['nomfnc'] : '' }}
+        {{ $vinculo['nomfnc'] ? ' - Setor: ' . $vinculo['nomabvset'] : '' }}
+        - Tel: {{ $vinculo['numtelfmt'] }}<br />
+        {!! $vinculo['nomfnc'] ? 'Função: ' . $vinculo['nomfnc']. '<br />' : '' !!}
+        Email: {{ $vinculo['codema'] }}
       </td>
     </tr>
     <tr>
