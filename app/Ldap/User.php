@@ -322,7 +322,7 @@ class User
      *
      * @param array $pessoa
      * @author Alessandro Costa de Oliveira 11/03/2022
-     */    
+     */
     public static function criarOuAtulizarPorArray($pessoa)
     {
         // setando username e codpes (similar loginListener)
@@ -347,15 +347,12 @@ class User
 
             case 'data_nascimento':
             default:
-                $password = date('dmY', strtotime($pessoa['dtanas']));
+                $password = ($pessoa['dtanas'] != '') ? date('dmY', strtotime($pessoa['dtanas'])) : Utils::senhaAleatoria();
                 break;
         }
 
-        // as regras de setor aqui parecem diferentes das regras de setor do loginListener
-
         // remove o código da unidade do setor
-        dd(Pessoa::vinculosSetores($codpes, config('web-ldap-admin.replicado_unidade')) );
-        $setor = str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', Pessoa::obterSiglasSetoresAtivos($codpes)[0]); # Não é a melhor opção
+        $setor = str_replace('-' . config('web-ldap-admin.replicado_unidade'), '', $pessoa['nomabvset']);
         if (empty($setor)) {
             $setor = $pessoa['tipvinext'];
             if ($pessoa['tipvinext'] == 'Aluno de Graduação') {
@@ -370,8 +367,7 @@ class User
         $attr['nome'] = $pessoa['nompesttd'];
         $attr['email'] = $pessoa['codema'];
 
-        //
-        $grupos = Pessoa::vinculosSetores($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'));
+        $grupos = ($pessoa['tipvinext'] != 'Externo') ? Pessoa::vinculosSetores($pessoa['codpes'], config('web-ldap-admin.replicado_unidade')) : [$pessoa['tipvinext']];
         $grupos = array_unique($grupos);
         sort($grupos);
 
