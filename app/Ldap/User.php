@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Uspdev\Replicado\Graduacao;
 use Uspdev\Replicado\Pessoa;
 use Uspdev\Utils\Generic as Utils;
+use Illuminate\Support\Facades\Gate;
 
 class User
 {
