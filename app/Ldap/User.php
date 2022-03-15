@@ -6,10 +6,10 @@ use Adldap\Laravel\Facades\Adldap;
 use Adldap\Models\Attributes\AccountControl;
 use App\Ldap\Group as LdapGroup;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Gate;
 use Uspdev\Replicado\Graduacao;
 use Uspdev\Replicado\Pessoa;
 use Uspdev\Utils\Generic as Utils;
-use Illuminate\Support\Facades\Gate;
 
 class User
 {
@@ -350,6 +350,7 @@ class User
             case 'telephonenumber':
                 $username = explode('@', $pessoa['codema'])[0];
                 $username = preg_replace("/[^a-zA-Z0-9]+/", "", $username); //email sem caracteres especiais
+                $username = substr($username, 0, 15); //limitando em 15 caracteres
                 $attr['telephonenumber'] = $pessoa['codpes'];
                 break;
             case 'username':
@@ -368,7 +369,6 @@ class User
             case 'data_nascimento':
             default:
                 $password = ($pessoa['dtanas'] != '') ? date('dmY', strtotime($pessoa['dtanas'])) : Utils::senhaAleatoria();
-                break;
         }
 
         if ($pessoa['nomabvset']) {
