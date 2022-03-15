@@ -97,7 +97,7 @@ OBS.: Aparentemente estando nesta OU ou no conteiner Users padrão, o usuário c
 
     LDAP_OU_DEFAULT=
 
-Ao criar conta nova ou trocar a senha, pode-se definir um prazo para expiração de senha padrão. Se 0 (default), a senha não vai expirar. O valor é em dias.
+Ao criar conta nova ou trocar a senha, pode-se definir um prazo para expiração de conta padrão. Se 0 (default), a conta não vai expirar. O valor é em dias.
 
     EXPIRAR_EM=0
 
@@ -105,9 +105,11 @@ Configura em qual campo vai estar associado o codpes da pessoa. Por padrão é n
 
     CAMPO_CODPES=username
     
-Configura como será criado a senha padrão para os novos usuários ldap. Pode ser a **data de nascimento**(default) ou **random**. O random deve ser compatível com a diretiva de senah forte do AD.
+Configura como será criado a senha padrão para os novos usuários ldap. Pode ser a **data de nascimento**(default) ou **random**. O random é compatível com a diretiva de senha forte do AD.
 
     SENHA_PADRAO=data_nascimento 
+
+OBS.: Quando a pessoa não tem vínculo (dados replicados), pode logar e sincroniza/cria conta no login, a conta é criada com senha random, pois não está disponível a data de nascimento.
 
 ## Dicas
 
@@ -122,13 +124,6 @@ Como rodar filas sem limite de tempo:
 
     php artisan queue:listen --timeout=0
 
-Caso o deploy do sistema seja realizado em contexto e não na raiz do domínio 
-talvez seja necessário habilitar a diretiva RewriteBase no arquivo public/.htaccess: 
-
-    RewriteEngine On
-    RewriteBase "/<CONTEXTO>/"
-    ...
-         
 ## Códigos Úteis
 
 Ativar toda base de usuários:
