@@ -29,23 +29,23 @@ class ViewServiceProvider extends ServiceProvider
         View::composer('profile', ProfileComposer::class);
 
         // Using closure based composers...
-        View::composer('dashboard', function ($view) {
-            //
+        View::composer('*', function ($view) {
+            // Menu dinâmico solicita conta admin
+            $menuContaAdmin = [
+                'text' => 'Solicitação de Conta de Administrador',
+                'url' => 'solicita',
+                'can' => 'ninguem',
+            ];
+
+            if (config('web-ldap-admin.solicitaContaAdmin') == 1) {
+                $menuContaAdmin['can'] = 'user';
+                \UspTheme::addMenu('solicitaContaAdmin', $menuContaAdmin);
+            } elseif (config('web-ldap-admin.solicitaContaAdmin') == 2) {
+                $menuContaAdmin['can'] = 'servidor';
+                \UspTheme::addMenu('solicitaContaAdmin', $menuContaAdmin);
+            }
+
         });
 
-        // Menu dinâmico solicita conta admin
-        $menuContaAdmin = [
-            'text' => 'Solicitação de Conta de Administrador',
-            'url' => 'solicita',
-            'can' => 'user',
-        ];
-
-        if (config('web-ldap-admin.solicitaContaAdmin') == 0) {
-            $menuContaAdmin['can'] = 'nada';
-        } elseif (config('web-ldap-admin.solicitaContaAdmin') == 2) {
-            $menuContaAdmin['can'] = 'servidor';
-        }
-
-        \UspTheme::addMenu('solicitaContaAdmin', $menuContaAdmin);
     }
 }
