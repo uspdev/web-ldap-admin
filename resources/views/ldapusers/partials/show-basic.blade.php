@@ -12,10 +12,12 @@
       <td> <b> Grupos </b> </td>
       <td>{{ $attr['grupos'] ?? '' }}</td>
     </tr>
-    <tr>
-      <td> <b> Descrição </b> </td>
-      <td>{{ $attr['description'] ?? '' }}</td>
-    </tr>
+    @if ($attr['description'])
+      <tr>
+        <td> <b> Descrição </b> </td>
+        <td>{{ $attr['description'] }}</td>
+      </tr>
+    @endif
     <tr>
       <td><b>Nro. USP</b></td>
       <td>{{ $attr['codpes'] ?? '' }}</td>
@@ -32,7 +34,7 @@
     </tr>
     <tr>
       <td> <b> Data da última alteração da senha </b> </td>
-      <td> {{ $attr['senha_alterada_em'] ?? '' }} </td>
+      <td> {{ $attr['senha_alterada_em'] ?? 'Usuário deve alterar senha no próximo logon' }} </td>
     </tr>
   </tbody>
 </table>
