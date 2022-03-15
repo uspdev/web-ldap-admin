@@ -24,6 +24,7 @@ class User
      * $attr['nome']  : Nome completo
      * $attr['email'] : Email
      * $attr['setor'] : Departamento
+     * $attr['descricao'] : Descricao
      **/
     public static function createOrUpdate(string $username, array $attr, array $groups = [], $password = null)
     {
@@ -78,6 +79,11 @@ class User
         // Departamento
         if (!empty($attr['setor'])) {
             $user->setDepartment($attr['setor']);
+        }
+
+        // Descrição, informa se a conta foi criada a partir da sincronização
+        if (!empty($attr['descricao'])) {
+            $user->setDescription($attr['descricao']);
         }
 
         $user->save();
@@ -343,7 +349,7 @@ class User
      * @param array $pessoa
      * @author Alessandro Costa de Oliveira 11/03/2022
      */
-    public static function criarOuAtulizarPorArray($pessoa)
+    public static function criarOuAtulizarPorArray($pessoa, $metodo = '')
     {
         // setando username e codpes (similar loginListener)
         switch (strtolower(config('web-ldap-admin.campoCodpes'))) {
@@ -386,6 +392,8 @@ class User
 
         $attr['nome'] = $pessoa['nompesttd'];
         $attr['email'] = $pessoa['codema'];
+
+        $attr['descricao'] = 'Sincronizado com o replicado';
 
         $grupos = ($pessoa['tipvinext'] != 'Externo') ? Pessoa::vinculosSetores($pessoa['codpes'], config('web-ldap-admin.replicado_unidade')) : [$pessoa['tipvinext']];
         $grupos = array_unique($grupos);
