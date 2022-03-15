@@ -182,7 +182,10 @@ class LdapUserController extends Controller
         // o $codpesValido serve para informar se o codpes extraído veio do campo indicado no config
         $vinculos = $codpes ? Replicado::listarVinculosEstendidos($codpes) : [];
 
-        return view('ldapusers.show', compact('attr', 'user', 'vinculos', 'codpesValido'));
+        // Foto
+        $foto = ($codpes != null) ? \Uspdev\Wsfoto::obter($codpes) : '';
+
+        return view('ldapusers.show', compact('attr', 'user', 'vinculos', 'codpesValido', 'foto'));
     }
 
     /**
