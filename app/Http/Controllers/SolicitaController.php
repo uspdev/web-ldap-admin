@@ -74,8 +74,8 @@ class SolicitaController extends Controller
         $groupname = config('web-ldap-admin.localAdminGroupLdap');
         $group = LdapGroup::createOrUpdate($groupname);
 
-        if(!$ldapuser->inGroup($groupname)){
-            $group->addMember($ldapuser);
+        if(!$user->inGroup($groupname)){
+            $group->addMember($user);
             $group->save();
         }
 
