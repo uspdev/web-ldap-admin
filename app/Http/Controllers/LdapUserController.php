@@ -183,7 +183,7 @@ class LdapUserController extends Controller
         $vinculos = $codpes ? Replicado::listarVinculosEstendidos($codpes) : [];
 
         // Foto
-        $foto = ($codpes != null) ? \Uspdev\Wsfoto::obter($codpes) : '';
+        $foto = (config('web-ldap-admin.mostrarFoto') == 1 and $codpes != null) ? \Uspdev\Wsfoto::obter($codpes) : '';
 
         return view('ldapusers.show', compact('attr', 'user', 'vinculos', 'codpesValido', 'foto'));
     }
