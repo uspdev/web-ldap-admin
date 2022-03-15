@@ -35,9 +35,12 @@ return [
     # Campo LDAP que será usado como codpes
     # telephoneNumber, username
     # vai ser aplicado strtolower então o case não importa
-    'campoCodpes' => env('CAMPO_CODPES','username'), 
+    'campoCodpes' => env('CAMPO_CODPES','username'),
 
     # Tipo padrão de senha
     # data_nascimento, random
-    'senhaPadrao' => env('SENHA_PADRAO','data_nascimento'), 
+    'senhaPadrao' => env('SENHA_PADRAO','data_nascimento'),
+
+    # Mostrar WsFoto? Default 0 = não
+    'mostrarFoto' => env('WSFOTO', 0),
 ];
