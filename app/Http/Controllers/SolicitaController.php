@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Auth;
 use App\Models\Solicita;
 use App\Ldap\Group as LdapGroup;
+use App\Ldap\User as LdapUser;
+
 use Adldap\Laravel\Facades\Adldap;
 use Carbon\Carbon;
 
