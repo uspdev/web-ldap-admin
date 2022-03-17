@@ -75,7 +75,7 @@ Copie o arquivo .env.example para .env e faça os ajustes necessários.
 
 ### Configurações da aplicação
 
-Servidor domain controller:
+#### Servidor domain controller
 
     LDAP_HOSTS=dc.xurepinha.br
     LDAP_PORT=636
@@ -87,34 +87,45 @@ Servidor domain controller:
 
 O LDAP_USERNAME pode ter variações. Na biblioteca adldap2 indica o uso de usuario@xurepiha.br. Também pode ser usado a sintaxe de domínio anterior ao AD xurepinha\\\\usuario.
 
-Configuração referente ao processo de sincronização de dados do usuário durante o login no sistema. 
+#### Sincronização automática do LDAP
 
-* **0** - não cria usuário ldap automaticamente no login;
-* **1** (default) - cria usuário ldap automaticamente no login e sincroniza os seguintes dados do usuário ao logar no sistema:
+Configuração referente ao processo de sincronização de dados do usuário durante o login no sistema.
+
+* **0** - não cria pessoa ldap automaticamente no login;
+* **1** (default) - cria pessoa ldap automaticamente no login e sincroniza dados com replicado. O valos existente nesses campos serão sobrescritos:
     * nome
     * sobrenome
     * email
-    * cria e coloca a pessoa nos grupos "vinculo estendido (tipvinext)", "setor" e "vinculo estendido setor". OBS.: Preserva os demais grupos já existentes
     * telefone: preenche com nro USP ser estiver configurado no env
     * departamento
 
+Além disso, cria e coloca a pessoa nos grupos "vinculo estendido (tipvinext)", "setor" e "vinculo estendido setor". OBS.: Preserva os demais grupos já existentes.
+
     SINC_LDAP_LOGIN=1
 
-Configura o OU (organizational unit) padrão onde os usuários e grupos serão inseridos. É conveniente setar um valor aqui. Se vazio vai criar na raiz do CN (conteiner).
+#### Organizational unit (OU) padrão
 
-OBS.: Aparentemente estando nesta OU ou no conteiner Users padrão, o usuário consegue fazere login normalmente. Mas acho que é importante no uso de diretivas de grupos. 
+Define onde os usuários e grupos serão inseridos. É conveniente setar um valor aqui. Se vazio (default) vai criar na raiz do CN (conteiner).
+
+OBS.: Aparentemente estando nesta OU ou no conteiner Users padrão, o usuário consegue fazer login normalmente. Mas acho que é importante no uso de diretivas de grupos. 
 
     LDAP_OU_DEFAULT=
+
+#### Expiração da senha
 
 Ao criar conta nova ou trocar a senha, pode-se definir um prazo para expiração de conta padrão. Se 0 (default), a conta não vai expirar. O valor é em dias.
 
     EXPIRAR_EM=0
 
-Configura em qual campo vai estar associado o codpes da pessoa. Por padrão é no campo **username** mas pode ser atribuído ao campo **telephoneNumber**. No segundo caso, na criação de novo usuário automático, o username vai ser o **email** sem caracteres especiais (somente letras e números) e sem o domínio. Se o usuário já existir o username pode ser qualquer.
+#### Campo associado ao codpes
+
+Configura qual campo vai estar associado ao codpes da pessoa. Por padrão é no campo **username** mas pode ser atribuído ao campo **telephoneNumber**. No segundo caso, na criação de novo usuário automático, o username vai ser o **email** sem caracteres especiais (somente letras e números) e sem o domínio. Se o usuário já existir o username pode ser qualquer.
 
     CAMPO_CODPES=username
     
-Configura como será criado a senha padrão para os novos usuários ldap. Pode ser a **data de nascimento**(default) ou **random**. O random é compatível com a diretiva de senha forte do AD.
+#### Padrão de criação de senhas
+
+Configura como será criado a senha padrão para os novos usuários ldap. Pode ser a **data de nascimento** (default) ou **random**. O random é compatível com a diretiva de senha forte do AD.
 
     SENHA_PADRAO=data_nascimento 
 
