@@ -45,6 +45,20 @@ class ViewServiceProvider extends ServiceProvider
                 \UspTheme::addMenu('solicitaContaAdmin', $menuContaAdmin);
             }
 
+            // menu dinâmico badge indicando syncronização de login ativa
+            if (config('web-ldap-admin.sincLdapLogin') == 1) {
+                $text = '<span class="badge badge-info">on <i class="fas fa-handshake"></i></span>';
+                $title = 'Sincronização automática ativada';
+            } else {
+                $text = '<span class="badge badge-dark"> off <i class="fas fa-handshake-alt-slash"></i></span>';
+                $title = 'Sincronização automática desativada';
+            }
+            \UspTheme::addMenu('web-ldap-admin', [
+                'text' => $text,
+                'title' => $title,
+                'can' => 'gerente',
+            ]);
+
         });
 
     }

@@ -87,7 +87,16 @@ Servidor domain controller:
 
 O LDAP_USERNAME pode ter variações. Na biblioteca adldap2 indica o uso de usuario@xurepiha.br. Também pode ser usado a sintaxe de domínio anterior ao AD xurepinha\\\\usuario.
 
-Configuração referente ao processo de sincronização de dados do usuário durante o login no sistema. Se **0** não cria usuário ldap automaticamente no login, se **1** (default) cria usuário ldap automaticamente no login.
+Configuração referente ao processo de sincronização de dados do usuário durante o login no sistema. 
+
+* **0** - não cria usuário ldap automaticamente no login;
+* **1** (default) - cria usuário ldap automaticamente no login e sincroniza os seguintes dados do usuário ao logar no sistema:
+    * nome
+    * sobrenome
+    * email
+    * cria e coloca a pessoa nos grupos "vinculo estendido (tipvinext)", "setor" e "vinculo estendido setor". OBS.: Preserva os demais grupos já existentes
+    * telefone: preenche com nro USP ser estiver configurado no env
+    * departamento
 
     SINC_LDAP_LOGIN=1
 

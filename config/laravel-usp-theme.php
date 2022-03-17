@@ -23,6 +23,9 @@ $menu = [
 
 $right_menu = [
     [
+        'key' => 'web-ldap-admin',
+    ],
+    [
         'key' => 'senhaunica-socialite',
     ],
     [
