@@ -103,6 +103,12 @@ Além disso, cria e coloca a pessoa nos grupos "vinculo estendido (tipvinext)", 
 
     SINC_LDAP_LOGIN=1
 
+#### Desativar desligados
+
+No processo de sincronização o sistema pode desativar os usuários que não tem mais vínculos ativos com a unidade, a não ser que estejam listados nos Números USP permitidos sem vínculo. false (default) - não desativa desligados; true - desativa desligados
+
+DESATIVAR_DESLIGADOS=false
+
 #### Organizational unit (OU) padrão
 
 Define onde os usuários e grupos serão inseridos. É conveniente setar um valor aqui. Se vazio (default) vai criar na raiz do CN (conteiner).
@@ -130,6 +136,18 @@ Configura como será criado a senha padrão para os novos usuários ldap. Pode s
     SENHA_PADRAO=data_nascimento 
 
 OBS.: Quando a pessoa não tem vínculo (dados replicados), pode logar e sincroniza/cria conta no login, a conta é criada com senha random, pois não está disponível a data de nascimento.
+
+#### Permite assumir conta de admin
+
+Permite que a pessoa obtenha acesso privilegiado a determinado computador por tempo limitado. 0 (default) - ninguém pode solicitar; 1 - todos; 2 - somente servidores (docentes e não docentes).
+
+    SOLICITA_CONTA_ADMIN = 0
+
+#### Mostrar foto
+
+Permite buscar foto e exibir nas informações da pessoa. 0 (default) - não mostrar; 1 - mostrar foto.
+
+    WSFOTO=0
 
 ## Dicas
 

@@ -10,17 +10,21 @@ return [
     # Paginação, quantidade de registros padrão, 50 default
     'registrosPorPagina' => env('REGISTROS_POR_PAGINA', 50),
 
-    # Desativar desligados (true/false default)
+    # Desativar desligados na sincronização (true/false default)
     'desativarDesligados' => env('DESATIVAR_DESLIGADOS', false),
 
-    'localAdminGroupLdap' => env('LOCAL_ADMIN_GROUP_LDAP', 'LOCAL_ADMIN'),
-
+    # foi desativado em 2/2022. Nesse caso ele mantem os grupos 
+    # existentes e adiciona se necessário os demais grupos
     'notRemoveGroups' => env('NOT_REMOVE_GROUPS', 'LOCAL_ADMIN,STI'),
 
     # 0 = ninguém, 1 = todos, 2 = servidores (funcionários e docentes)
     'solicitaContaAdmin' => env('SOLICITA_CONTA_ADMIN', 0),
 
-    # 0 = não sincroniza durante login, 1 = sincroniza durante login
+    # Grupo que o usuário será adicionado para ao solicitar conta de admin
+    'localAdminGroupLdap' => env('LOCAL_ADMIN_GROUP_LDAP', 'LOCAL_ADMIN'),
+
+    # sincroniza ldap com dados do replicado durante o login da pessoa
+    # 0 - não sincroniza durante login; 1 - sincroniza durante login
     'sincLdapLogin' => env('SINC_LDAP_LOGIN', 1),
 
     # Unidade Organizacional padrão
@@ -33,7 +37,7 @@ return [
     'ocultarUsuarios' => ['administrator', 'administrador', 'krbtgt', 'guest'],
 
     # Campo LDAP que será usado como codpes
-    # employeeNumber, username
+    # username, employeeNumber 
     # vai ser aplicado strtolower então o case não importa
     'campoCodpes' => env('CAMPO_CODPES','username'),
 
