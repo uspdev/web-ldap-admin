@@ -180,6 +180,7 @@ class LdapUserController extends Controller
     {
         $attr = LdapUser::show($user);
         $vinculos = [];
+        $foto = '';
         // o $codpesValido serve para informar se o codpes extraído veio do campo indicado no config
         list($codpes, $codpesValido) = LdapUser::obterCodpes($user, true);
 
