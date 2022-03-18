@@ -277,11 +277,11 @@ class LdapUserController extends Controller
     {
         $this->authorize('gerente');
 
-        $vinculos = \Uspdev\Replicado\Pessoa::tiposVinculos(config('web-ldap-admin.replicado_unidade'));
+        $vinculos = Pessoa::tiposVinculos(config('web-ldap-admin.replicado_unidade'));
         foreach ($vinculos as &$vinculo) {
-            $vinculo['countReplicado'] = \Uspdev\Replicado\Pessoa::ativosVinculo($vinculo['tipvinext'], config('web-ldap-admin.replicado_unidade'), 1)[0]['total'];
-            $vinculo['countAD'] = count(\App\Ldap\User::getUsersGroup($vinculo['tipvinext']));
-            $vinculo['style'] = $vinculo['countAD'] < $vinculo['countReplicado'] ? 'text-danger' : '';
+            $vinculo['countReplicado'] = Pessoa::ativosVinculo($vinculo['tipvinext'], config('web-ldap-admin.replicado_unidade'), 1)[0]['total'];
+            $vinculo['countAD'] = count(LdapUser::getUsersGroup($vinculo['tipvinext']));
+            $vinculo['style'] = ($vinculo['countAD'] < $vinculo['countReplicado']) ? 'text-danger' : '';
         }
 
         return view('ldapusers.sync', compact('vinculos'));
