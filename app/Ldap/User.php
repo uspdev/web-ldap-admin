@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Gate;
 use Uspdev\Replicado\Graduacao;
 use Uspdev\Replicado\Pessoa;
 use Uspdev\Utils\Generic as Utils;
+use \Adldap\Models\User as LdapUser;
 
 class User
 {
@@ -166,9 +167,8 @@ class User
      * @param \Adldap\Models\User $user
      * @return Array
      */
-    public static function show($user)
+    public static function show(LdapUser $user)
     {
-
         $attr = [];
 
         // Nome e email
@@ -181,11 +181,12 @@ class User
         // Data da criação da conta
         $ativacao = $user->whencreated[0];
         if (!is_null($ativacao)) {
+            // vamos subtrair 3 horas para bater com o TZ local. TODO: alguma forma de melhorar isso?
             $ativacao = Carbon::createFromFormat('YmdHis\.0\Z', $ativacao)->subHours(3)->format('d/m/Y H:i:s');
         }
         $attr['ativacao'] = $ativacao;
 
-        // última senha alterada
+        // data da última senha alterada
         $last = $user->getPasswordLastSetDate();
         if (!is_null($last)) {
             $last = Carbon::createFromFormat('Y-m-d H:i:s', $last)->format('d/m/Y H:i:s');
@@ -199,7 +200,7 @@ class User
         }
         $attr['expira'] = $expira;
 
-        // Grupos
+        // Grupos: vamos ocultar o grupo "Domain Users"
         $grupos = array_diff($user->getGroupNames(), ['Domain Users']);
         sort($grupos);
         $attr['grupos'] = implode(', ', $grupos);
@@ -223,7 +224,7 @@ class User
      * @param $status Se true retorna se o codpes veio do campo correto ou não, segundo o config
      * @return Int|Array|Null
      */
-    public static function obterCodpes(\Adldap\Models\User $user, Bool $status = false)
+    public static function obterCodpes(LdapUser $user, Bool $status = false)
     {
         $valido = true;
         switch (strtolower(config('web-ldap-admin.campoCodpes'))) {
@@ -314,9 +315,9 @@ class User
         if ($group != false) {
             $ldapusers = Adldap::search()->users();
             $ldapusers = $ldapusers->where('memberof', '=', $group->getDnBuilder()->get());
-            $ldapusers = $ldapusers->where('samaccountname', '!=', 'Administrator');
-            $ldapusers = $ldapusers->where('samaccountname', '!=', 'krbtgt');
-            $ldapusers = $ldapusers->where('samaccountname', '!=', 'Guest');
+            foreach (config('web-ldap-admin.ocultarUsuarios') as $ocultar) {
+                $ldapusers = $ldapusers->where('samaccountname', '!=', $ocultar);
+            }
             $ldapusers = $ldapusers->sortBy('displayname', 'asc');
             $ldapusers = $ldapusers->paginate(config('web-ldap-admin.registrosPorPagina'))->getResults();
         }
