@@ -107,7 +107,7 @@ Além disso, cria e coloca a pessoa nos grupos "vinculo estendido (tipvinext)", 
 
 No processo de sincronização o sistema pode desativar os usuários que não tem mais vínculos ativos com a unidade, a não ser que estejam listados nos Números USP permitidos sem vínculo. false (default) - não desativa desligados; true - desativa desligados
 
-DESATIVAR_DESLIGADOS=false
+    DESATIVAR_DESLIGADOS=false
 
 #### Organizational unit (OU) padrão
 
