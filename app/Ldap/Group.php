@@ -3,27 +3,28 @@
 namespace App\Ldap;
 
 use Adldap\Laravel\Facades\Adldap;
+use \Adldap\Models\User as LdapUser;
 
 class Group
 {
     public static function createOrUpdate(string $name)
     {
-        $group = Adldap::search()->groups()->where('cn', '=', trim($name))->first();
+        $name = trim($name);
+        $group = Adldap::search()->groups()->where('cn', '=', $name)->first();
         if (!$group) {
             $group = Adldap::make()->group();
             $group->setDn("CN={$name}," . $group->getDnBuilder());
-            $group->setName(trim($name));
-
-            // vamos nomear o grupo de forma a não conflitar
-            $group->setAttribute('sAMAccountName','GRUPO-' . trim($name));
+            $group->setName($name);
+            // vamos prefixar o nome do grupo de forma a não conflitar
+            $group->setAttribute('sAMAccountName', 'GRUPO-' . $name);
+            $group->setAttribute('info', 'Criado por web-ldap-admin em ' . now()->format('d/m/Y H:i:s'));
             $group->save();
 
-            // Busca a OU padrão informada no .env
-            $ou = Adldap::search()->ous()->find(config('web-ldap-admin.ouDefault'));
             // Move o grupo para a OU padrão somente se ela existir,
-            // do contrário deixa o grupo na raiz
-            $group->move($ou);
+            // do contrário deixa o grupo na raiz ou no local de origem
+            $group->move(Adldap::search()->ous()->find(config('web-ldap-admin.ouDefault')));
         }
+
         return $group;
     }
 
@@ -34,7 +35,7 @@ class Group
      * @param Array $group
      * @return Null
      */
-    public static function addMember(\Adldap\Models\User $user, array $groups)
+    public static function addMember(LdapUser $user, array $groups)
     {
         $before_groups = $user->getGroupNames();
         $notRemoveGroups = explode(',', config('web-ldap-admin.notRemoveGroups'));
@@ -65,7 +66,7 @@ class Group
         // assim, por hora, vou assumir que os grupos criado pelo laravel estão sem descrição
         // adicionando iscriticalsystemobject como filtro. Melhora mas não limpa todos (Masaki)
         $r = [];
-        $groups = Adldap::search()->groups()->where('iscriticalsystemobject','!','TRUE')->get();
+        $groups = Adldap::search()->groups()->where('iscriticalsystemobject', '!', 'TRUE')->get();
         foreach ($groups as $group) {
             array_push($r, $group->getName());
         }

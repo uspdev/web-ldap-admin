@@ -125,7 +125,7 @@ Ao criar conta nova ou trocar a senha, pode-se definir um prazo para expiração
 
 #### Campo associado ao codpes
 
-Configura qual campo vai estar associado ao codpes da pessoa. Por padrão é no campo **username** mas pode ser atribuído ao campo **employeeNumber**. No segundo caso, na criação de novo usuário automático, o username vai ser o **email** sem caracteres especiais (somente letras e números) e sem o domínio. Se o usuário já existir o username pode ser qualquer.
+Configura qual campo vai estar associado ao codpes da pessoa. Por padrão é no campo **username** mas pode ser atribuído ao campo **employeeNumber**. No segundo caso, na criação de novo usuário automático, o username vai ser o **email** sem caracteres especiais (somente letras e números), sem o domínio, limitado a 15 caracteres. Se o usuário já existir o username pode ser qualquer.
 
     CAMPO_CODPES=username
     
@@ -183,6 +183,14 @@ Rodar um job pelo tinker:
 
 ## Funcionamento dos Grupos
 
-O sistema vai adicionar o usuário ao grupo com o mesmo nome do vínculo. Ex.: ALUNOGR, SERVIDOR, etc. Os grupos são criados automaticamente.
+O sistema vai adicionar o usuário ao grupo com o mesmo nome do vínculo. Ex.: ALUNOGR, SERVIDOR, etc. Os grupos são criados automaticamente. 
+
+* Se o grupo foi criado pelo web-ldap-admin ele seta o atributo managedBy=web-ldap-admin
+
+Grupos criados:
+
+* SETOR (codset)
+* Vinculo-estendido (tipvinext)
+* Vinculo-estendido + SETOR
 
 O departamento (department) corresponde ao setor, se tiver.
