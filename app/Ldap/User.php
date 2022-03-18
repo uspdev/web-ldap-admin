@@ -73,7 +73,7 @@ class User
         }
 
         // caso o codpes venha no employeenumber
-        if (!empty($attr['employeenumber'])) {
+        if (!empty($attr['employeeNumber'])) {
             $user->setEmployeeNumber($attr['employeeNumber']);
         }
 
