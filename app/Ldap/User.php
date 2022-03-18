@@ -71,9 +71,9 @@ class User
             $user->setEmail($attr['email']);
         }
 
-        // caso o codpes venha no telephonenumber
-        if (!empty($attr['telephonenumber'])) {
-            $user->setTelephoneNumber($attr['telephonenumber']);
+        // caso o codpes venha no employeenumber
+        if (!empty($attr['employeenumber'])) {
+            $user->setEmployeeNumber($attr['employeeNumber']);
         }
 
         // Departamento
@@ -139,13 +139,14 @@ class User
      */
     public static function obterUserPorCodpes($codpes)
     {
-        if (strtolower(config('web-ldap-admin.campoCodpes')) == 'telephonenumber') {
-            return Adldap::search()->users()->findBy('telephoneNumber', $codpes);
+        $user = Adldap::search()->users()->findBy(config('web-ldap-admin.campoCodpes'), $codpes);
+
+        // não vai encontrar se for pelo username, nesse caso vamos usar o CN
+        if (is_null($user)) {
+            $user = Adldap::search()->users()->where('cn', '=', $codpes)->first();
         }
-        if (strtolower(config('web-ldap-admin.campoCodpes') == 'username')) {
-            return Adldap::search()->users()->where('cn', '=', $codpes)->first();
-        }
-        return null;
+
+        return $user;
     }
 
     /**
@@ -212,7 +213,7 @@ class User
     /**
      * Retorna o codpes do usuário ldap
      *
-     * O codpes pode ser o username ou o telephonenumber e é setado no config.
+     * O codpes pode ser o username ou o employeeNumber e é setado no config.
      * Se não encontrar no campo apropriado faz a busca no outro campo
      * para o caso de ter mudado a regra ao longo do uso
      *
@@ -226,8 +227,8 @@ class User
     {
         $valido = true;
         switch (strtolower(config('web-ldap-admin.campoCodpes'))) {
-            case 'telephonenumber':
-                if (!is_numeric($codpes = $user->getTelephoneNumber())) {
+            case 'employeenumber':
+                if (!is_numeric($codpes = $user->getEmployeeNumber())) {
                     $codpes = $user->getAccountName();
                     $valido = false;
                 }
@@ -235,7 +236,7 @@ class User
             case 'username':
             default:
                 if (!is_numeric($codpes = $user->getAccountName())) {
-                    $codpes = $user->getTelephoneNumber();
+                    $codpes = $user->getEmployeeNumber();
                     $valido = false;
                 }
                 break;
@@ -353,17 +354,22 @@ class User
     {
         // setando username e codpes (similar loginListener)
         switch (strtolower(config('web-ldap-admin.campoCodpes'))) {
-            case 'telephonenumber':
+            case 'employeenumber':
                 $username = explode('@', $pessoa['codema'])[0];
                 $username = preg_replace("/[^a-zA-Z0-9]+/", "", $username); //email sem caracteres especiais
                 $username = substr($username, 0, 15); //limitando em 15 caracteres
-                $attr['telephonenumber'] = $pessoa['codpes'];
+                $attr['employeeNumber'] = $pessoa['codpes'];
                 break;
             case 'username':
             default:
                 $username = $pessoa['codpes'];
-                $attr['telephonenumber'] = '';
+                $attr['employeeNumber'] = '';
                 break;
+        }
+
+        // setando para testes se não vier dtanas
+        if (!isset($pessoa['dtanas'])) {
+            $pessoa['dtanas'] = '1/1/1970';
         }
 
         // setando senha
@@ -390,7 +396,7 @@ class User
         }
         $attr['setor'] = $setor;
 
-        $attr['nome'] = $pessoa['nompesttd'];
+        $attr['nome'] = $pessoa['nompesttd'] ?? $pessoa['nompes'];
         $attr['email'] = $pessoa['codema'];
 
         $attr['descricao'] = 'Sincronizado com o replicado';

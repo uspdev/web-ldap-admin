@@ -96,7 +96,7 @@ Configuração referente ao processo de sincronização de dados do usuário dur
     * nome
     * sobrenome
     * email
-    * telefone: preenche com nro USP ser estiver configurado no env
+    * employeeNumber: preenche com nro USP ser estiver configurado no env
     * departamento
 
 Além disso, cria e coloca a pessoa nos grupos "vinculo estendido (tipvinext)", "setor" e "vinculo estendido setor". OBS.: Preserva os demais grupos já existentes.
@@ -119,7 +119,7 @@ Ao criar conta nova ou trocar a senha, pode-se definir um prazo para expiração
 
 #### Campo associado ao codpes
 
-Configura qual campo vai estar associado ao codpes da pessoa. Por padrão é no campo **username** mas pode ser atribuído ao campo **telephoneNumber**. No segundo caso, na criação de novo usuário automático, o username vai ser o **email** sem caracteres especiais (somente letras e números) e sem o domínio. Se o usuário já existir o username pode ser qualquer.
+Configura qual campo vai estar associado ao codpes da pessoa. Por padrão é no campo **username** mas pode ser atribuído ao campo **employeeNumber**. No segundo caso, na criação de novo usuário automático, o username vai ser o **email** sem caracteres especiais (somente letras e números) e sem o domínio. Se o usuário já existir o username pode ser qualquer.
 
     CAMPO_CODPES=username
     

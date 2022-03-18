@@ -33,7 +33,7 @@ return [
     'ocultarUsuarios' => ['administrator', 'administrador', 'krbtgt', 'guest'],
 
     # Campo LDAP que será usado como codpes
-    # telephoneNumber, username
+    # employeeNumber, username
     # vai ser aplicado strtolower então o case não importa
     'campoCodpes' => env('CAMPO_CODPES','username'),
 
