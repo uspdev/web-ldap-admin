@@ -149,6 +149,7 @@ class LdapUserController extends Controller
     public function show(Request $request, $username)
     {
         $this->authorize('gerente');
+        \UspTheme::activeUrl('ldapusers');
 
         $user = LdapUser::obterUserPorUsername($username);
         if (!$user) {
