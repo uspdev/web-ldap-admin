@@ -174,17 +174,19 @@ class LdapUserController extends Controller
     }
 
     /**
-     * parte comum do show para show e my
+     * parte comum do para show e my
      */
     protected function showCommon($user)
     {
         $attr = LdapUser::show($user);
-        list($codpes, $codpesValido) = LdapUser::obterCodpes($user, true);
+        $vinculos = [];
         // o $codpesValido serve para informar se o codpes extraído veio do campo indicado no config
-        $vinculos = $codpes ? Replicado::listarVinculosEstendidos($codpes) : [];
+        list($codpes, $codpesValido) = LdapUser::obterCodpes($user, true);
 
-        // Foto
-        $foto = (config('web-ldap-admin.mostrarFoto') == 1 and $codpes != null) ? \Uspdev\Wsfoto::obter($codpes) : '';
+        if ($codpes) {
+            $vinculos = Replicado::listarVinculosEstendidos($codpes);
+            $foto = (config('web-ldap-admin.mostrarFoto') == 1) ? \Uspdev\Wsfoto::obter($codpes) : '';
+        }
 
         return view('ldapusers.show', compact('attr', 'user', 'vinculos', 'codpesValido', 'foto'));
     }
@@ -214,7 +216,7 @@ class LdapUserController extends Controller
         if (!is_null($request->senha)) {
             $request->validate([
                 'senha' => ['required', 'confirmed', 'min:8'],
-                'must_change_pwd' => ['nullable','in:1'],
+                'must_change_pwd' => ['nullable', 'in:1'],
             ]);
 
             if (LdapUser::changePassword($username, $request->senha, $request->must_change_pwd)) {
