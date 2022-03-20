@@ -1164,16 +1164,16 @@
         },
         {
             "name": "guzzlehttp/guzzle",
-            "version": "7.4.1",
+            "version": "7.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/guzzle.git",
-                "reference": "ee0a041b1760e6a53d2a39c8c34115adc2af2c79"
+                "reference": "ac1ec1cd9b5624694c3a40be801d94137afb12b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/ee0a041b1760e6a53d2a39c8c34115adc2af2c79",
-                "reference": "ee0a041b1760e6a53d2a39c8c34115adc2af2c79",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/ac1ec1cd9b5624694c3a40be801d94137afb12b4",
+                "reference": "ac1ec1cd9b5624694c3a40be801d94137afb12b4",
                 "shasum": ""
             },
             "require": {
@@ -1268,7 +1268,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/guzzle/issues",
-                "source": "https://github.com/guzzle/guzzle/tree/7.4.1"
+                "source": "https://github.com/guzzle/guzzle/tree/7.4.2"
             },
             "funding": [
                 {
@@ -1284,7 +1284,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-12-06T18:43:05+00:00"
+            "time": "2022-03-20T14:16:28+00:00"
         },
         {
             "name": "guzzlehttp/promises",
@@ -1372,16 +1372,16 @@
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "2.1.0",
+            "version": "2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "089edd38f5b8abba6cb01567c2a8aaa47cec4c72"
+                "reference": "6565c7e0db3231e92dd5ca3bed448b30fbc89eb1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/089edd38f5b8abba6cb01567c2a8aaa47cec4c72",
-                "reference": "089edd38f5b8abba6cb01567c2a8aaa47cec4c72",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/6565c7e0db3231e92dd5ca3bed448b30fbc89eb1",
+                "reference": "6565c7e0db3231e92dd5ca3bed448b30fbc89eb1",
                 "shasum": ""
             },
             "require": {
@@ -1405,7 +1405,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.1-dev"
+                    "dev-master": "2.2-dev"
                 }
             },
             "autoload": {
@@ -1467,7 +1467,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/psr7/issues",
-                "source": "https://github.com/guzzle/psr7/tree/2.1.0"
+                "source": "https://github.com/guzzle/psr7/tree/2.2.0"
             },
             "funding": [
                 {
@@ -1483,7 +1483,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-10-06T17:43:30+00:00"
+            "time": "2022-03-20T13:51:08+00:00"
         },
         {
             "name": "laravel/framework",
@@ -6096,16 +6096,16 @@
         },
         {
             "name": "tightenco/collect",
-            "version": "v8.83.2",
+            "version": "v8.83.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tighten/collect.git",
-                "reference": "d9c66d586ec2d216d8a31283d73f8df1400cc722"
+                "reference": "369a4eebc0d1763e6eba30526f190eaa76b78e8c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tighten/collect/zipball/d9c66d586ec2d216d8a31283d73f8df1400cc722",
-                "reference": "d9c66d586ec2d216d8a31283d73f8df1400cc722",
+                "url": "https://api.github.com/repos/tighten/collect/zipball/369a4eebc0d1763e6eba30526f190eaa76b78e8c",
+                "reference": "369a4eebc0d1763e6eba30526f190eaa76b78e8c",
                 "shasum": ""
             },
             "require": {
@@ -6144,9 +6144,9 @@
             ],
             "support": {
                 "issues": "https://github.com/tighten/collect/issues",
-                "source": "https://github.com/tighten/collect/tree/v8.83.2"
+                "source": "https://github.com/tighten/collect/tree/v8.83.5"
             },
-            "time": "2022-02-16T16:15:54+00:00"
+            "time": "2022-03-18T22:24:16+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
@@ -6244,16 +6244,16 @@
         },
         {
             "name": "uspdev/laravel-usp-theme",
-            "version": "2.4.5",
+            "version": "2.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/uspdev/laravel-usp-theme.git",
-                "reference": "0beb72bc2a0977e381f3f1dbe4cc989746ed3f28"
+                "reference": "1ac15008ebb6ccab7d8ed05cc31cffeb0d28ddb1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/uspdev/laravel-usp-theme/zipball/0beb72bc2a0977e381f3f1dbe4cc989746ed3f28",
-                "reference": "0beb72bc2a0977e381f3f1dbe4cc989746ed3f28",
+                "url": "https://api.github.com/repos/uspdev/laravel-usp-theme/zipball/1ac15008ebb6ccab7d8ed05cc31cffeb0d28ddb1",
+                "reference": "1ac15008ebb6ccab7d8ed05cc31cffeb0d28ddb1",
                 "shasum": ""
             },
             "type": "library",
@@ -6288,9 +6288,9 @@
             "description": "usp theme for laravel",
             "support": {
                 "issues": "https://github.com/uspdev/laravel-usp-theme/issues",
-                "source": "https://github.com/uspdev/laravel-usp-theme/tree/2.4.5"
+                "source": "https://github.com/uspdev/laravel-usp-theme/tree/2.4.6"
             },
-            "time": "2022-03-17T13:47:21+00:00"
+            "time": "2022-03-20T17:07:50+00:00"
         },
         {
             "name": "uspdev/replicado",
@@ -9188,5 +9188,5 @@
         "php": "^7.2.5"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.2.0"
 }
