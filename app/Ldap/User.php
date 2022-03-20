@@ -43,7 +43,9 @@ class User
             $user->setPassword($password ?? Utils::senhaAleatoria());
 
             // Trocar a senha no próximo logon
-            $user->setAttribute('pwdlastset', 0);
+            if (config('web-ldap-admin.obrigaTrocarSenhaNoWindows')) {
+                $user->setAttribute('pwdlastset', 0);
+            }
 
             // Enable the new user (using user account control).
             $user->setUserAccountControl(AccountControl::NORMAL_ACCOUNT);

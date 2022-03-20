@@ -47,4 +47,11 @@ return [
 
     # Mostrar WsFoto? Default 0 = não
     'mostrarFoto' => env('WSFOTO', 0),
+
+    # Forçar trocar senha no pŕoximo login do windows?
+    # se o login com AD é usado em outros sistemas, como aplicações web 
+    # ou em terminais com linux deixar essa opção como 0 (falsa)
+    # pois o usuário fica travado e não consegue logar em nada a não ser nos windows.
+    # Por default está 1 (true) pois assim estava no Ldap/User.php
+    'obrigaTrocarSenhaNoWindows' => env('OBRIGA_TROCAR_SENHA_NO_WINDOWS', 1),
 ];
