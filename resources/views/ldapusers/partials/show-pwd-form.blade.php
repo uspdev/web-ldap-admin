@@ -18,7 +18,7 @@
         <input type="password" class="form-control" name="senha_confirmation">
       </div>
 
-      @if (Gate::check('gerente'))
+      @if (Gate::check('gerente') and config('web-ldap-admin.obrigaTrocarSenhaNoWindows'))
         <div class="form-group form-check">
           <input type="checkbox" class="form-check-input" name="must_change_pwd" value="1" checked>
           <label for="usr">Usuário deve alterar a senha no próximo logon</label>
