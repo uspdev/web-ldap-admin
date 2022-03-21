@@ -30,26 +30,27 @@ class LdapUserController extends Controller
         $this->authorize('gerente');
         \UspTheme::activeUrl('ldapusers');
 
+        //vamos validar os campos??
+        $request->validate([
+            'perPage' => 'nullable',
+            'page' => 'nullable',
+            'search' => 'nullable',
+            'grupos' => 'nullable',
+        ]);
+
         // Registros por página
-        if (empty($request->perPage)) {
-            $perPage = config('web-ldap-admin.registrosPorPagina');
-        } else {
-            $perPage = $request->perPage;
-        }
+        $perPage = empty($request->perPage) ? config('web-ldap-admin.registrosPorPagina') : $request->perPage;
 
         // Verifica qual a página
-        if (empty($request->page)) {
-            $page = 1;
-        } else {
-            $page = $request->page;
-        }
+        $page = empty($request->page) ? 1 : $request->page;
 
         // Busca
         $ldapusers = Adldap::search()->users();
 
         if (!empty($request->search) && isset($request->search)) {
             // buscar por username ou por nome
-            $ldapusers = $ldapusers->orWhere('displayname', 'contains', $request->search)->orWhere('samaccountname', 'contains', $request->search);
+            $ldapusers = $ldapusers->orWhere('displayname', 'contains', $request->search)
+                ->orWhere('samaccountname', 'contains', $request->search);
         }
 
         if (!empty($request->grupos) && isset($request->grupos)) {
