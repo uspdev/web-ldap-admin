@@ -60,6 +60,7 @@ class LdapUserController extends Controller
                     $ldapusers = $ldapusers->orWhere('memberof', '=', $group->getDnBuilder()->get());
                 }
             } else {
+                //TODO: aqui nao acho que precise separado do FOR
                 $group = Adldap::search()->groups()->find($request->grupos[0]);
                 $ldapusers = $ldapusers->where('memberof', '=', $group->getDnBuilder()->get());
             }
