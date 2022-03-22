@@ -8,6 +8,7 @@ use App\Ldap\Group as LdapGroup;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Uspdev\Replicado\Graduacao;
+use Uspdev\Replicado\Estrutura;
 use Uspdev\Replicado\Pessoa;
 use Uspdev\Utils\Generic as Utils;
 use \Adldap\Models\User as LdapUser;
@@ -392,7 +393,19 @@ class User
         } else {
             $setor = $pessoa['tipvinext'];
             if ($pessoa['tipvinext'] == 'Aluno de Graduação') {
-                $nomabvset = Graduacao::setorAluno($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'))['nomabvset'];
+                if (config('web-ldap-admin.curHabSet') == '') {
+                    $nomabvset = Graduacao::setorAluno($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'))['nomabvset'];
+                } else {
+                    $curso = Graduacao::curso($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'));
+                    $codcur = $curso['codcur'];
+                    $codhab = $curso['codhab'];
+                    foreach (config('web-ldap-admin.curHabSet') as $curHabSet) {
+                        if ($curHabSet['codcur'] == $codcur && $curHabSet['codhab'] == $codhab) {
+                            $codset = $curHabSet['codset'];
+                        }
+                    }
+                    $nomabvset = Estrutura::dump($codset)['nomabvset'];
+                }
                 $setor = $pessoa['tipvinext'] . ' ' . $nomabvset;
             }
             // aqui poderia tratar os outros casos de Pós Graduação, Posdoc, etc
@@ -406,13 +419,19 @@ class User
 
         if( $pessoa['tipvinext'] != 'Externo') {
             if(config('web-ldap-admin.tipoNomesGrupos') == 'extenso'){
-                $grupos = Pessoa::vinculosSetores($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'));
+                $vinculosSetores = Pessoa::vinculosSetores($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'));
+                foreach ($vinculosSetores as $key => $value) {
+                    if ($value == 'Aluno de Graduação') {
+                        $vinculosSetores[1] = 'Aluno de Graduação ' . $nomabvset;
+                    }
+                }
+                $grupos = ($pessoa['tipvinext'] != 'Externo') ? $vinculosSetores : [$pessoa['tipvinext']];
             }
             if(config('web-ldap-admin.tipoNomesGrupos') == 'siglas'){
                 $setores = Pessoa::obterSiglasSetoresAtivos($pessoa['codpes']);
                 $vinculos = Pessoa::obterSiglasVinculosAtivos($pessoa['codpes']);
                 $grupos = array_merge($setores,$vinculos);
-            }            
+            }
         } else {
             $grupos = [$pessoa['tipvinext']];
         }
