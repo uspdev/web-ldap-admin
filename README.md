@@ -149,6 +149,12 @@ Permite buscar foto e exibir nas informações da pessoa. 0 (default) - não mos
 
     WSFOTO=0
 
+#### Trocar senha na criação de contas novas
+
+Ao criar uma nova conta no ldap, ele força o usuário a trocar a senha no próximo logon do windows. Se o login com AD é usado em outros sistemas, como aplicações web ou em terminais com linux deixar essa opção como 0 (falsa).
+
+    OBRIGA_TROCAR_SENHA_NO_WINDOWS=1
+
 ## Dicas
 
 Nessa aplicação, SENHAUNICA_ADMINS pode gerenciar usuários, SENHAUNICA_GERENTES pode realizar as operações em geral e usuários comuns podem alterar suas respectivas senhas.
