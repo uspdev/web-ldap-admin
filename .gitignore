@@ -24,4 +24,8 @@ Dockerfile.custom
 php.ini
 
 # vim bkp
-*.*~
+*~
+*.swp
+
+# Curso graduação x Habilitação x Setor
+/storage/curhabset.json
