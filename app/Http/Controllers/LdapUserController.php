@@ -181,13 +181,14 @@ class LdapUserController extends Controller
     {
         $attr = LdapUser::show($user);
         $vinculos = [];
-        $foto = '';
         // o $codpesValido serve para informar se o codpes extraído veio do campo indicado no config
         list($codpes, $codpesValido) = LdapUser::obterCodpes($user, true);
 
         if ($codpes) {
             $vinculos = Replicado::listarVinculosEstendidos($codpes);
-            $foto = (config('web-ldap-admin.mostrarFoto') == 1) ? \Uspdev\Wsfoto::obter($codpes) : '';
+            $foto = \Uspdev\Wsfoto::obter($codpes);
+        } else {
+            $foto = '';
         }
 
         return view('ldapusers.show', compact('attr', 'user', 'vinculos', 'codpesValido', 'foto'));

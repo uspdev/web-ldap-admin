@@ -1,6 +1,6 @@
 <table class="table table-striped">
   <tbody>
-    @if (config('web-ldap-admin.mostrarFoto') == 1 && $foto != '')
+    @if ($foto != '')
       <tr>
         <td style="width:30%"> <b>Foto cartão USP </b> </td>
         <td><img style="width: 80px; float: left;" src="data:image/png;base64, {{ $foto }}" alt="foto"></td>
