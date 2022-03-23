@@ -63,5 +63,5 @@ return [
 
     # Curso de graduação x Habilitação x Setor (Departamento de ensino)
     # Se não estiver configurada no env o método setorAluno será utilizado
-    'curHabSet' => (env('CUR_HAB_SET')) ? array_values(json_decode(file_get_contents('/app/' . env('CUR_HAB_SET')), true)) : [],
+    'grCursoSetor' => (env('CUR_HAB_SET')) ? array_values(json_decode(file_get_contents(env('CUR_HAB_SET')), true)) : [],
 ];

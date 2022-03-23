@@ -393,15 +393,15 @@ class User
         } else {
             $setor = $pessoa['tipvinext'];
             if ($pessoa['tipvinext'] == 'Aluno de Graduação') {
-                if (config('web-ldap-admin.curHabSet') == '') {
+                if (empty(config('web-ldap-admin.grCursoSetor'))) {
                     $nomabvset = Graduacao::setorAluno($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'))['nomabvset'];
                 } else {
                     $curso = Graduacao::curso($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'));
                     $codcur = $curso['codcur'];
                     $codhab = $curso['codhab'];
-                    foreach (config('web-ldap-admin.curHabSet') as $curHabSet) {
-                        if ($curHabSet['codcur'] == $codcur && $curHabSet['codhab'] == $codhab) {
-                            $codset = $curHabSet['codset'];
+                    foreach (config('web-ldap-admin.grCursoSetor') as $grCursoSetor) {
+                        if ($grCursoSetor['codcur'] == $codcur && $grCursoSetor['codhab'] == $codhab) {
+                            $codset = $grCursoSetor['codset'];
                         }
                     }
                     $nomabvset = Estrutura::dump($codset)['nomabvset'];
@@ -421,7 +421,7 @@ class User
             if(config('web-ldap-admin.tipoNomesGrupos') == 'extenso'){
                 $vinculosSetores = Pessoa::vinculosSetores($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'));
                 foreach ($vinculosSetores as $key => $value) {
-                    if ($value == 'Aluno de Graduação') {
+                    if ($value == 'Aluno de Graduação' && isset($nomabvset)) {
                         $vinculosSetores[1] = 'Aluno de Graduação ' . $nomabvset;
                     }
                 }
