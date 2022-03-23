@@ -12,10 +12,14 @@ return [
 
     # Desativar desligados na sincronização (true/false default)
     'desativarDesligados' => env('DESATIVAR_DESLIGADOS', false),
-
-    # foi desativado em 2/2022. Nesse caso ele mantem os grupos
-    # existentes e adiciona se necessário os demais grupos
+ 
+    # Grupos que não devem ser removidos
     'notRemoveGroups' => env('NOT_REMOVE_GROUPS', 'LOCAL_ADMIN,STI'),
+
+    # No login ou na sincronização remover todos grupos, excetos
+    # os que estão em notRemoveGroups.
+    # 0 - não remover todos grupo, 1 - remover todos grupos
+    'removeAllGroups' => env('REMOVE_ALL_GROUPS',0),
 
     # 0 = ninguém, 1 = todos, 2 = servidores (funcionários e docentes)
     'solicitaContaAdmin' => env('SOLICITA_CONTA_ADMIN', 0),
@@ -56,4 +60,8 @@ return [
     # Curso de graduação x Habilitação x Setor (Departamento de ensino)
     # Se não estiver configurada no env o método setorAluno será utilizado
     'grCursoSetor' => (env('CUR_HAB_SET')) ? array_values(json_decode(file_get_contents(env('CUR_HAB_SET')), true)) : [],
+
+    # Sincronizar grupos usando nome por extenso ou somente siglas?
+    # extenso, siglas
+    'tipoNomesGrupos' => env('TIPO_NOMES_GRUPOS', 'extenso'),
 ];
