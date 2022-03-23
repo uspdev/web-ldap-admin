@@ -404,7 +404,19 @@ class User
 
         $attr['descricao'] = 'Sincronizado com o replicado';
 
-        $grupos = ($pessoa['tipvinext'] != 'Externo') ? Pessoa::vinculosSetores($pessoa['codpes'], config('web-ldap-admin.replicado_unidade')) : [$pessoa['tipvinext']];
+        if( $pessoa['tipvinext'] != 'Externo') {
+            if(config('web-ldap-admin.tipoNomesGrupos') == 'extenso'){
+                $grupos = Pessoa::vinculosSetores($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'));
+            }
+            if(config('web-ldap-admin.tipoNomesGrupos') == 'siglas'){
+                $setores = Pessoa::obterSiglasSetoresAtivos($pessoa['codpes']);
+                $vinculos = Pessoa::obterSiglasVinculosAtivos($pessoa['codpes']);
+                $grupos = array_merge($setores,$vinculos);
+            }            
+        } else {
+            $grupos = [$pessoa['tipvinext']];
+        }
+
         $grupos = array_unique($grupos);
         sort($grupos);
 

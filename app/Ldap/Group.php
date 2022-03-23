@@ -43,9 +43,9 @@ class Group
 
         $groups = array_merge($keep_groups, $groups);
 
-        // Vamos remover todos grupos e adicionar apenas os necessários
-        // porque remover todos????? Não vamos mexer com os grupos existentes
-        // $user->removeAllGroups();
+        if (config('web-ldap-admin.removeAllGroups')) {
+            $user->removeAllGroups();
+        }        
 
         //remove posições vazias, repetidas e sujas
         $groups = array_map('trim', $groups);
