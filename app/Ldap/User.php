@@ -401,12 +401,11 @@ class User
                     $codhab = $curso['codhab'];
                     foreach (config('web-ldap-admin.grCursoSetor') as $grCursoSetor) {
                         if ($grCursoSetor['codcur'] == $codcur && $grCursoSetor['codhab'] == $codhab) {
-                            $codset = $grCursoSetor['codset'];
+                            $nomabvset = $grCursoSetor['nomabvset'];
                         }
                     }
-                    $nomabvset = Estrutura::dump($codset)['nomabvset'];
                 }
-                $setor = $pessoa['tipvinext'] . ' ' . $nomabvset;
+                $setor = (isset($nomabvset)) ? trim($pessoa['tipvinext'] . ' ' . $nomabvset) : $pessoa['tipvinext'];
             }
             // aqui poderia tratar os outros casos de Pós Graduação, Posdoc, etc
         }

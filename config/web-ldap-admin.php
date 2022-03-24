@@ -63,5 +63,8 @@ return [
 
     # Curso de graduação x Habilitação x Setor (Departamento de ensino)
     # Se não estiver configurada no env o método setorAluno será utilizado
-    'grCursoSetor' => (env('CUR_HAB_SET')) ? array_values(json_decode(file_get_contents(env('CUR_HAB_SET')), true)) : [],
+    'grCursoSetor' => (env('CUR_HAB_SET')) ? json_decode(file_get_contents(env('CUR_HAB_SET')), true) : [],
+
+    # 0 não mostra foto (nem foto fake), 1 mostra foto
+    'mostrarFoto' => env('MOSTRAR_FOTO', 0),
 ];
