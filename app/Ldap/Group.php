@@ -54,9 +54,7 @@ class Group
 
         foreach ($groups as $groupname) {
             $group = self::createOrUpdate($groupname);
-            if (!$user->inGroup($group)) {
-                $group->addMember($user);
-            }
+            $group->addMember($user);
         }
     }
 
