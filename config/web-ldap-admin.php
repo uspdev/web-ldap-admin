@@ -12,7 +12,7 @@ return [
 
     # Desativar desligados na sincronização (true/false default)
     'desativarDesligados' => env('DESATIVAR_DESLIGADOS', false),
- 
+
     # Grupos que não devem ser removidos
     'notRemoveGroups' => env('NOT_REMOVE_GROUPS', 'LOCAL_ADMIN,STI'),
 
@@ -41,7 +41,7 @@ return [
     'ocultarUsuarios' => ['administrator', 'administrador', 'krbtgt', 'guest'],
 
     # Campo LDAP que será usado como codpes
-    # username, employeeNumber 
+    # username, employeeNumber
     # vai ser aplicado strtolower então o case não importa
     'campoCodpes' => env('CAMPO_CODPES','username'),
 
@@ -49,11 +49,8 @@ return [
     # data_nascimento, random
     'senhaPadrao' => env('SENHA_PADRAO','data_nascimento'),
 
-    # Mostrar WsFoto? Default 0 = não
-    'mostrarFoto' => env('WSFOTO', 0),
-
     # Forçar trocar senha no pŕoximo login do windows
-    # se o login com AD é usado em outros sistemas, como aplicações web 
+    # se o login com AD é usado em outros sistemas, como aplicações web
     # ou em terminais com linux deixar essa opção como 0 (falsa)
     # pois o usuário fica travado e não consegue logar em nada a não ser nos windows.
     # Por default está 1 (true) pois assim estava no Ldap/User.php
@@ -63,4 +60,11 @@ return [
     # Sincronizar grupos usando nome por extenso ou somente siglas?
     # extenso, siglas
     'tipoNomesGrupos' => env('TIPO_NOMES_GRUPOS', 'extenso'),
+
+    # Curso de graduação x Habilitação x Setor (Departamento de ensino)
+    # Se não estiver configurada no env o método setorAluno será utilizado
+    'grCursoSetor' => (env('CUR_HAB_SET')) ? json_decode(file_get_contents(env('CUR_HAB_SET')), true) : [],
+
+    # 0 não mostra foto (nem foto fake), 1 mostra foto
+    'mostrarFoto' => env('MOSTRAR_FOTO', 0),
 ];
