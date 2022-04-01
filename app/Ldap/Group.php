@@ -17,7 +17,11 @@ class Group
             $group->setName($name);
             // vamos prefixar o nome do grupo de forma a não conflitar
             $group->setAttribute('sAMAccountName', 'GRUPO-' . $name);
-            $group->setAttribute('info', 'Criado por web-ldap-admin em ' . now()->format('d/m/Y H:i:s'));
+            
+            # Deixando essa linha temporariamente desativada pois está gerando o erro no login:
+            # ldap_modify_batch(): Batch Modify: Invalid DN syntax at
+            #$group->setAttribute('info', 'Criado por web-ldap-admin em ' . now()->format('d/m/Y H:i:s'));
+            
             $group->save();
 
             // Move o grupo para a OU padrão somente se ela existir,
