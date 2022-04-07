@@ -96,11 +96,16 @@ class User
         LdapGroup::addMember($user, $groups);
 
         // Busca a OU padrão informada no .env
-        $ou = Adldap::search()->ous()->find(config('web-ldap-admin.ouDefault'));
+        // Se vazio, não é necessário alterar nada, pois o default é a raiz (Thiago)
+        if(config('web-ldap-admin.ouDefault') != ''){
+            $ou = Adldap::search()->ous()->find(config('web-ldap-admin.ouDefault'));
 
-        // Move o usuário para a OU padrão somente se ela existir,
-        // do contrário deixa o usuário na raiz
-        $user->move($ou);
+            // Move o usuário para a OU padrão somente se ela existir,
+            // do contrário deixa o usuário na raiz
+            $user->move($ou);
+        }
+
+
 
         return $user;
     }
