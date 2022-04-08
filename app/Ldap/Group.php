@@ -62,7 +62,6 @@ class Group
 
         foreach ($groups as $groupname) {
             $group = self::createOrUpdate($groupname);
-            #dd($user->getCommonName());
             $group->addMember($user);
         }
     }
