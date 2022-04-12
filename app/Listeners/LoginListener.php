@@ -70,7 +70,7 @@ class LoginListener
 
                 // Tem um erro também com a variável $vinculoPessoa que é criado dentro de um if
                 // mas é chamada fora, e o sistema quebra quando o fluxo não entra no if
-                // Vou deixar comentado até enteder o caso
+                // Vou deixar comentado até conversar com masaki e alessandro para otimizarmos esse login
                 // 12/04/2022 - @thiagogomesverissimo
 
                 /*
