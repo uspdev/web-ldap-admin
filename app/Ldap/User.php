@@ -440,6 +440,11 @@ class User
             $grupos = [$pessoa['tipvinext']];
         }
 
+        // Se a sincronização dos grupos com o replicado for desativada, vamos mandar esse array vazio
+        if (config('web-ldap-admin.syncGroupsWithReplicado') == 0) {
+            $grupos = [];
+        }
+
         $grupos = array_unique($grupos);
         sort($grupos);
 
