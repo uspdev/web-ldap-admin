@@ -51,7 +51,7 @@ class Group
 
         $groups = array_merge($keep_groups, $groups);
 
-        if (config('web-ldap-admin.removeAllGroups')) {
+        if (config('web-ldap-admin.removeAllGroups') == 'yes') {
             $user->removeAllGroups();
         }        
 

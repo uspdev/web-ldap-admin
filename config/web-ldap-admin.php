@@ -17,13 +17,11 @@ return [
     'notRemoveGroups' => env('NOT_REMOVE_GROUPS', 'LOCAL_ADMIN,STI'),
 
     # Sincronizar grupos com replicado
-    # 0 - não sincroniza grupos ; 1 - sincroniza grupos
-    'syncGroupsWithReplicado' => env('SYNC_GROUPS_WITH_REPLICADO', 1),
+    'syncGroupsWithReplicado' => env('SYNC_GROUPS_WITH_REPLICADO', 'yes'),
 
     # No login ou na sincronização remover todos grupos, excetos
     # os que estão em notRemoveGroups.
-    # 0 - não remover todos grupo, 1 - remover todos grupos
-    'removeAllGroups' => env('REMOVE_ALL_GROUPS',0),
+    'removeAllGroups' => env('REMOVE_ALL_GROUPS','no'),
 
     # 0 = ninguém, 1 = todos, 2 = servidores (funcionários e docentes)
     'solicitaContaAdmin' => env('SOLICITA_CONTA_ADMIN', 0),

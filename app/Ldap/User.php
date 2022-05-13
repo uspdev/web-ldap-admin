@@ -441,7 +441,7 @@ class User
         }
 
         // Se a sincronização dos grupos com o replicado for desativada, vamos mandar esse array vazio
-        if (config('web-ldap-admin.syncGroupsWithReplicado') == 0) {
+        if (config('web-ldap-admin.syncGroupsWithReplicado') == 'no') {
             $grupos = [];
         }
 
