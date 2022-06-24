@@ -17,11 +17,11 @@ class Group
             $group->setName($name);
             // vamos prefixar o nome do grupo de forma a não conflitar
             $group->setAttribute('sAMAccountName', 'GRUPO-' . $name);
-            
+
             # Deixando essa linha temporariamente desativada pois está gerando o erro no login:
             # ldap_modify_batch(): Batch Modify: Invalid DN syntax at
             #$group->setAttribute('info', 'Criado por web-ldap-admin em ' . now()->format('d/m/Y H:i:s'));
-            
+
             $group->save();
 
             // Move o grupo para a OU padrão somente se ela existir,
@@ -30,7 +30,7 @@ class Group
             if(config('web-ldap-admin.ouDefault') != ''){
                 $group->move(Adldap::search()->ous()->find(config('web-ldap-admin.ouDefault')));
             }
-            
+
         }
 
         return $group;
@@ -53,7 +53,7 @@ class Group
 
         if (config('web-ldap-admin.removeAllGroups') == 'yes') {
             $user->removeAllGroups();
-        }        
+        }
 
         //remove posições vazias, repetidas e sujas
         $groups = array_map('trim', $groups);
@@ -68,7 +68,7 @@ class Group
 
     public static function listaGrupos()
     {
-        // Nota: não encontrei nada que me permissite distinguir grupo do default do sistema ou não
+        // Nota: não encontrei nada que me permitisse distinguir grupo do default do sistema ou não
         // assim, por hora, vou assumir que os grupos criado pelo laravel estão sem descrição
         // adicionando iscriticalsystemobject como filtro. Melhora mas não limpa todos (Masaki)
         $r = [];
