@@ -7,15 +7,25 @@
       @csrf
       @method('patch')
 
+      <span style="color: red;">
+      @php
+          $complexidade = explode(',', config('web-ldap-admin.senhaComplexidade'));
+          foreach ($complexidade as $regra) {
+              echo "$regra<br />";
+          }
+      @endphp
+      </span>
+
       <div class="form-group">
         <label for="usr"> Nova senha:</label>
-        <input type="password" class="form-control" name="senha">
-        <i> Mínimo de 8 caracteres. </i>
+        <input type="password" class="form-control" name="senha" id="senha" placeholder="Digite a nova senha">
+        <input type="checkbox" onclick="mostrarSenha('senha')"> Mostrar senha
       </div>
 
       <div class="form-group">
         <label for="usr"> Repetir Nova senha:</label>
-        <input type="password" class="form-control" name="senha_confirmation">
+        <input type="password" class="form-control" name="senha_confirmation" id="senha_confirmation" placeholder="Repita a nova senha">
+        <input type="checkbox" onclick="mostrarSenha('senha_confirmation')"> Mostrar senha
       </div>
 
       @if (Gate::check('gerente'))
@@ -31,3 +41,14 @@
     </form>
   </div>
 </div>
+
+<script>
+function mostrarSenha(field) {
+  var x = document.getElementById(field);
+  if (x.type === "password") {
+    x.type = "text";
+  } else {
+    x.type = "password";
+  }
+}
+</script>

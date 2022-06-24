@@ -51,6 +51,9 @@ return [
     # data_nascimento, random
     'senhaPadrao' => env('SENHA_PADRAO','data_nascimento'),
 
+    # Complexidade de senha
+    'senhaComplexidade' => env('SENHA_COMPLEXIDADE', 'Mínimo de 8 caracteres.,Letras e números.,Ao menos um caracter especial.'),
+
     # Forçar trocar senha no pŕoximo login do windows
     # se o login com AD é usado em outros sistemas, como aplicações web
     # ou em terminais com linux deixar essa opção como 0 (falsa)
