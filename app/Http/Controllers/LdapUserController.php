@@ -130,12 +130,15 @@ class LdapUserController extends Controller
             'email' => ['required', 'email', new LdapEmailRule],
         ]);
 
+        $grupos = [$request->grupos, 'NAOREPLICADO'];
+
         LdapUser::createOrUpdate($request->username, [
-            'nome' => $request->nome,
-            'email' => $request->email,
-            'setor' => 'NAOREPLICADO',
-        ],
-            [$request->grupo, 'NAOREPLICADO']);
+                'nome' => $request->nome,
+                'email' => $request->email,
+                'setor' => 'NAOREPLICADO',
+            ],
+            $grupos
+        );
 
         $request->session()->flash('alert-success', 'Usuário cadastrado com sucesso!');
         return redirect("ldapusers/{$request->username}");
