@@ -21,17 +21,42 @@
             <div class="card-body">
                 <h5 class="card-title">Permitir pessoas sem vínculo</h5>
                 <div class="row">
-                    <div class="col-md-6">
-                        <form method="post" action="{{ url('/configs') }}">
+                    <div class="col-md-auto">
+                        <form id="nrousp" method="post" action="{{ url('/configs') }}">
                             {{ csrf_field() }}
                             <div class="form-group">
                                 <label for="nome">Números USP permitidos de pessoas sem vínculo com a unidade</label>
-                                <textarea class="form-control" name="codpes_sem_vinculo" required>{{$codpes_sem_vinculo}}</textarea>
+                                <textarea rows="{{ count(explode(',', $codpes_sem_vinculo)) }}" placeholder="Digite um número USP por linha"
+                                    class="form-control text-right" name="codpes_sem_vinculo" id="codpes_sem_vinculo"
+                                    required>{{ str_replace(',', "\r\n", $codpes_sem_vinculo) }}</textarea>
+                                <span class="text-danger">
+                                    Digite um Número USP por linha.<br />
+                                    Crie a conta manualmente no AD para as pessoas com <strong>Dados não encontrados</strong>.
+                                </span>
                             </div>
                             <div class="form-group">
                               <input type="submit" class="btn btn-primary" value="Enviar">
                             </div>
                         </form>
+                    </div>
+                    <div class="col-md-auto">
+                        <div class="form-group">
+                            Números USP, nome, unidade e vínculo na USP. Tabela <code>CATR_CRACHA</code>.
+                            <ul class="mt-2">
+                                @foreach (explode(',', $codpes_sem_vinculo) as $codpes)
+                                <li>
+                                    {{ $codpes }} -
+                                    @if (Uspdev\Replicado\Pessoa::cracha($codpes))
+                                        {{ Uspdev\Replicado\Pessoa::cracha($codpes)['nompescra'] }} -
+                                        {{ Uspdev\Replicado\Pessoa::cracha($codpes)['nomorg'] }} -
+                                        {{ Uspdev\Replicado\Pessoa::cracha($codpes)['tipvinaux'] }}
+                                    @else
+                                        <strong>Dados não encontrados</strong>
+                                    @endif
+                                </li>
+                                @endforeach
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -58,4 +83,17 @@
     </div>
  </div>
 
- @stop
+@stop
+
+@section('javascripts_bottom')
+  @parent
+  <script type="text/javascript">
+    $(function() {
+        $('#nrousp').submit(function() {
+            var campo = $('#codpes_sem_vinculo');
+            campo.val( $.trim(campo.val()).replace(/\s+/g, ',') );
+            return true;
+        });
+    });
+  </script>
+@endsection
