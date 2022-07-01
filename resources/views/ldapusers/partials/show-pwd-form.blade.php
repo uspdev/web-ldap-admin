@@ -1,5 +1,10 @@
+@section('styles')
+  @parent
+  <link rel="stylesheet" href="password_strength/password_strength_custom.css">
+@endsection
+
 <hr />
-<h4>Alterar senha</h4>
+<h4>Alterar senha <i class="fas fa-bell text-info" aria-hidden="true"></i></h4>
 
 <div class="row">
   <div class="col-sm-6 ml-2">
@@ -7,26 +12,17 @@
       @csrf
       @method('patch')
 
-      <span style="color: red;">
-      @php
-          $complexidade = explode(',', config('web-ldap-admin.senhaComplexidade'));
-          foreach ($complexidade as $regra) {
-              echo "$regra<br />";
-          }
-      @endphp
-      </span>
+      {{--
+      // TODO: 01/07/2022 - ECAdev @alecosta: Popover com as regras de complexidade
+      // TODO: 01/07/2022 - ECAdev @alecosta: Adicionar no plugin password strength as regras de complexidade que faltam
+      // TODO: 01/07/2022 - ECAdev @alecosta: Parametrizar quais regras de complexidade devem ser verificadas
+      // TODO: 01/07/2022 - ECAdev @alecosta: Adicionar um ícone de olho no campo input para mostrar ou ocultar a senhapas
+      // TODO: 01/07/2022 - ECAdev @alecosta: Validar as regras de complexidade também no servidor
+      --}}
 
-      <div class="form-group">
-        <label for="usr"> Nova senha:</label>
-        <input type="password" class="form-control" name="senha" id="senha" placeholder="Digite a nova senha">
-        <input type="checkbox" onclick="mostrarSenha('senha')"> Mostrar senha
-      </div>
+      <div id="senha"></div>
 
-      <div class="form-group">
-        <label for="usr"> Repetir Nova senha:</label>
-        <input type="password" class="form-control" name="senha_confirmation" id="senha_confirmation" placeholder="Repita a nova senha">
-        <input type="checkbox" onclick="mostrarSenha('senha_confirmation')"> Mostrar senha
-      </div>
+      <div id="senha_confirmation"></div>
 
       @if (Gate::check('gerente'))
         <div class="form-group form-check">
@@ -42,13 +38,41 @@
   </div>
 </div>
 
-<script>
-function mostrarSenha(field) {
-  var x = document.getElementById(field);
-  if (x.type === "password") {
-    x.type = "text";
-  } else {
-    x.type = "password";
-  }
-}
-</script>
+@section('javascripts_bottom')
+  @parent
+	<script src="password_strength/password_strength_lightweight_custom.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('#senha').strength_meter({
+      //  CSS selectors
+      strengthWrapperClass: 'strength_wrapper',
+      inputClass: 'strength_input form-control',
+      strengthMeterClass: 'strength_meter',
+      toggleButtonClass: 'button_strength',
+      // text for show / hide password links
+      showPasswordText: 'Mostrar senha',
+      hidePasswordText: 'Ocultar senha'
+      });
+      $('#senha_confirmation').strength_meter({
+      //  CSS selectors
+      strengthWrapperClass: 'strength_wrapper',
+      inputClass: 'strength_input form-control',
+      strengthMeterClass: 'strength_meter',
+      toggleButtonClass: 'button_strength',
+      // text for show / hide password links
+      showPasswordText: 'Mostrar senha',
+      hidePasswordText: 'Ocultar senha'
+      });
+      $('#senha').find("input[type=password]").each(function(ev) {
+        if (!$(this).val()) {
+          $(this).attr("placeholder", "Nova senha");
+        }
+      });
+      $('#senha_confirmation').find("input[type=password]").each(function(ev) {
+        if (!$(this).val()) {
+          $(this).attr("placeholder", "Confirma senha");
+        }
+      });
+    })
+  </script>
+@endsection
