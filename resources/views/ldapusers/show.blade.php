@@ -25,7 +25,7 @@
       @if (Gate::check('gerente') && $attr['codpes'] && !$codpesValido)
         <div class="alert alert-warning" role="alert">
           O número USP está presente mas não no campo indicado pelo config
-          (campoCodpes={{ config('web-ldap-admin.campoCodpes') }}). 
+          (campoCodpes={{ config('web-ldap-admin.campoCodpes') }}).
           O usuário, ao efetuar login, não vai ter essa conta associada a ele!
         </div>
       @endif
@@ -43,4 +43,22 @@
     </div>
   </div>
 
+@endsection
+
+@section('javascripts_bottom')
+  @parent
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('#addGroup').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget) // Button that triggered the modal
+        var recipient = button.data('whatever') // Extract info from data-* attributes
+        var modal = $(this)
+        modal.find('.modal-body h5').text(recipient)
+        $("#grupos").select2 ({
+          tags: true,
+          placeholder: "Selecione o(s) grupo(s) ou digite o(s) nome(s) de novo(s) grupo(s)"
+        })
+      });
+    });
+  </script>
 @endsection

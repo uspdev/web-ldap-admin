@@ -17,6 +17,7 @@ Route::post('ldapusers/sync', [LdapUserController::class, 'syncReplicado']);
 Route::patch('ldapusers/{username}', [LdapUserController::class, 'update']);
 Route::get('ldapusers/{username}', [LdapUserController::class, 'show']);
 Route::delete('ldapusers/{username}', [LdapUserController::class, 'destroy']);
+Route::post('ldapusers/group', [LdapUserController::class, 'addGroup']);
 
 #configs
 Route::get('configs', [ConfigController::class, 'show']);

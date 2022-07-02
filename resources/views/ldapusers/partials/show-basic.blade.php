@@ -16,7 +16,15 @@
     </tr>
     <tr>
       <td> <b> Grupos </b> </td>
-      <td>{{ $attr['grupos'] ?? '' }}</td>
+      <td>
+        {{ $attr['grupos'] ?? '' }}
+        @can('gerente')
+        <button type="button" class="btn btn-success btn-sm ml-2" data-toggle="modal" data-target="#addGroup" data-backdrop="static"
+          data-whatever="{{ $attr['username'] }} {{ $attr['display_name'] }}" data-keyboard="false" title="Adicionar ao(s) grupo(s)">
+          <i class="fas fa-users" aria-hidden="true"></i> Grupo
+        </button>
+        @endcan
+      </td>
     </tr>
     @if ($attr['description'])
       <tr>
@@ -44,3 +52,5 @@
     </tr>
   </tbody>
 </table>
+
+@include('ldapusers.partials.add-group-form')

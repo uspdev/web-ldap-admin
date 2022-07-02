@@ -307,4 +307,22 @@ class LdapUserController extends Controller
         return redirect('/ldapusers');
     }
 
+    public function addGroup(Request $request)
+    {
+        $this->authorize('gerente');
+        // Validações
+        $request->validate([
+            'username' => ['required'],
+            'grupos' => ['required'],
+        ]);
+        $grupos = $request->grupos;
+        $user = LdapUser::obterUserPorUsername($request->username);
+        foreach ($grupos as $grupo) {
+            $group = LdapGroup::createOrUpdate($grupo);
+            $group->addMember($user);
+        }
+        $request->session()->flash('alert-success', 'Grupo(s) adicionado(s) com sucesso.');
+        return redirect("/ldapusers/$request->username");
+    }
+
 }
