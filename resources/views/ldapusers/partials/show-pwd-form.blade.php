@@ -4,21 +4,20 @@
 @endsection
 
 <hr />
-<h4>Alterar senha <i class="fas fa-bell text-info" aria-hidden="true"></i></h4>
+<h4>Alterar senha</h4>
 
 <div class="row">
-  <div class="col-sm-6 ml-2">
+  <div class="col">
     <form method="POST" action="{{ url('/ldapusers/' . $attr['username']) }}">
       @csrf
       @method('patch')
 
       {{--
-      // TODO: 01/07/2022 - ECAdev @alecosta: Popover com as regras de complexidade
-      // TODO: 01/07/2022 - ECAdev @alecosta: Adicionar no plugin password strength as regras de complexidade que faltam
       // TODO: 01/07/2022 - ECAdev @alecosta: Parametrizar quais regras de complexidade devem ser verificadas
-      // TODO: 01/07/2022 - ECAdev @alecosta: Adicionar um ícone de olho no campo input para mostrar ou ocultar a senhapas
       // TODO: 01/07/2022 - ECAdev @alecosta: Validar as regras de complexidade também no servidor
       --}}
+
+      {{-- https://github.com/mkurayan/password_strength --}}
 
       <div id="senha"></div>
 
@@ -36,6 +35,17 @@
       </div>
     </form>
   </div>
+  {{-- Por ora resolvi deixar a complexidade somente no /public/password_strength/password_strength_lightweight_custom.js  --}}
+  {{-- <div class="col">
+    <p style="color: red; font-size: 0.9rem;">
+      @php
+          $complexidade = explode(',', config('web-ldap-admin.senhaComplexidade'));
+          foreach ($complexidade as $regra) {
+              echo "$regra<br />";
+          }
+      @endphp
+    </p>
+  </div> --}}
 </div>
 
 @section('javascripts_bottom')
@@ -45,32 +55,34 @@
     $(document).ready(function() {
       $('#senha').strength_meter({
       //  CSS selectors
-      strengthWrapperClass: 'strength_wrapper',
+      strengthWrapperClass: 'input-group mb-3 w-50',
       inputClass: 'strength_input form-control',
       strengthMeterClass: 'strength_meter',
       toggleButtonClass: 'button_strength',
       // text for show / hide password links
-      showPasswordText: 'Mostrar senha',
-      hidePasswordText: 'Ocultar senha'
+      showPasswordText: '<i class="fas fa-eye" aria-hidden="true" title="Mostra senha"></i>',
+      hidePasswordText: '<i class="fas fa-eye-slash" aria-hidden="true" title="Oculta senha"></i>'
       });
       $('#senha_confirmation').strength_meter({
       //  CSS selectors
-      strengthWrapperClass: 'strength_wrapper',
+      strengthWrapperClass: 'input-group mb-3 w-50',
       inputClass: 'strength_input form-control',
       strengthMeterClass: 'strength_meter',
       toggleButtonClass: 'button_strength',
       // text for show / hide password links
-      showPasswordText: 'Mostrar senha',
-      hidePasswordText: 'Ocultar senha'
+      showPasswordText: '<i class="fas fa-eye" aria-hidden="true" title="Mostra senha"></i>',
+      hidePasswordText: '<i class="fas fa-eye-slash" aria-hidden="true" title="Oculta senha"></i>'
       });
       $('#senha').find("input[type=password]").each(function(ev) {
         if (!$(this).val()) {
           $(this).attr("placeholder", "Nova senha");
+          $(this).attr("name", "senha");
         }
       });
       $('#senha_confirmation').find("input[type=password]").each(function(ev) {
         if (!$(this).val()) {
           $(this).attr("placeholder", "Confirma senha");
+          $(this).attr("name", "senha_confirmation");
         }
       });
     })
