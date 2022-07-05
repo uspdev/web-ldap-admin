@@ -12,10 +12,7 @@
       @csrf
       @method('patch')
 
-      {{--
-      // TODO: 01/07/2022 - ECAdev @alecosta: Parametrizar quais regras de complexidade devem ser verificadas
-      // TODO: 01/07/2022 - ECAdev @alecosta: Validar as regras de complexidade também no servidor
-      --}}
+      {{-- // TODO: 01/07/2022 - ECAdev @alecosta: Parametrizar quais regras de complexidade devem ser verificadas --}}
 
       {{-- https://github.com/mkurayan/password_strength --}}
 

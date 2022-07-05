@@ -56,10 +56,10 @@ Dependencies:
             </ul> \
             <p> \
             <h4>Força da senha:</h4> \
-            <span class="badge badge-light" style="background-color: #FF7979;">Muito fraca</span> \
-            <span class="badge badge-light" style="background-color: #FDA068;">Fraca</span> \
-            <span class="badge badge-light" style="background-color: #FFE560;">Média</span> \
-            <span class="badge badge-light" style="background-color: #9BF47D;">Forte</span> \
+            <i class="fas fa-frown-open text-secondary" aria-hidden="true"></i> <span class="badge badge-light" style="background-color: #FF7979;">Muito fraca</span> \
+            <i class="fas fa-frown text-secondary" aria-hidden="true"></i> <span class="badge badge-light" style="background-color: #FDA068;">Fraca</span> \
+            <i class="fas fa-meh text-secondary" aria-hidden="true"></i> <span class="badge badge-light" style="background-color: #FFE560;">Média</span> \
+            <i class="fas fa-smile text-secondary" aria-hidden="true"></i> <span class="badge badge-light" style="background-color: #9BF47D;">Forte</span> \
             </p> \
             </div>');
 
@@ -148,13 +148,13 @@ Dependencies:
         if (total === 0) {
             meter.html('');
         } else if (total === 1) {
-            meter.addClass('veryweak');
+            meter.addClass('veryweak').html('<p><i class="fas fa-frown-open text-secondary aria-hidden="true"></i></p>');
         } else if (total === 2) {
-            meter.addClass('weak');
+            meter.addClass('weak').html('<p><i class="fas fa-frown text-secondary aria-hidden="true"></i></p>');
         } else if (total === 3) {
-            meter.addClass('medium');
+            meter.addClass('medium').html('<p><i class="fas fa-meh text-secondary aria-hidden="true"></i></p>');
         } else {
-            meter.addClass('strong');
+            meter.addClass('strong').html('<p><i class="fas fa-smile text-secondary aria-hidden="true"></i></p>');
         }
     },
 

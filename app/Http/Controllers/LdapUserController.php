@@ -221,7 +221,9 @@ class LdapUserController extends Controller
         // troca de senha
         if (!is_null($request->senha)) {
             $request->validate([
-                'senha' => ['required', 'confirmed', 'min:8'],
+                // TODO: 04/07/2022 - ECAdev @alecosta: Parametrizar
+                // 'senha' => ['required', 'confirmed', 'min:8'], # Sem complexidade
+                'senha' => ['required', 'confirmed', 'min:8|max:20', 'regex:/[0-9]/', 'regex:/[A-Z]/', 'regex:/[!@#\$%\^&\*()_]/'], # Com complexidade
                 'must_change_pwd' => ['nullable', 'in:1'],
             ]);
 
