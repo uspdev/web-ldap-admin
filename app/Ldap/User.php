@@ -337,7 +337,7 @@ class User
     {
         foreach ($desligados as $desligado) {
             // remover dos grupos
-            $user = SELF::obterUserPorUsername($username);
+            $user = SELF::obterUserPorUsername($desligado);
             $groups = $user->getGroups();
             foreach ($groups as $group) {
                 $group->removeMember($user);
@@ -398,9 +398,11 @@ class User
         } else {
             $setor = $pessoa['tipvinext'];
             if ($pessoa['tipvinext'] == 'Aluno de Graduação') {
+                // echo "{$pessoa['codpes']}<br />";
                 if (empty(config('web-ldap-admin.grCursoSetor'))) {
                     $nomabvset = Graduacao::setorAluno($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'))['nomabvset'];
                 } else {
+                    // 8026323 Larissa Guarnieri Ferreira Capito
                     $curso = Graduacao::curso($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'));
                     $codcur = $curso['codcur'];
                     $codhab = $curso['codhab'];
