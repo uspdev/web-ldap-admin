@@ -17,12 +17,20 @@ class Group
             $group->setName($name);
             // vamos prefixar o nome do grupo de forma a não conflitar
             $group->setAttribute('sAMAccountName', 'GRUPO-' . $name);
-            $group->setAttribute('info', 'Criado por web-ldap-admin em ' . now()->format('d/m/Y H:i:s'));
+
+            # Deixando essa linha temporariamente desativada pois está gerando o erro no login:
+            # ldap_modify_batch(): Batch Modify: Invalid DN syntax at
+            #$group->setAttribute('info', 'Criado por web-ldap-admin em ' . now()->format('d/m/Y H:i:s'));
+
             $group->save();
 
             // Move o grupo para a OU padrão somente se ela existir,
             // do contrário deixa o grupo na raiz ou no local de origem
-            $group->move(Adldap::search()->ous()->find(config('web-ldap-admin.ouDefault')));
+            // Se vazio, não é necessário alterar nada, pois o default é a raiz (Thiago)
+            if(config('web-ldap-admin.ouDefault') != ''){
+                $group->move(Adldap::search()->ous()->find(config('web-ldap-admin.ouDefault')));
+            }
+
         }
 
         return $group;
@@ -43,9 +51,9 @@ class Group
 
         $groups = array_merge($keep_groups, $groups);
 
-        if (config('web-ldap-admin.removeAllGroups')) {
+        if (config('web-ldap-admin.removeAllGroups') == 'yes') {
             $user->removeAllGroups();
-        }        
+        }
 
         //remove posições vazias, repetidas e sujas
         $groups = array_map('trim', $groups);
@@ -54,15 +62,13 @@ class Group
 
         foreach ($groups as $groupname) {
             $group = self::createOrUpdate($groupname);
-            if (!$user->inGroup($group)) {
-                $group->addMember($user);
-            }
+            $group->addMember($user);
         }
     }
 
     public static function listaGrupos()
     {
-        // Nota: não encontrei nada que me permissite distinguir grupo do default do sistema ou não
+        // Nota: não encontrei nada que me permitisse distinguir grupo do default do sistema ou não
         // assim, por hora, vou assumir que os grupos criado pelo laravel estão sem descrição
         // adicionando iscriticalsystemobject como filtro. Melhora mas não limpa todos (Masaki)
         $r = [];

@@ -1,9 +1,9 @@
 # web-ldap-admin
 
 Sistema escrito em laravel que permite gerenciar usuários da sua
-unidade na Universidade de São Paulo em uma base local do tipo 
-domain controller implementada em samba-ad-dc ou Active Directory. 
-Para tal, dois serviços são necessários para rodar esse sistema: 
+unidade na Universidade de São Paulo em uma base local do tipo
+domain controller implementada em samba-ad-dc ou Active Directory.
+Para tal, dois serviços são necessários para rodar esse sistema:
 banco de dados corporativa replicada (sybase ou mssql) e tokens do OAuth 1 para senha única.
 
 Esse sistema permite:
@@ -61,7 +61,7 @@ Caso não queira inserir automaticamente a pessoa, esse recurso pode ser desabil
 
 ## Instalação
 
-    git clone git@github.com/uspdev/php-ldap-admin 
+    git clone git@github.com/uspdev/php-ldap-admin
     composer install --no-dev (ambiente de produção)
 
 ## Configurações no .env
@@ -113,7 +113,7 @@ No processo de sincronização o sistema pode desativar os usuários que não te
 
 Define onde os usuários e grupos serão inseridos. É conveniente setar um valor aqui. Se vazio (default) vai criar na raiz do CN (conteiner).
 
-OBS.: Aparentemente estando nesta OU ou no conteiner Users padrão, o usuário consegue fazer login normalmente. Mas acho que é importante no uso de diretivas de grupos. 
+OBS.: Aparentemente estando nesta OU ou no conteiner Users padrão, o usuário consegue fazer login normalmente. Mas acho que é importante no uso de diretivas de grupos.
 
     LDAP_OU_DEFAULT=
 
@@ -128,12 +128,12 @@ Ao criar conta nova ou trocar a senha, pode-se definir um prazo para expiração
 Configura qual campo vai estar associado ao codpes da pessoa. Por padrão é no campo **username** mas pode ser atribuído ao campo **employeeNumber**. No segundo caso, na criação de novo usuário automático, o username vai ser o **email** sem caracteres especiais (somente letras e números), sem o domínio, limitado a 15 caracteres. Se o usuário já existir o username pode ser qualquer.
 
     CAMPO_CODPES=username
-    
+
 #### Padrão de criação de senhas
 
 Configura como será criado a senha padrão para os novos usuários ldap. Pode ser a **data de nascimento** (default) ou **random**. O random é compatível com a diretiva de senha forte do AD.
 
-    SENHA_PADRAO=data_nascimento 
+    SENHA_PADRAO=data_nascimento
 
 OBS.: Quando a pessoa não tem vínculo (dados replicados), pode logar e sincroniza/cria conta no login, a conta é criada com senha random, pois não está disponível a data de nascimento.
 
@@ -145,9 +145,9 @@ Permite que a pessoa obtenha acesso privilegiado a determinado computador por te
 
 #### Mostrar foto
 
-Permite buscar foto e exibir nas informações da pessoa. 0 (default) - não mostrar; 1 - mostrar foto.
+Permite buscar foto e exibir nas informações da pessoa. 0 (default) - não mostrar (nem foto fake); 1 - mostrar foto.
 
-    WSFOTO=0
+    MOSTRAR_FOTO=0
 
 #### Trocar senha na criação de contas novas
 
@@ -159,8 +159,8 @@ Ao criar uma nova conta no ldap, ele força o usuário a trocar a senha no próx
 
 Nessa aplicação, SENHAUNICA_ADMINS pode gerenciar usuários, SENHAUNICA_GERENTES pode realizar as operações em geral e usuários comuns podem alterar suas respectivas senhas.
 
-No ambiente de desenvolvimento, às vezes é necessário desativar a verificação 
-dos certificado SSL/TLS, para isso, em /etc/ldap/ldap.conf manter apenas: 
+No ambiente de desenvolvimento, às vezes é necessário desativar a verificação
+dos certificado SSL/TLS, para isso, em /etc/ldap/ldap.conf manter apenas:
 
     TLS_REQCERT ALLOW
 
@@ -189,7 +189,7 @@ Rodar um job pelo tinker:
 
 ## Funcionamento dos Grupos
 
-O sistema vai adicionar o usuário ao grupo com o mesmo nome do vínculo. Ex.: ALUNOGR, SERVIDOR, etc. Os grupos são criados automaticamente. 
+O sistema vai adicionar o usuário ao grupo com o mesmo nome do vínculo. Ex.: ALUNOGR, SERVIDOR, etc. Os grupos são criados automaticamente.
 
 * Se o grupo foi criado pelo web-ldap-admin ele seta o atributo managedBy=web-ldap-admin
 

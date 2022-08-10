@@ -14,7 +14,9 @@ class Replicado
             switch ($vinculo['tipvinext']) {
                 case 'Aluno de Pós-Graduação':
                     $pg = Posgraduacao::obterVinculoAtivo($codpes);
-                    $vinculo = array_merge($vinculo, $pg);
+                    if (!empty($pg)) {
+                        $vinculo = array_merge($vinculo, $pg);
+                    }
                     break;
 
                 case 'Servidor':

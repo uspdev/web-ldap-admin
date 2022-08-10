@@ -8,6 +8,7 @@ use App\Ldap\Group as LdapGroup;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Uspdev\Replicado\Graduacao;
+use Uspdev\Replicado\Estrutura;
 use Uspdev\Replicado\Pessoa;
 use Uspdev\Utils\Generic as Utils;
 use \Adldap\Models\User as LdapUser;
@@ -95,11 +96,16 @@ class User
         LdapGroup::addMember($user, $groups);
 
         // Busca a OU padrão informada no .env
-        $ou = Adldap::search()->ous()->find(config('web-ldap-admin.ouDefault'));
+        // Se vazio, não é necessário alterar nada, pois o default é a raiz (Thiago)
+        if(config('web-ldap-admin.ouDefault') != ''){
+            $ou = Adldap::search()->ous()->find(config('web-ldap-admin.ouDefault'));
 
-        // Move o usuário para a OU padrão somente se ela existir,
-        // do contrário deixa o usuário na raiz
-        $user->move($ou);
+            // Move o usuário para a OU padrão somente se ela existir,
+            // do contrário deixa o usuário na raiz
+            $user->move($ou);
+        }
+
+
 
         return $user;
     }
@@ -331,9 +337,11 @@ class User
     {
         foreach ($desligados as $desligado) {
             // remover dos grupos
-            $user = SELF::obterUserPorUsername($username);
+            $user = SELF::obterUserPorUsername($desligado);
             $groups = $user->getGroups();
+            dd($groups);
             foreach ($groups as $group) {
+                echo "{$desligado}: <br />";
                 $group->removeMember($user);
             }
 
@@ -392,8 +400,19 @@ class User
         } else {
             $setor = $pessoa['tipvinext'];
             if ($pessoa['tipvinext'] == 'Aluno de Graduação') {
-                $nomabvset = Graduacao::setorAluno($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'))['nomabvset'];
-                $setor = $pessoa['tipvinext'] . ' ' . $nomabvset;
+                if (empty(config('web-ldap-admin.grCursoSetor'))) {
+                    $nomabvset = Graduacao::setorAluno($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'))['nomabvset'];
+                } else {
+                    $curso = Graduacao::curso($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'));
+                    $codcur = $curso['codcur'];
+                    $codhab = $curso['codhab'];
+                    foreach (config('web-ldap-admin.grCursoSetor') as $grCursoSetor) {
+                        if ($grCursoSetor['codcur'] == $codcur && $grCursoSetor['codhab'] == $codhab) {
+                            $nomabvset = $grCursoSetor['nomabvset'];
+                        }
+                    }
+                }
+                $setor = (isset($nomabvset)) ? trim($pessoa['tipvinext'] . ' ' . $nomabvset) : $pessoa['tipvinext'];
             }
             // aqui poderia tratar os outros casos de Pós Graduação, Posdoc, etc
         }
@@ -406,15 +425,26 @@ class User
 
         if( $pessoa['tipvinext'] != 'Externo') {
             if(config('web-ldap-admin.tipoNomesGrupos') == 'extenso'){
-                $grupos = Pessoa::vinculosSetores($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'));
+                $vinculosSetores = Pessoa::vinculosSetores($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'));
+                foreach ($vinculosSetores as $key => $value) {
+                    if ($value == 'Aluno de Graduação' && isset($nomabvset)) {
+                        $vinculosSetores[1] = 'Aluno de Graduação ' . $nomabvset;
+                    }
+                }
+                $grupos = ($pessoa['tipvinext'] != 'Externo') ? $vinculosSetores : [$pessoa['tipvinext']];
             }
             if(config('web-ldap-admin.tipoNomesGrupos') == 'siglas'){
                 $setores = Pessoa::obterSiglasSetoresAtivos($pessoa['codpes']);
                 $vinculos = Pessoa::obterSiglasVinculosAtivos($pessoa['codpes']);
                 $grupos = array_merge($setores,$vinculos);
-            }            
+            }
         } else {
             $grupos = [$pessoa['tipvinext']];
+        }
+
+        // Se a sincronização dos grupos com o replicado for desativada, vamos mandar esse array vazio
+        if (config('web-ldap-admin.syncGroupsWithReplicado') == 'no') {
+            $grupos = [];
         }
 
         $grupos = array_unique($grupos);

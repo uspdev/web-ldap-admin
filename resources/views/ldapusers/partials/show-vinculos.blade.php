@@ -14,8 +14,13 @@
       <td>
         @switch($vinculo['tipvinext'])
           @case('Aluno de Pós-Graduação')
-            Orientador: {{ $vinculo['nompesori'] }},
-            Programa: {{ $vinculo['nomcur'] }} - nível {{ $vinculo['nivpgm'] }}
+            {{-- Opcional por não ser vínculo ativo na unidade --}}
+            @if (!empty($vinculo['nompesori']))
+              Orientador: {{ $vinculo['nompesori'] }},
+              Programa: {{ $vinculo['nomcur'] }} - nível {{ $vinculo['nivpgm'] }}
+            @else
+              Unidade: {{ $vinculo['sglclgund'] }} - {{ $vinculo['nomclgund'] }}
+            @endif
           @break
 
           @case('Servidor')

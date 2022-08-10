@@ -131,12 +131,15 @@ class LdapUserController extends Controller
             'email' => ['required', 'email', new LdapEmailRule],
         ]);
 
+        $grupos = [$request->grupos, 'NAOREPLICADO'];
+
         LdapUser::createOrUpdate($request->username, [
-            'nome' => $request->nome,
-            'email' => $request->email,
-            'setor' => 'NAOREPLICADO',
-        ],
-            [$request->grupo, 'NAOREPLICADO']);
+                'nome' => $request->nome,
+                'email' => $request->email,
+                'setor' => 'NAOREPLICADO',
+            ],
+            $grupos
+        );
 
         $request->session()->flash('alert-success', 'Usuário cadastrado com sucesso!');
         return redirect("ldapusers/{$request->username}");
@@ -182,13 +185,14 @@ class LdapUserController extends Controller
     {
         $attr = LdapUser::show($user);
         $vinculos = [];
-        $foto = '';
         // o $codpesValido serve para informar se o codpes extraído veio do campo indicado no config
         list($codpes, $codpesValido) = LdapUser::obterCodpes($user, true);
 
         if ($codpes) {
             $vinculos = Replicado::listarVinculosEstendidos($codpes);
-            $foto = (config('web-ldap-admin.mostrarFoto') == 1) ? \Uspdev\Wsfoto::obter($codpes) : '';
+            $foto = \Uspdev\Wsfoto::obter($codpes);
+        } else {
+            $foto = '';
         }
 
         return view('ldapusers.show', compact('attr', 'user', 'vinculos', 'codpesValido', 'foto'));
@@ -218,7 +222,9 @@ class LdapUserController extends Controller
         // troca de senha
         if (!is_null($request->senha)) {
             $request->validate([
-                'senha' => ['required', 'confirmed', 'min:8'],
+                // TODO: 04/07/2022 - ECAdev @alecosta: Parametrizar
+                // 'senha' => ['required', 'confirmed', 'min:8'], # Sem complexidade
+                'senha' => ['required', 'confirmed', 'min:8|max:20', 'regex:/[0-9]/', 'regex:/[A-Z]/', 'regex:/[!@#\$%\^&\*()_]/'], # Com complexidade
                 'must_change_pwd' => ['nullable', 'in:1'],
             ]);
 
