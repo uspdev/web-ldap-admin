@@ -337,9 +337,11 @@ class User
     {
         foreach ($desligados as $desligado) {
             // remover dos grupos
-            $user = SELF::obterUserPorUsername($username);
+            $user = SELF::obterUserPorUsername($desligado);
             $groups = $user->getGroups();
+            dd($groups);
             foreach ($groups as $group) {
+                echo "{$desligado}: <br />";
                 $group->removeMember($user);
             }
 
