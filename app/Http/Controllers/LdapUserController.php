@@ -131,12 +131,15 @@ class LdapUserController extends Controller
             'email' => ['required', 'email', new LdapEmailRule],
         ]);
 
+        $grupos = [$request->grupos, 'NAOREPLICADO'];
+
         LdapUser::createOrUpdate($request->username, [
-            'nome' => $request->nome,
-            'email' => $request->email,
-            'setor' => 'NAOREPLICADO',
-        ],
-            [$request->grupo, 'NAOREPLICADO']);
+                'nome' => $request->nome,
+                'email' => $request->email,
+                'setor' => 'NAOREPLICADO',
+            ],
+            $grupos
+        );
 
         $request->session()->flash('alert-success', 'Usuário cadastrado com sucesso!');
         return redirect("ldapusers/{$request->username}");
@@ -182,13 +185,14 @@ class LdapUserController extends Controller
     {
         $attr = LdapUser::show($user);
         $vinculos = [];
-        $foto = '';
         // o $codpesValido serve para informar se o codpes extraído veio do campo indicado no config
         list($codpes, $codpesValido) = LdapUser::obterCodpes($user, true);
 
         if ($codpes) {
             $vinculos = Replicado::listarVinculosEstendidos($codpes);
-            $foto = (config('web-ldap-admin.mostrarFoto') == 1) ? \Uspdev\Wsfoto::obter($codpes) : '';
+            $foto = \Uspdev\Wsfoto::obter($codpes);
+        } else {
+            $foto = '';
         }
 
         return view('ldapusers.show', compact('attr', 'user', 'vinculos', 'codpesValido', 'foto'));
@@ -302,6 +306,24 @@ class LdapUserController extends Controller
         SincronizaReplicado::dispatch($request->type);
         $request->session()->flash('alert-success', 'Sincronização em andamento');
         return redirect('/ldapusers');
+    }
+
+    public function addGroup(Request $request)
+    {
+        $this->authorize('gerente');
+        // Validações
+        $request->validate([
+            'username' => ['required'],
+            'grupos' => ['required'],
+        ]);
+        $grupos = $request->grupos;
+        $user = LdapUser::obterUserPorUsername($request->username);
+        foreach ($grupos as $grupo) {
+            $group = LdapGroup::createOrUpdate($grupo);
+            $group->addMember($user);
+        }
+        $request->session()->flash('alert-success', 'Grupo(s) adicionado(s) com sucesso.');
+        return redirect("/ldapusers/$request->username");
     }
 
 }
