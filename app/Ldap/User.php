@@ -300,7 +300,8 @@ class User
         }
 
         $user->setPassword($password);
-        $user->setAccountExpiry(SELF::getExpiryDays());
+        // Leonardo Ruiz: Alteracao de senha nao deve alterar validade da conta
+        //$user->setAccountExpiry(SELF::getExpiryDays());
 
         if ($must_change_pwd) {
             $user->setEnableForcePasswordChange();
