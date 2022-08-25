@@ -34,12 +34,18 @@
   </div>
 
   <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-5">
       @include('ldapusers.partials.show-basic')
     </div>
-    <div class="col-md-6">
-      @includeWhen(Gate::check('gerente'),'ldapusers.partials.show-vinculos')
-      @includeWhen($user->isEnabled(),'ldapusers.partials.show-pwd-form')
+    <div class="col-md-5">
+      @includeWhen(Gate::check('gerente'), 'ldapusers.partials.show-vinculos')
+      @includeWhen($user->isEnabled(), 'ldapusers.partials.show-pwd-form')
+    </div>
+    <div class="col-md-2">
+      @if (config('web-ldap-admin.mostrarFoto') == 1 && $foto != '')
+        <div><b>Foto cartão USP</b></div>
+        <div><img style="float: left; width: 100%" src="data:image/png;base64, {{ $foto }}" alt="foto"></div>
+    @endif
     </div>
   </div>
 
