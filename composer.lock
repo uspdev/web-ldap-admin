@@ -6437,16 +6437,16 @@
         },
         {
             "name": "uspdev/wsfoto",
-            "version": "2.0.1",
+            "version": "2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/uspdev/wsfoto.git",
-                "reference": "385f500693db3bb2203e658934c8619a5bdd1017"
+                "reference": "8129b629b8da6c9b6b708d3c7188046e97ffc2f6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/uspdev/wsfoto/zipball/385f500693db3bb2203e658934c8619a5bdd1017",
-                "reference": "385f500693db3bb2203e658934c8619a5bdd1017",
+                "url": "https://api.github.com/repos/uspdev/wsfoto/zipball/8129b629b8da6c9b6b708d3c7188046e97ffc2f6",
+                "reference": "8129b629b8da6c9b6b708d3c7188046e97ffc2f6",
                 "shasum": ""
             },
             "type": "library",
@@ -6470,9 +6470,9 @@
             "homepage": "https://github.com/uspdev/wsfoto",
             "support": {
                 "issues": "https://github.com/uspdev/wsfoto/issues",
-                "source": "https://github.com/uspdev/wsfoto/tree/2.0.1"
+                "source": "https://github.com/uspdev/wsfoto/tree/2.0.2"
             },
-            "time": "2022-03-23T15:26:55+00:00"
+            "time": "2022-03-25T21:05:01+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -9188,5 +9188,5 @@
         "php": "^7.2.5"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }
