@@ -8,7 +8,7 @@
     Username: {{ $attr['username'] ?? '' }}
     <span class="badge">@include('ldapusers.partials.show-expiry')</span>
     <span class="badge">@include('ldapusers.partials.show-enabled')</span>
-    <span class="badge">@includeWhen(Gate::check('gerente'),'ldapusers.partials.show-delete')</span>
+    <span class="badge">@includeWhen(Gate::check('gerente'), 'ldapusers.partials.show-delete')</span>
   </div>
 
   <div class="row">
@@ -45,7 +45,7 @@
       @if (config('web-ldap-admin.mostrarFoto') == 1 && $foto != '')
         <div><b>Foto cartão USP</b></div>
         <div><img style="float: left; width: 100%" src="data:image/png;base64, {{ $foto }}" alt="foto"></div>
-    @endif
+      @endif
     </div>
   </div>
 
@@ -55,12 +55,12 @@
   @parent
   <script type="text/javascript">
     $(document).ready(function() {
-      $('#addGroup').on('show.bs.modal', function (event) {
+      $('#addGroup').on('show.bs.modal', function(event) {
         var button = $(event.relatedTarget) // Button that triggered the modal
         var recipient = button.data('whatever') // Extract info from data-* attributes
         var modal = $(this)
         modal.find('.modal-body h5').text(recipient)
-        $("#grupos").select2 ({
+        $("#grupos").select2({
           tags: true,
           placeholder: "Selecione o(s) grupo(s) ou digite o(s) nome(s) de novo(s) grupo(s)"
         })
