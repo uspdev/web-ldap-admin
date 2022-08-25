@@ -98,7 +98,7 @@ class LdapUserController extends Controller
 
         $grupos = LdapGroup::listaGrupos();
 
-        return view('ldapusers.index', compact('ldapusers', 'grupos', 'request', 'nav', 'gruposUrl', 'searchGrupos'));
+        return view('ldapusers.index', compact('ldapusers', 'grupos', 'request', 'nav', 'gruposUrl', 'searchGrupos', 'perPage'));
     }
 
     /**
