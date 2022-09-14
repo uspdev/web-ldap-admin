@@ -162,7 +162,7 @@ Nessa aplicação, SENHAUNICA_ADMINS pode gerenciar usuários, SENHAUNICA_GERENT
 No ambiente de desenvolvimento, às vezes é necessário desativar a verificação
 dos certificado SSL/TLS, para isso, em /etc/ldap/ldap.conf manter apenas TLS_REQCERT ALLOW:
 
-    echo 'TLS_REQCERT ALLOW' | sudo tee -a /etc/ldap/ldap.conf
+    echo 'TLS_REQCERT ALLOW' | sudo tee /etc/ldap/ldap.conf
     
 Como rodar filas sem limite de tempo:
 
