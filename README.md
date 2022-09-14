@@ -160,10 +160,10 @@ Ao criar uma nova conta no ldap, ele força o usuário a trocar a senha no próx
 Nessa aplicação, SENHAUNICA_ADMINS pode gerenciar usuários, SENHAUNICA_GERENTES pode realizar as operações em geral e usuários comuns podem alterar suas respectivas senhas.
 
 No ambiente de desenvolvimento, às vezes é necessário desativar a verificação
-dos certificado SSL/TLS, para isso, em /etc/ldap/ldap.conf manter apenas:
+dos certificado SSL/TLS, para isso, em /etc/ldap/ldap.conf manter apenas TLS_REQCERT ALLOW:
 
-    TLS_REQCERT ALLOW
-
+    echo 'TLS_REQCERT ALLOW' | sudo tee -a /etc/ldap/ldap.conf
+    
 Como rodar filas sem limite de tempo:
 
     php artisan queue:listen --timeout=0
