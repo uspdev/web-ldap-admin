@@ -51,7 +51,7 @@ class User
             // Enable the new user (using user account control).
             $user->setUserAccountControl(AccountControl::NORMAL_ACCOUNT);
 
-            // vamos expirar senha conforme config
+            // vamos expirar senha conforme configsobrenome
             $user->setAccountExpiry(SELF::getExpiryDays());
         }
 
@@ -78,6 +78,11 @@ class User
         // caso o codpes venha no employeenumber
         if (!empty($attr['employeeNumber'])) {
             $user->setEmployeeNumber($attr['employeeNumber']);
+        }
+
+        // caso o codpes venha no physicaldeliveryofficename
+        if (!empty($attr['physicalDeliveryOfficeName'])) {
+            $user->setPhysicalDeliveryOfficeName($attr['physicalDeliveryOfficeName']);
         }
 
         // Departamento
@@ -340,9 +345,7 @@ class User
             // remover dos grupos
             $user = SELF::obterUserPorUsername($desligado);
             $groups = $user->getGroups();
-            dd($groups);
             foreach ($groups as $group) {
-                echo "{$desligado}: <br />";
                 $group->removeMember($user);
             }
 
@@ -369,8 +372,14 @@ class User
             case 'employeenumber':
                 $username = explode('@', $pessoa['codema'])[0];
                 $username = preg_replace("/[^a-zA-Z0-9]+/", "", $username); //email sem caracteres especiais
-                $username = substr($username, 0, 15); //limitando em 15 caracteres
+                // Se username inicia com número o prefixo é adicionado
+                if (is_numeric(substr($username, 0, 1))) {
+                    $username = config('web-ldap-admin.prefixUsername') . substr($username, 0, (15 - strlen(config('web-ldap-admin.prefixUsername')))); //limitando em 15 caracteres
+                } else {
+                    $username = substr($username, 0, 15); //limitando em 15 caracteres
+                }
                 $attr['employeeNumber'] = $pessoa['codpes'];
+                $attr['physicalDeliveryOfficeName'] = $pessoa['codpes'];
                 break;
             case 'username':
             default:
