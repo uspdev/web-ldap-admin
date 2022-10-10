@@ -383,7 +383,7 @@ class User
                 break;
             case 'username':
             default:
-                $username = $pessoa['codpes'];
+                $username = $pessoa['codpes']; // TODO IF pretende usar com prefixo + username (codpes)
                 $attr['employeeNumber'] = '';
                 break;
         }
