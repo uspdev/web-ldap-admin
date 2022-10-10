@@ -131,7 +131,7 @@ class LdapUserController extends Controller
             'email' => ['required', 'email', new LdapEmailRule],
         ]);
 
-        $grupos = [$request->grupos, 'NAOREPLICADO'];
+        $grupos = array_merge($request->grupos, ['NAOREPLICADO']);
 
         LdapUser::createOrUpdate($request->username, [
                 'nome' => $request->nome,
