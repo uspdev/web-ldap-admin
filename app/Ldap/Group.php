@@ -62,7 +62,10 @@ class Group
 
         foreach ($groups as $groupname) {
             $group = self::createOrUpdate($groupname);
-            $group->addMember($user);
+            // Somente se não pertence ao grupo
+            if (!$user->inGroup($groupname)) {
+                $group->addMember($user);
+            }
         }
     }
 
