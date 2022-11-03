@@ -62,8 +62,15 @@ class Group
 
         foreach ($groups as $groupname) {
             $group = self::createOrUpdate($groupname);
-            // Somente se não pertence ao grupo
-            if (!$user->inGroup($groupname)) {
+            // TODO 03/11/2022 - ECAdev @alecosta: Precisa ser compatível as unidades que utilizam: ECA, FFLCH, EESC, IF, ...
+            // 03/11/2022 - ECAdev @alecosta: Para que funcione na ECA, tenho que ignorar a condição abaixo. Com a condição os grupos são criados, mas o usuário não é adicionado nos grupos.
+            if (!in_array('27', explode(',', config('web-ldap-admin.replicado_unidades')))) {
+                // Somente se não pertence ao grupo
+                if (!$user->inGroup($groupname)) {
+                    $group->addMember($user);
+                }
+            } else {
+                // 03/11/2022 - ECAdev @alecosta: Na ECA adiciona no grupo independente de já pertencer ou não
                 $group->addMember($user);
             }
         }
