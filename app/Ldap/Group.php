@@ -81,6 +81,7 @@ class Group
         // Nota: não encontrei nada que me permitisse distinguir grupo do default do sistema ou não
         // assim, por hora, vou assumir que os grupos criado pelo laravel estão sem descrição
         // adicionando iscriticalsystemobject como filtro. Melhora mas não limpa todos (Masaki)
+        // TODO 03/11/2022 - ECAdev @alecosta: Aqui na ECA (Windows Server 2019) lista os grupos DnsAdmins e DnsUpdateProxy
         $r = [];
         $groups = Adldap::search()->groups()->where('iscriticalsystemobject', '!', 'TRUE')->get();
         foreach ($groups as $group) {
