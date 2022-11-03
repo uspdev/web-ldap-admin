@@ -6,6 +6,7 @@ return [
 
     # Unidades autorizadas
     'replicado_unidade' => env('REPLICADO_CODUNDCLG'),
+    'replicado_unidades' => env('REPLICADO_CODUNDCLGS'),
 
     # Paginação, quantidade de registros padrão, 50 default
     'registrosPorPagina' => env('REGISTROS_POR_PAGINA', 50),
