@@ -4,6 +4,7 @@ namespace App\Replicado;
 
 use Uspdev\Replicado\DB;
 use Uspdev\Replicado\Pessoa as ReplicadoPessoa;
+use Uspdev\Replicado\Graduacao;
 
 class Pessoa extends ReplicadoPessoa
 {
