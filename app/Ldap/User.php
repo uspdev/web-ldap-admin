@@ -12,7 +12,6 @@ use Uspdev\Replicado\Estrutura;
 use Uspdev\Replicado\Pessoa;
 use Uspdev\Utils\Generic as Utils;
 use \Adldap\Models\User as LdapUser;
-use App\Replicado\Pessoa;
 
 class User
 {
@@ -436,7 +435,7 @@ class User
 
         if( $pessoa['tipvinext'] != 'Externo') {
             if(config('web-ldap-admin.tipoNomesGrupos') == 'extenso'){
-                $vinculosSetores = Pessoa::listarVinculosSetores($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'));
+                $vinculosSetores = \App\Replicado\Pessoa::listarVinculosExtensoSetores($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'));
                 foreach ($vinculosSetores as $key => $value) {
                     if ($value == 'Aluno de Graduação' && isset($nomabvset)) {
                         $vinculosSetores[1] = 'Aluno de Graduação ' . $nomabvset;

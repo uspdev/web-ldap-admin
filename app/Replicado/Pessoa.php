@@ -22,7 +22,7 @@ class Pessoa extends ReplicadoPessoa
     }
 
     /**
-     * Método para listar todos os vínculos e setores de uma pessoa
+     * Método para listar todos os vínculos por extenso e setores de uma pessoa
      *
      * Somente ATIVOS
      * Também Docente Aposentado
@@ -32,7 +32,7 @@ class Pessoa extends ReplicadoPessoa
      * @return array
      * @author modificado por Alessandro em 10/11/2022
      */
-    public static function listarVinculosSetores(int $codpes, $codundclg = null) # codundclg não pode ser Integer por conta de mais de uma unidade
+    public static function listarVinculosExtensoSetores(int $codpes, $codundclg = null) # codundclg não pode ser Integer por conta de mais de uma unidade
     {
         $codundclg = $codundclg ?: getenv('REPLICADO_CODUNDCLGS');
         $codundclg = $codundclg ?: getenv('REPLICADO_CODUNDCLG');
