@@ -7,6 +7,7 @@ use App\Models\Config;
 use Illuminate\Auth\Events\Login;
 use Session;
 use Uspdev\Replicado\Pessoa;
+use App\Replicado\Pessoa;
 
 class LoginListener
 {
@@ -33,7 +34,7 @@ class LoginListener
         $event->user->username = $event->user->codpes;
         $event->user->save();
 
-        $vinculos = Pessoa::vinculosSetores($event->user->username, config('web-ldap-admin.replicado_unidade'));
+        $vinculos = Pessoa::listarVinculosSetores($event->user->username, config('web-ldap-admin.replicado_unidade'));
 
         // Como usamos a função array_merge, as respostas nulas devem ser arrays vazios
         if ($vinculos == null) {
