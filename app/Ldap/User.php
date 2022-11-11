@@ -249,6 +249,18 @@ class User
                 }
                 break;
             case 'username':
+                if (config('web-ldap-admin.prefixUsername') != '') {
+                    if (!is_numeric($codpes = $user->getEmployeeNumber())) {
+                        $codpes = $user->getAccountName();
+                        $valido = false;
+                    }
+                } else {
+                    if (!is_numeric($codpes = $user->getAccountName())) {
+                        $codpes = $user->getEmployeeNumber();
+                        $valido = false;
+                    }
+                }
+                break;
             default:
                 if (!is_numeric($codpes = $user->getAccountName())) {
                     $codpes = $user->getEmployeeNumber();
