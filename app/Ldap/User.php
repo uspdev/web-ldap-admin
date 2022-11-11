@@ -157,7 +157,8 @@ class User
 
         // não vai encontrar se for pelo username, nesse caso vamos usar o CN
         if (is_null($user)) {
-            $user = Adldap::search()->users()->where('cn', '=', $codpes)->first();
+            // se estiver usando o prefixo
+            $user = Adldap::search()->users()->where('cn', '=', config('web-ldap-admin.prefixUsername') . $codpes)->first();
         }
 
         return $user;
@@ -382,8 +383,16 @@ class User
                 $attr['physicalDeliveryOfficeName'] = $pessoa['codpes'];
                 break;
             case 'username':
+                $username = config('web-ldap-admin.prefixUsername') . $pessoa['codpes'];
+                if (config('web-ldap-admin.prefixUsername') != '') {
+                    $attr['employeeNumber'] = $pessoa['codpes'];
+                } else {
+                    $attr['employeeNumber'] = '';
+                }
+                $attr['physicalDeliveryOfficeName'] = $pessoa['codpes'];
+                break;
             default:
-                $username = $pessoa['codpes']; // TODO IF pretende usar com prefixo + username (codpes)
+                $username = $pessoa['codpes'];
                 $attr['physicalDeliveryOfficeName'] = $pessoa['codpes']; # por padrão gravar o codpes na coluna Office do MS AD // TODO quem usa Samba precisa testar
                 $attr['employeeNumber'] = '';
                 break;
