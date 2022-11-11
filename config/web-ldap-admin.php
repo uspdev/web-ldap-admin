@@ -6,6 +6,7 @@ return [
 
     # Unidades autorizadas
     'replicado_unidade' => env('REPLICADO_CODUNDCLG'),
+    'replicado_unidades' => env('REPLICADO_CODUNDCLGS'),
 
     # Paginação, quantidade de registros padrão, 50 default
     'registrosPorPagina' => env('REGISTROS_POR_PAGINA', 50),
@@ -43,7 +44,7 @@ return [
     'ocultarUsuarios' => ['administrator', 'administrador', 'krbtgt', 'guest'],
 
     # Campo LDAP que será usado como codpes
-    # username, employeeNumber
+    # username ou employeeNumber
     # vai ser aplicado strtolower então o case não importa
     'campoCodpes' => env('CAMPO_CODPES','username'),
 
@@ -72,4 +73,7 @@ return [
 
     # 0 não mostra foto (nem foto fake), 1 mostra foto
     'mostrarFoto' => env('MOSTRAR_FOTO', 0),
+
+    # Prefixo do username
+    'prefixUsername' => env('PREFIX_USERNAME', ''),
 ];

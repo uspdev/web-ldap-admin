@@ -51,7 +51,7 @@ class User
             // Enable the new user (using user account control).
             $user->setUserAccountControl(AccountControl::NORMAL_ACCOUNT);
 
-            // vamos expirar senha conforme config
+            // vamos expirar senha conforme configsobrenome
             $user->setAccountExpiry(SELF::getExpiryDays());
         }
 
@@ -78,6 +78,11 @@ class User
         // caso o codpes venha no employeenumber
         if (!empty($attr['employeeNumber'])) {
             $user->setEmployeeNumber($attr['employeeNumber']);
+        }
+
+        // caso o codpes venha no physicaldeliveryofficename
+        if (!empty($attr['physicalDeliveryOfficeName'])) {
+            $user->setPhysicalDeliveryOfficeName($attr['physicalDeliveryOfficeName']);
         }
 
         // Departamento
@@ -152,7 +157,8 @@ class User
 
         // não vai encontrar se for pelo username, nesse caso vamos usar o CN
         if (is_null($user)) {
-            $user = Adldap::search()->users()->where('cn', '=', $codpes)->first();
+            // se estiver usando o prefixo
+            $user = Adldap::search()->users()->where('cn', '=', config('web-ldap-admin.prefixUsername') . $codpes)->first();
         }
 
         return $user;
@@ -243,6 +249,18 @@ class User
                 }
                 break;
             case 'username':
+                if (config('web-ldap-admin.prefixUsername') != '') {
+                    if (!is_numeric($codpes = $user->getEmployeeNumber())) {
+                        $codpes = $user->getAccountName();
+                        $valido = false;
+                    }
+                } else {
+                    if (!is_numeric($codpes = $user->getAccountName())) {
+                        $codpes = $user->getEmployeeNumber();
+                        $valido = false;
+                    }
+                }
+                break;
             default:
                 if (!is_numeric($codpes = $user->getAccountName())) {
                     $codpes = $user->getEmployeeNumber();
@@ -340,9 +358,7 @@ class User
             // remover dos grupos
             $user = SELF::obterUserPorUsername($desligado);
             $groups = $user->getGroups();
-            dd($groups);
             foreach ($groups as $group) {
-                echo "{$desligado}: <br />";
                 $group->removeMember($user);
             }
 
@@ -369,12 +385,27 @@ class User
             case 'employeenumber':
                 $username = explode('@', $pessoa['codema'])[0];
                 $username = preg_replace("/[^a-zA-Z0-9]+/", "", $username); //email sem caracteres especiais
-                $username = substr($username, 0, 15); //limitando em 15 caracteres
+                // Se username inicia com número o prefixo é adicionado
+                if (is_numeric(substr($username, 0, 1))) {
+                    $username = config('web-ldap-admin.prefixUsername') . substr($username, 0, (15 - strlen(config('web-ldap-admin.prefixUsername')))); //limitando em 15 caracteres
+                } else {
+                    $username = substr($username, 0, 15); //limitando em 15 caracteres
+                }
                 $attr['employeeNumber'] = $pessoa['codpes'];
+                $attr['physicalDeliveryOfficeName'] = $pessoa['codpes'];
                 break;
             case 'username':
+                $username = config('web-ldap-admin.prefixUsername') . $pessoa['codpes'];
+                if (config('web-ldap-admin.prefixUsername') != '') {
+                    $attr['employeeNumber'] = $pessoa['codpes'];
+                } else {
+                    $attr['employeeNumber'] = '';
+                }
+                $attr['physicalDeliveryOfficeName'] = $pessoa['codpes'];
+                break;
             default:
                 $username = $pessoa['codpes'];
+                $attr['physicalDeliveryOfficeName'] = $pessoa['codpes']; # por padrão gravar o codpes na coluna Office do MS AD // TODO quem usa Samba precisa testar
                 $attr['employeeNumber'] = '';
                 break;
         }
@@ -426,7 +457,7 @@ class User
 
         if( $pessoa['tipvinext'] != 'Externo') {
             if(config('web-ldap-admin.tipoNomesGrupos') == 'extenso'){
-                $vinculosSetores = Pessoa::vinculosSetores($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'));
+                $vinculosSetores = \App\Replicado\Pessoa::listarVinculosExtensoSetores($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'));
                 foreach ($vinculosSetores as $key => $value) {
                     if ($value == 'Aluno de Graduação' && isset($nomabvset)) {
                         $vinculosSetores[1] = 'Aluno de Graduação ' . $nomabvset;
