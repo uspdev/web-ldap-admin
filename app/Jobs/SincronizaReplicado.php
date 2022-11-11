@@ -37,7 +37,7 @@ class SincronizaReplicado implements ShouldQueue
     public function handle()
     {
         foreach ($this->type as $type) {
-            foreach (Pessoa::tiposVinculos($this->unidade) as $vinculo) {
+            foreach (Pessoa::listarTiposVinculoExtenso() as $vinculo) {
                 if ($type == $vinculo['tipvinext']) {
                     $this->sync(Pessoa::ativosVinculo($vinculo['tipvinext'], $this->unidade));
                 }
@@ -64,7 +64,8 @@ class SincronizaReplicado implements ShouldQueue
                 // Array das pessoas do replicado
                 $replicadoUsers = [];
                 foreach ($pessoas as $pessoa) {
-                    array_push($replicadoUsers, $pessoa['codpes']);
+                    // se setado o prefixo passa prefixo + codpes
+                    array_push($replicadoUsers, config('web-ldap-admin.prefixUsername') . $pessoa['codpes']);
                 }
                 // Array das contas no AD
                 $contasAD = [];
