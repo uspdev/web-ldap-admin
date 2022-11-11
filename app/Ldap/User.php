@@ -384,6 +384,7 @@ class User
             case 'username':
             default:
                 $username = $pessoa['codpes']; // TODO IF pretende usar com prefixo + username (codpes)
+                $attr['physicalDeliveryOfficeName'] = $pessoa['codpes']; # por padrão gravar o codpes na coluna Office do MS AD // TODO quem usa Samba precisa testar
                 $attr['employeeNumber'] = '';
                 break;
         }
