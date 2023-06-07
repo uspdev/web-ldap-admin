@@ -340,7 +340,7 @@ class User
             // remover dos grupos
             $user = SELF::obterUserPorUsername($desligado);
             $groups = $user->getGroups();
-            dd($groups);
+
             foreach ($groups as $group) {
                 echo "{$desligado}: <br />";
                 $group->removeMember($user);

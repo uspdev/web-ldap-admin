@@ -62,7 +62,9 @@ class Group
 
         foreach ($groups as $groupname) {
             $group = self::createOrUpdate($groupname);
-            $group->addMember($user);
+            if(!in_array($user->getAccountName(), $group->getMemberNames())){
+                $group->addMember($user);
+            }           
         }
     }
 
