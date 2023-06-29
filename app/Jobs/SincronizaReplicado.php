@@ -80,7 +80,7 @@ class SincronizaReplicado implements ShouldQueue
 
             foreach ($pessoas as $pessoa) {
                 // Chama método para criar ou atualizar passando o array da pessoa
-                LdapUser::criarOuAtulizarPorArray($pessoa);
+                LdapUser::criarOuAtualizarPorArray($pessoa);
             }
         }
     }

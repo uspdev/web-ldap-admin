@@ -362,7 +362,7 @@ class User
      * @param array $pessoa
      * @author Alessandro Costa de Oliveira 11/03/2022
      */
-    public static function criarOuAtulizarPorArray($pessoa, $metodo = '')
+    public static function criarOuAtualizarPorArray($pessoa, $metodo = '')
     {
         // setando username e codpes (similar loginListener)
         switch (strtolower(config('web-ldap-admin.campoCodpes'))) {
