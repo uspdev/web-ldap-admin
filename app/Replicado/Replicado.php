@@ -21,7 +21,7 @@ class Replicado
 
                 case 'Servidor':
                     $servidor = \App\Replicado\Pessoa::obterServidorAtivo($codpes);
-                    $vinculo = array_merge($vinculo, $servidor);
+                    if(!$servidor) $vinculo = array_merge($vinculo, $servidor);
                     break;
             }
         }
