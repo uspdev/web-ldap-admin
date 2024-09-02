@@ -90,7 +90,19 @@ class User
             $user->setDescription($attr['descricao']);
         }
 
+        // Atributos para Linux
+        $username_integer = (int) $username;
+        if(config('web-ldap-admin.usarAtributosLinux') & $username_integer!=0) {    
+            $user->setAttribute('uid', config('web-ldap-admin.prefixo_linux') . $username);
+            $user->setAttribute('uidNumber', $username);
+            $user->setAttribute('gidNumber', config('web-ldap-admin.gid_linux'));
+            $user->setAttribute('loginShell', '/bin/bash');
+            $user->setAttribute('unixHomeDirectory', '/home/'. config('web-ldap-admin.prefixo_linux') . $username);
+        }
+
         $user->save();
+
+        $user->setDepartment($attr['setor']);
 
         // Adiciona a um ou mais grupo
         LdapGroup::addMember($user, $groups);

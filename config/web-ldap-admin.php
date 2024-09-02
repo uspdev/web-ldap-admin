@@ -72,4 +72,9 @@ return [
 
     # 0 não mostra foto (nem foto fake), 1 mostra foto
     'mostrarFoto' => env('MOSTRAR_FOTO', 0),
+
+    # Campos para Linux
+    'usarAtributosLinux' => env('USAR_ATRIBUTOS_LINUX', 0),
+    'prefixo_linux' => env('PREFIXO_LINUX', 'a'),
+    'gid_linux' => env('GID_LINUX', 6000),
 ];
