@@ -92,11 +92,13 @@ class User
 
         // Atributos para Linux
         $username_integer = (int) $username;
-        if(config('web-ldap-admin.usarAtributosLinux') & $username_integer!=0) {    
+        if(config('web-ldap-admin.usarAtributosLinux') & $username_integer!=0) {  
+            
             $user->setAttribute('uid', config('web-ldap-admin.prefixo_linux') . $username);
             $user->setAttribute('uidNumber', $username);
             $user->setAttribute('gidNumber', config('web-ldap-admin.gid_linux'));
             $user->setAttribute('loginShell', '/bin/bash');
+            $user->setAttribute('userPrincipalName', $username.'@'.config('web-ldap-admin.ldap_domain'));
             $user->setAttribute('unixHomeDirectory', '/home/'. config('web-ldap-admin.prefixo_linux') . $username);
         }
 

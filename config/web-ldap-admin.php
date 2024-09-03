@@ -77,4 +77,5 @@ return [
     'usarAtributosLinux' => env('USAR_ATRIBUTOS_LINUX', 0),
     'prefixo_linux' => env('PREFIXO_LINUX', 'a'),
     'gid_linux' => env('GID_LINUX', 6000),
+    'ldap_domain' => env('LDAP_DOMAIN', 'smbdomain.local.br'),
 ];
