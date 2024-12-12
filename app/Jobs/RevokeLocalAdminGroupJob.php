@@ -43,10 +43,13 @@ class RevokeLocalAdminGroupJob implements ShouldQueue
 
             $ldapuser = Adldap::search()->users()->where('cn', '=', $solicitation->user->username)->first();
 
-            if($ldapuser->inGroup($groupname)){
-                $ldapuser->removeGroup($group);
-                $ldapuser->save();
+            if(!is_null($ldapuser) and !empty($ldapuser) and isset($ldapuser)){
+                if($ldapuser->inGroup($groupname)){
+                    $ldapuser->removeGroup($group);
+                    $ldapuser->save();
+                }
             }
+
             $solicitation->expired = true;
             $solicitation->save();
 
