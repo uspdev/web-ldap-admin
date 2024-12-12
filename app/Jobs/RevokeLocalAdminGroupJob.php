@@ -47,11 +47,11 @@ class RevokeLocalAdminGroupJob implements ShouldQueue
                 if($ldapuser->inGroup($groupname)){
                     $ldapuser->removeGroup($group);
                     $ldapuser->save();
+                    
+                    $solicitation->expired = true;
+                    $solicitation->save();
                 }
             }
-
-            $solicitation->expired = true;
-            $solicitation->save();
 
         }
     }
