@@ -193,16 +193,18 @@ Como rodar filas sem limite de tempo:
 Ativar toda base de usuários:
 
     php artisan tinker
-        $users = \Adldap\Laravel\Facades\Adldap::search()->users()->get();
-        foreach($users as $user) {
-            $user->setUserAccountControl(AccountControl::NORMAL_ACCOUNT);
-            $user->save();
-        }
+    
+    $users = \Adldap\Laravel\Facades\Adldap::search()->users()->get();
+    foreach($users as $user) {
+        $user->setUserAccountControl(AccountControl::NORMAL_ACCOUNT);
+        $user->save();
+    }
 
 Rodar um job pelo tinker:
 
     php artisan tinker
-        App\Jobs\RevokeLocalAdminGroupJob::dispatch();
+    
+    \Queue::push(new App\Jobs\RevokeLocalAdminGroupJob());
 
 ## Funcionamento dos Grupos
 
