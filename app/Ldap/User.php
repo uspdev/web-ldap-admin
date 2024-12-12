@@ -451,6 +451,9 @@ class User
             if(config('web-ldap-admin.tipoNomesGrupos') == 'siglas'){
                 $setores = Pessoa::obterSiglasSetoresAtivos($pessoa['codpes']);
                 $vinculos = Pessoa::obterSiglasVinculosAtivos($pessoa['codpes']);
+                // caso não haja vinculos ou setores, vamos deixar como array
+                if(is_null($setores)) $setores = [];
+                if(is_null($vinculos)) $vinculos = [];
                 $grupos = array_merge($setores,$vinculos);
             }
         } else {
