@@ -6278,27 +6278,27 @@
         },
         {
             "name": "uspdev/laravel-usp-theme",
-            "version": "2.8.0",
+            "version": "2.8.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/uspdev/laravel-usp-theme.git",
-                "reference": "5c6caeb99e9a83701286e81a71aaa153ffe9c20b"
+                "reference": "b9059d8bc76863ca5ac7cad65684d2e78e20104d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/uspdev/laravel-usp-theme/zipball/5c6caeb99e9a83701286e81a71aaa153ffe9c20b",
-                "reference": "5c6caeb99e9a83701286e81a71aaa153ffe9c20b",
+                "url": "https://api.github.com/repos/uspdev/laravel-usp-theme/zipball/b9059d8bc76863ca5ac7cad65684d2e78e20104d",
+                "reference": "b9059d8bc76863ca5ac7cad65684d2e78e20104d",
                 "shasum": ""
             },
             "type": "library",
             "extra": {
                 "laravel": {
-                    "providers": [
-                        "Uspdev\\UspTheme\\ServiceProvider"
-                    ],
                     "aliases": {
                         "UspTheme": "Uspdev\\UspTheme\\Facades\\UspTheme"
-                    }
+                    },
+                    "providers": [
+                        "Uspdev\\UspTheme\\ServiceProvider"
+                    ]
                 }
             },
             "autoload": {
@@ -6322,9 +6322,9 @@
             "description": "usp theme for laravel",
             "support": {
                 "issues": "https://github.com/uspdev/laravel-usp-theme/issues",
-                "source": "https://github.com/uspdev/laravel-usp-theme/tree/2.8.0"
+                "source": "https://github.com/uspdev/laravel-usp-theme/tree/2.8.13"
             },
-            "time": "2023-04-25T12:30:40+00:00"
+            "time": "2025-01-22T10:42:36+00:00"
         },
         {
             "name": "uspdev/replicado",
@@ -9001,12 +9001,12 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^7.2.5"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
 }
