@@ -27,7 +27,7 @@ class Group
             // Move o grupo para a OU padrão somente se ela existir,
             // do contrário deixa o grupo na raiz ou no local de origem
             // Se vazio, não é necessário alterar nada, pois o default é a raiz (Thiago)
-            if(config('web-ldap-admin.ouDefault') != ''){
+            if (config('web-ldap-admin.ouDefault') != '') {
                 $group->move(Adldap::search()->ous()->find(config('web-ldap-admin.ouDefault')));
             }
 
@@ -62,9 +62,14 @@ class Group
 
         foreach ($groups as $groupname) {
             $group = self::createOrUpdate($groupname);
-            if(!in_array($user->getAccountName(), $group->getMemberNames())){
+            // if(!in_array($user->getAccountName(), $group->getMemberNames())){
+            //     $group->addMember($user);
+            // }           
+            // comentado pois dá erro no login
+            // no SET não usamos o login da pessoa então OK
+            if (!$user->inGroup($groupname)) {
                 $group->addMember($user);
-            }           
+            }
         }
     }
 

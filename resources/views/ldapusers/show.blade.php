@@ -39,6 +39,7 @@
     </div>
     <div class="col-md-5">
       @includeWhen(Gate::check('gerente'), 'ldapusers.partials.show-vinculos')
+      @includeWhen(Gate::check('gerente'), 'ldapusers.partials.show-new-password')
       @includeWhen($user->isEnabled(), 'ldapusers.partials.show-pwd-form')
     </div>
     <div class="col-md-2">

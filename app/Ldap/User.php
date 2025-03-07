@@ -381,10 +381,13 @@ class User
         // setando username e codpes (similar loginListener)
         switch (strtolower(config('web-ldap-admin.campoCodpes'))) {
             case 'employeenumber':
-                $username = explode('@', $pessoa['codema'])[0];
+                $email = Pessoa::retornarEmailUsp($pessoa['codpes']) ?? $pessoa['codema'];
+                $email = empty($email) ?: Pessoa::email($pessoa['codpes']);
+                $username = explode('@', $email)[0];
                 $username = preg_replace("/[^a-zA-Z0-9]+/", "", $username); //email sem caracteres especiais
                 $username = substr($username, 0, 15); //limitando em 15 caracteres
                 $attr['employeeNumber'] = $pessoa['codpes'];
+                // dd($email, $pessoa);
                 break;
             case 'username':
             default:
@@ -392,7 +395,6 @@ class User
                 $attr['employeeNumber'] = '';
                 break;
         }
-
         // setando para testes se não vier dtanas
         if (!isset($pessoa['dtanas'])) {
             $pessoa['dtanas'] = '1/1/1970';
@@ -472,6 +474,6 @@ class User
         // (tanto no login do usuário quanto na sincronização com o replicado)
         if ((array_filter(config('web-ldap-admin.vinculos_autorizados')) === []) ||             // quando a variável não foi configurada, permitimos todos os usuários (como sempre havia sido)
             !empty(array_intersect($grupos, config('web-ldap-admin.vinculos_autorizados'))))    // só permite se o usuário for de um dos vínculos autorizados
-            self::createOrUpdate($username, $attr, $grupos, $password);
+            return self::createOrUpdate($username, $attr, $grupos, $password);
     }
 }
