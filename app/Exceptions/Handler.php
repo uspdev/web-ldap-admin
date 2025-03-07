@@ -48,8 +48,11 @@ class Handler extends ExceptionHandler
      *
      * @throws \Throwable
      */
-    public function render($request, Throwable $exception)
+    public function render($request, Throwable $e)
     {
-        return parent::render($request, $exception);
+        if (stripos($e->getMessage(), 'Server is unwilling to perform'))
+            abort(422, 'A senha gerada automaticamente pelo sistema para criar o usuário no servidor LDAP não atende os requisitos de complexidade estabelecidos pelo servidor. Experimente alterar a variável SENHA_PADRAO do .env para random.');
+        
+        return parent::render($request, $e);
     }
 }
