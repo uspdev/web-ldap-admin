@@ -12,6 +12,7 @@ use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Uspdev\Replicado\Pessoa;
+use Uspdev\Utils\Generic as Utils;
 
 class LdapUserController extends Controller
 {
@@ -71,6 +72,12 @@ class LdapUserController extends Controller
             $ldapusers = $ldapusers->where('samaccountname', '!=', $usuario);
         }
 
+        // mostra somente os usuários habilitados
+        // $ldapusers = $ldapusers->whereEnabled();
+
+        // tentativa de mostrar somente contas não expiradas
+        // $ldapusers = $ldapusers->whereBetween('accountexpires', [(new \DateTime('October 1st 2010'))->format('YmdHis.0\Z'), now()->format('YmdHis.0\Z')]);
+
         // Ordenando
         $ldapusers = $ldapusers->sortBy('displayname', 'asc');
 
@@ -124,25 +131,51 @@ class LdapUserController extends Controller
     {
         $this->authorize('gerente');
 
-        // Validações
+        if (isset($request->acao) && $request->acao == 'criar-por-codpes') {
+            $request->validate([
+                'codpes' => 'required|integer',
+            ]);
+
+            // verifincado se usuário já existe no ldap
+            if ($user = LdapUser::obterUserPorCodpes($request->codpes)) {
+                $request->session()->flash('alert-info', 'Usuário já existe!');
+                return redirect("ldapusers/" . $user->GetaccountName());
+            }
+
+            // verificando se o codpes possui vinculo ativo na unidade
+            $pessoa = Pessoa::listarVinculosAtivos($request->codpes);
+            if (!$pessoa) {
+                $request->session()->flash('alert-warning', 'Número USP ' . $request->codpes . ' não encontrado!');
+                return back();
+            }
+            // dd($pessoa);
+
+            // criando usuario a partir do codpes
+            $user = LdapUser::criarOuAtualizarPorArray($pessoa[0]);
+            $user->setPassword($password = Utils::senhaAleatoria());
+            $user->save();
+
+            $request->session()->flash('alert-success', 'Usuário cadastrado com sucesso!');
+            return redirect("ldapusers/" . $user->GetaccountName())->with('password', $password);
+        }
+
+        // criando usuário com dados manuais
         $request->validate([
             'username' => ['required', 'regex:/^[a-zA-Z0-9]*$/i', new LdapUsernameRule],
             'nome' => ['required'],
             'email' => ['required', 'email', new LdapEmailRule],
         ]);
 
-        $grupos = [$request->grupos, 'NAOREPLICADO'];
-
-        LdapUser::createOrUpdate($request->username, [
-                'nome' => $request->nome,
-                'email' => $request->email,
-                'setor' => 'NAOREPLICADO',
-            ],
-            $grupos
-        );
+        $grupos = array_merge($request->grupos, ['NAOREPLICADO']);
+        $attr = [
+            'nome' => $request->nome,
+            'email' => $request->email,
+            'setor' => 'NAOREPLICADO',
+        ];
+        $user = LdapUser::createOrUpdate($request->username, $attr, $grupos);
 
         $request->session()->flash('alert-success', 'Usuário cadastrado com sucesso!');
-        return redirect("ldapusers/{$request->username}");
+        return redirect("ldapusers/" . $user->GetaccountName());
     }
 
     /**

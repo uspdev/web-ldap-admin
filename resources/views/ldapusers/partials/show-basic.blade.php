@@ -1,5 +1,6 @@
 <table class="table table-striped">
   <tbody>
+
     <tr>
       <td style="width:30%"> <b>Seu nome </b> </td>
       <td>{{ $attr['display_name'] ?? '' }}</td>

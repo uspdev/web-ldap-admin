@@ -381,10 +381,13 @@ class User
         // setando username e codpes (similar loginListener)
         switch (strtolower(config('web-ldap-admin.campoCodpes'))) {
             case 'employeenumber':
-                $username = explode('@', $pessoa['codema'])[0];
+                $email = Pessoa::retornarEmailUsp($pessoa['codpes']) ?? $pessoa['codema'];
+                $email = empty($email) ?: Pessoa::email($pessoa['codpes']);
+                $username = explode('@', $email)[0];
                 $username = preg_replace("/[^a-zA-Z0-9]+/", "", $username); //email sem caracteres especiais
                 $username = substr($username, 0, 15); //limitando em 15 caracteres
                 $attr['employeeNumber'] = $pessoa['codpes'];
+                // dd($email, $pessoa);
                 break;
             case 'username':
             default:
@@ -392,7 +395,6 @@ class User
                 $attr['employeeNumber'] = '';
                 break;
         }
-
         // setando para testes se não vier dtanas
         if (!isset($pessoa['dtanas'])) {
             $pessoa['dtanas'] = '1/1/1970';
@@ -467,7 +469,7 @@ class User
 
         $grupos = array_unique($grupos);
         sort($grupos);
-
-        self::createOrUpdate($username, $attr, $grupos, $password);
+        // dd($username, $attr, $grupos, $password);
+        return self::createOrUpdate($username, $attr, $grupos, $password);
     }
 }

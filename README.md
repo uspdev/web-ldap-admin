@@ -210,7 +210,7 @@ Rodar um job pelo tinker:
 
 O sistema vai adicionar o usuário ao grupo com o mesmo nome do vínculo. Ex.: ALUNOGR, SERVIDOR, etc. Os grupos são criados automaticamente.
 
-* Se o grupo foi criado pelo web-ldap-admin ele seta o atributo managedBy=web-ldap-admin
+* Se o grupo foi criado pelo web-ldap-admin ele seta o atributo info=Criado por web-ldap-admin em "data:hora"
 
 Grupos criados:
 
