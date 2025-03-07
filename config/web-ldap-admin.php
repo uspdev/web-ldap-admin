@@ -79,7 +79,7 @@ return [
     'gid_linux' => env('GID_LINUX', 6000),
     'ldap_domain' => env('LDAP_DOMAIN', 'smbdomain.local.br'),
 
-    # Restringir gravação no servidor LDAP somente a usuários de determinados vínculos
+    # Restringir gravação no servidor LDAP somente a usuários de determinados vínculos (tipvin)
     # Se a variável abaixo não for configurada, todos os usuários são gravados no servidor LDAP (como sempre foi, até a criação desta variável)
     'vinculos_autorizados' => array_map('trim', explode(',', env('VINCULOS_AUTORIZADOS', ''))),
 ];

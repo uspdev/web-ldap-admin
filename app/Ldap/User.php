@@ -474,6 +474,6 @@ class User
         // (tanto no login do usuário quanto na sincronização com o replicado)
         if ((array_filter(config('web-ldap-admin.vinculos_autorizados')) === []) ||             // quando a variável não foi configurada, permitimos todos os usuários (como sempre havia sido)
             !empty(array_intersect($grupos, config('web-ldap-admin.vinculos_autorizados'))))    // só permite se o usuário for de um dos vínculos autorizados
-            self::createOrUpdate($username, $attr, $grupos, $password);
+            return self::createOrUpdate($username, $attr, $grupos, $password);
     }
 }
