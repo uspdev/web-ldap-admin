@@ -229,7 +229,7 @@ O departamento (department) corresponde ao setor, se tiver.
 - menu "Minha Conta (trocar senha da rede)": permite que o usuário altere sua senha no LDAP;
                                              permite que admins alterem senhas de usuários, obriguem que usuários alterem suas senhas no próximo logon, incluam usuários em grupos, configurem expiração de contas de usuários, desabilitem contas de usuários e excluam usuários... tudo isso na base do LDAP;
 - menu "Sincronizar OU": permite que admins sincronizem o LDAP da OU com o Replicado;
-                         permite que admins dêem acesso ao LDAP da OU a pessoas sem vínculo com a USP.
+                         permite que admins cadastrem pessoas sem vínculo com a unidade (elas são gravadas na tabela configs do web-ldap-admin, e esta tela faz uso da tabela CATR_CRACHA para conseguir exibir os nomes e outros dados dessas pessoas); em seguida, o admin deve criar a conta manualmente no servidor LDAP.
 
 
 #################
