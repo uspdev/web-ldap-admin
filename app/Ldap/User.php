@@ -418,7 +418,11 @@ class User
             $setor = $pessoa['tipvinext'];
             if ($pessoa['tipvinext'] == 'Aluno de Graduação') {
                 if (empty(config('web-ldap-admin.grCursoSetor'))) {
-                    $nomabvset = Graduacao::setorAluno($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'))['nomabvset'];
+                    try {
+                        $nomabvset = Graduacao::setorAluno($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'))['nomabvset'];
+                    } catch (\Exception $e) {
+                        $nomabvset = 'Sem departamento';
+                    }
                 } else {
                     $curso = Graduacao::curso($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'));
                     $codcur = $curso['codcur'];
@@ -472,8 +476,8 @@ class User
 
         // só grava o usuário no servidor LDAP se ele pertencer a vínculos autorizados para tal
         // (tanto no login do usuário quanto na sincronização com o replicado)
-        if ((array_filter(config('web-ldap-admin.vinculos_autorizados')) === []) ||             // quando a variável não foi configurada, permitimos todos os usuários (como sempre havia sido)
-            !empty(array_intersect($grupos, config('web-ldap-admin.vinculos_autorizados'))))    // só permite se o usuário for de um dos vínculos autorizados
+        //if ((array_filter(config('web-ldap-admin.vinculos_autorizados')) === []) ||             // quando a variável não foi configurada, permitimos todos os usuários (como sempre havia sido)
+        //    !empty(array_intersect($grupos, config('web-ldap-admin.vinculos_autorizados'))))    // só permite se o usuário for de um dos vínculos autorizados
             return self::createOrUpdate($username, $attr, $grupos, $password);
     }
 }

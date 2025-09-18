@@ -6,7 +6,11 @@
     <div>
       Login: {{ $user->getAccountName() }}<br />
       Senha: {{ session('password') }}<br />
-      Validade: {{ $user->expirationDate()->format('d/m/Y') }}
+      @if ($user->expirationDate())
+        Validade: {{ $user->expirationDate()->format('d/m/Y') }}
+      @else
+        Validade: Sem validade
+      @endif
     </div>
     <div class="text-danger">
       Isso não será mostrado novamente!
