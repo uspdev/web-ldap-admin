@@ -299,6 +299,9 @@ class LdapUserController extends Controller
             return redirect()->back();
         }
 
+        // evita que caia em tela vazia caso nada tenha sido alterado pelo usuário
+        $request->session()->flash('alert-success', "Nenhuma operação realizada.");
+        return redirect()->back();
     }
 
     /**
