@@ -29,3 +29,7 @@ php.ini
 
 # Curso graduação x Habilitação x Setor
 /storage/curhabset.json
+
+# DDEV
+/.ddev
+core.*
