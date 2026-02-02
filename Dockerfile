@@ -23,6 +23,8 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+RUN usermod -d /var/www/html www-data
+
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Configurar extensões
