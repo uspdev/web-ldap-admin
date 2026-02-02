@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     libonig-dev \
     libxml2-dev \
+    && ln -s /usr/lib/x86_64-linux-gnu/libsybdb.a /usr/lib/ \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -73,4 +74,5 @@ RUN composer dump-autoload
 EXPOSE 80
 
 CMD ["apache2-foreground"]
+
 
