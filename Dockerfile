@@ -59,11 +59,15 @@ RUN sed -ri -e 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-avail
 
 WORKDIR /var/www/html
 
+# Criar diretório do composer e dar permissões
+RUN mkdir -p /var/www/.composer && chown -R www-data:www-data /var/www/.composer
+
 # Copiar composer files
 COPY composer.json composer.lock ./
 
 # Instalar dependências
 USER www-data
+ENV COMPOSER_HOME=/var/www/.composer
 RUN composer install --no-interaction --no-dev --no-autoloader
 
 USER root
