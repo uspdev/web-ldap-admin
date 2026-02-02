@@ -73,3 +73,4 @@ RUN composer dump-autoload
 EXPOSE 80
 
 CMD ["apache2-foreground"]
+
