@@ -1,5 +1,7 @@
 FROM php:7.4-apache
 
+COPY dokku-deploy/ldap.conf /etc/ldap/ldap.conf
+
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
