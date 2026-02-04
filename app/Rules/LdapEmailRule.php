@@ -4,7 +4,7 @@ namespace App\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 
-use Adldap\Laravel\Facades\Adldap;
+use LdapRecord\Models\ActiveDirectory\User;
 
 class LdapEmailRule implements Rule
 {
@@ -27,11 +27,11 @@ class LdapEmailRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        $users = Adldap::search()->users()->get();
+        $users = User::get(); 
         $emails = [];
 
         foreach ($users as $user) {
-           array_push($emails,$user->getEmail());
+            array_push($emails, $user->getFirstAttribute('mail'));
         }
         return !in_array($value, $emails);
     }

@@ -1,7 +1,6 @@
 <?php
 namespace App\Http\Controllers;
 
-use Adldap\Laravel\Facades\Adldap;
 use App\Jobs\SincronizaReplicado;
 use App\Ldap\Group as LdapGroup;
 use App\Ldap\User as LdapUser;
@@ -13,6 +12,8 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Uspdev\Replicado\Pessoa;
 use Uspdev\Utils\Generic as Utils;
+use LdapRecord\Models\ActiveDirectory\User;
+use LdapRecord\Models\ActiveDirectory\Group;
 
 class LdapUserController extends Controller
 {
@@ -28,6 +29,8 @@ class LdapUserController extends Controller
      */
     public function index(Request $request)
     {
+        // menu "Usuários Ldap"
+
         $this->authorize('gerente');
         \UspTheme::activeUrl('ldapusers');
 
@@ -46,7 +49,7 @@ class LdapUserController extends Controller
         $page = empty($request->page) ? 1 : $request->page;
 
         // Busca
-        $ldapusers = Adldap::search()->users();
+        $ldapusers = User::query();
 
         if (!empty($request->search) && isset($request->search)) {
             // buscar por username ou por nome
@@ -57,13 +60,17 @@ class LdapUserController extends Controller
         if (!empty($request->grupos) && isset($request->grupos)) {
             if (count($request->grupos) > 1) {
                 for ($i = 0; $i < count($request->grupos); $i++) {
-                    $group = Adldap::search()->groups()->find($request->grupos[$i]);
-                    $ldapusers = $ldapusers->orWhere('memberof', '=', $group->getDnBuilder()->get());
+                    $group = Group::findBy('cn', $request->grupos[$i]);
+                    if ($group) {
+                        $ldapusers = $ldapusers->orWhere('memberof', '=', $group->getDn());
+                    }
                 }
             } else {
                 //TODO: aqui nao acho que precise separado do FOR
-                $group = Adldap::search()->groups()->find($request->grupos[0]);
-                $ldapusers = $ldapusers->where('memberof', '=', $group->getDnBuilder()->get());
+                $group = Group::findBy('cn', $request->grupos[0]);
+                if ($group) {
+                    $ldapusers = $ldapusers->where('memberof', '=', $group->getDn());
+                }
             }
         }
 
@@ -79,15 +86,36 @@ class LdapUserController extends Controller
         // $ldapusers = $ldapusers->whereBetween('accountexpires', [(new \DateTime('October 1st 2010'))->format('YmdHis.0\Z'), now()->format('YmdHis.0\Z')]);
 
         // Ordenando
-        $ldapusers = $ldapusers->sortBy('displayname', 'asc');
+        $ldapusers = $ldapusers->orderBy('displayname', 'asc');
 
         // Paginando
         // pagina começa no 0 mas vamos mostrar começando no 1
-        $ldapusers = $ldapusers->paginate($perPage, $page - 1);
-        $nav['pagCor'] = $ldapusers->getCurrentPage() + 1;
-        $nav['perPag'] = $ldapusers->getPerPage();
-        $nav['totPag'] = $ldapusers->getPages();
-        $nav['offset'] = $ldapusers->getCurrentOffSet();
+        
+        // processamento especial para contar mais de 1000 (a nova versão do LDAP trunca em 1000)
+        $allUsers = collect();
+        $ldapusers->chunk(1000, function ($chunk) use ($allUsers) {
+            foreach ($chunk as $user) {
+                $allUsers->push($user);
+            }
+        });
+        $allUsers = $allUsers->sortBy(function ($user) {
+            $nome = $user->getFirstAttribute('displayname');
+            return empty($nome) ? ' ' : $nome;
+        }, SORT_NATURAL | SORT_FLAG_CASE)->values();
+
+        // processamento especial para paginar manualmente
+        $page = request()->get('page', 1);    // Descobrimos a página atual baseada na URL (?page=X)
+        $offset = ($page - 1) * $perPage;     // Fatiamos a coleção para pegar apenas os itens da página atual... offset = onde começa o corte
+        $itemsForCurrentPage = $allUsers->slice($offset, $perPage)->values();
+        $ldapusers = new \Illuminate\Pagination\LengthAwarePaginator($itemsForCurrentPage, $allUsers->count(), $perPage, $page, ['path' => \Illuminate\Pagination\Paginator::resolveCurrentPath()]);    // Criamos o Paginador Manualmente para o Blade entender
+
+        $nav = [
+            'pagCor' => $ldapusers->currentPage(),
+            'perPag' => $ldapusers->perPage(),
+            'totPag' => $ldapusers->lastPage(),
+            'total'  => $ldapusers->total(), // É esse valor que vai aparecer como 1022
+            'offset' => $ldapusers->firstItem() - 1,
+        ];
 
         $maxLnk = 5; # Máximo de links
         $lnkLat = ceil($maxLnk / 2); # Cálculo dos links laterais
@@ -115,6 +143,8 @@ class LdapUserController extends Controller
      */
     public function create(Request $request)
     {
+        // menu "Criar usuário"
+        
         $this->authorize('gerente');
         \UspTheme::activeUrl('ldapusers/create');
 
@@ -129,6 +159,8 @@ class LdapUserController extends Controller
      */
     public function store(Request $request)
     {
+        // menu "Criar usuário" -> botão "Enviar Dados"
+
         $this->authorize('gerente');
 
         if (isset($request->acao) && $request->acao == 'criar-por-codpes') {
@@ -139,7 +171,7 @@ class LdapUserController extends Controller
             // verifincado se usuário já existe no ldap
             if ($user = LdapUser::obterUserPorCodpes($request->codpes)) {
                 $request->session()->flash('alert-info', 'Usuário já existe!');
-                return redirect("ldapusers/" . $user->GetaccountName());
+                return redirect("ldapusers/" . $user->getFirstAttribute('samaccountname'));
             }
 
             // verificando se o codpes possui vinculo ativo na unidade
@@ -152,11 +184,11 @@ class LdapUserController extends Controller
 
             // criando usuario a partir do codpes
             $user = LdapUser::criarOuAtualizarPorArray($pessoa[0]);
-            $user->setPassword($password = Utils::senhaAleatoria());
+            $user->unicodepwd = ($password = $password ?? Utils::senhaAleatoria());
             $user->save();
 
             $request->session()->flash('alert-success', 'Usuário cadastrado com sucesso!');
-            return redirect("ldapusers/" . $user->GetaccountName())->with('password', $password);
+            return redirect("ldapusers/" . $user->getFirstAttribute('samaccountname'))->with('password', $password);
         }
 
         // criando usuário com dados manuais
@@ -175,7 +207,7 @@ class LdapUserController extends Controller
         $user = LdapUser::createOrUpdate($request->username, $attr, $grupos);
 
         $request->session()->flash('alert-success', 'Usuário cadastrado com sucesso!');
-        return redirect("ldapusers/" . $user->GetaccountName());
+        return redirect("ldapusers/" . $user->getFirstAttribute('samaccountname'));
     }
 
     /**
@@ -186,6 +218,8 @@ class LdapUserController extends Controller
      */
     public function show(Request $request, $username)
     {
+        // menu "Usuários Ldap" -> algum usuário Ldap
+
         $this->authorize('gerente');
         \UspTheme::activeUrl('ldapusers');
 
@@ -200,6 +234,8 @@ class LdapUserController extends Controller
 
     public function my(Request $request)
     {
+        // menu "Minha Conta (trocar senha da rede)"
+
         $this->authorize('user');
         \UspTheme::activeUrl('ldapusers/my');
 
@@ -216,6 +252,8 @@ class LdapUserController extends Controller
      */
     protected function showCommon($user)
     {
+        // menu "Usuários Ldap" -> algum usuário Ldap, menu "Minha Conta (trocar senha da rede)"
+
         $attr = LdapUser::show($user);
         $vinculos = [];
         // o $codpesValido serve para informar se o codpes extraído veio do campo indicado no config
@@ -250,6 +288,8 @@ class LdapUserController extends Controller
      */
     public function update(Request $request, $username)
     {
+        // menu "Usuários Ldap" -> algum usuário Ldap, menu "Minha Conta (trocar senha da rede)" -> alguma opção do menu de expiração de conta, alguma opção do menu de habilitar/desabilitar, botão "Alterar"
+
         $this->authorize('user');
 
         // troca de senha
@@ -257,7 +297,7 @@ class LdapUserController extends Controller
             $request->validate([
                 // TODO: 04/07/2022 - ECAdev @alecosta: Parametrizar
                 // 'senha' => ['required', 'confirmed', 'min:8'], # Sem complexidade
-                'senha' => ['required', 'confirmed', 'min:8|max:20', 'regex:/[0-9]/', 'regex:/[A-Z]/', 'regex:/[!@#\$%\^&\*()_]/'], # Com complexidade
+                'senha' => ['required', 'confirmed', 'min:8', 'max:20', 'regex:/[0-9]/', 'regex:/[A-Z]/', 'regex:/[!@#\$%\^&\*()_]/'], # Com complexidade
                 'must_change_pwd' => ['nullable', 'in:1'],
             ]);
 
@@ -309,6 +349,8 @@ class LdapUserController extends Controller
      */
     public function destroy(Request $request, $username)
     {
+        // menu "Usuários Ldap" -> algum usuário Ldap, menu "Minha Conta (trocar senha da rede)" -> botão "Excluir"
+        
         $this->authorize('gerente');
 
         $attr = LdapUser::delete($username);
@@ -319,7 +361,10 @@ class LdapUserController extends Controller
 
     public function syncReplicadoForm(Request $request)
     {
+        // menu "Sincronizar ..." -> botão "Sincronizar com replicado"
+
         $this->authorize('gerente');
+        \UspTheme::activeUrl('configs');
 
         $vinculos = Pessoa::tiposVinculos(config('web-ldap-admin.replicado_unidade'));
         foreach ($vinculos as &$vinculo) {
@@ -333,6 +378,8 @@ class LdapUserController extends Controller
 
     public function syncReplicado(Request $request)
     {
+        // menu "Sincronizar ..." -> botão "Sincronizar com replicado" -> botão "Sincronizar"
+
         $this->authorize('gerente');
         $this->validate($request, [
             'type' => 'required',
@@ -345,6 +392,8 @@ class LdapUserController extends Controller
 
     public function addGroup(Request $request)
     {
+        // menu "Usuários Ldap" -> algum usuário Ldap, menu "Minha Conta (trocar senha da rede)" -> botão "Grupo" -> botão "Salvar"
+
         $this->authorize('gerente');
         // Validações
         $request->validate([
@@ -355,7 +404,7 @@ class LdapUserController extends Controller
         $user = LdapUser::obterUserPorUsername($request->username);
         foreach ($grupos as $grupo) {
             $group = LdapGroup::createOrUpdate($grupo);
-            $group->addMember($user);
+            $group->members()->attach($user);
         }
         $request->session()->flash('alert-success', 'Grupo(s) adicionado(s) com sucesso.');
         return redirect("/ldapusers/$request->username");

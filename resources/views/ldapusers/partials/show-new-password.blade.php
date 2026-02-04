@@ -4,10 +4,13 @@
 
   <div class="ml-2">
     <div>
-      Login: {{ $user->getAccountName() }}<br />
+      Login: {{ $user->getFirstAttribute('samaccountname') }}<br />
       Senha: {{ session('password') }}<br />
-      @if ($user->expirationDate())
-        Validade: {{ $user->expirationDate()->format('d/m/Y') }}
+      @php
+        $user_expirationDate = \App\Ldap\User::getExpirationDate($user);
+      @endphp
+      @if ($user_expirationDate)
+        Validade: {{ $user_expirationDate->format('d/m/Y') }}
       @else
         Validade: Sem validade
       @endif

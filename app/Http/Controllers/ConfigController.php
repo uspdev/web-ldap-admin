@@ -10,7 +10,10 @@ class ConfigController extends Controller
 {
     public function show()
     {
+        // menu "Sincronizar ..."
+
         $this->authorize('admin');
+        \UspTheme::activeUrl('configs');
         $config = Config::all()->last();
         if ($config == null) {
             $config = new Config;
@@ -29,6 +32,8 @@ class ConfigController extends Controller
      */
     public function update(Request $request)
     {
+        // menu "Sincronizar ..." -> botão "Enviar"
+
         $this->authorize('admin');
         $request->validate([
             'codpes_sem_vinculo' => [new Numeros_USP($request->codpes_sem_vinculo)],

@@ -4,7 +4,7 @@ namespace App\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 
-use Adldap\Laravel\Facades\Adldap;
+use LdapRecord\Models\ActiveDirectory\User;
 
 class LdapUsernameRule implements Rule
 {
@@ -27,7 +27,7 @@ class LdapUsernameRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        $user = Adldap::search()->users()->where('cn', '=', $value)->first();
+        $user = User::where('cn', '=', $value)->first();
 
         return empty($user);
     }

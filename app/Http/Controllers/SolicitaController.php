@@ -8,7 +8,7 @@ use App\Models\Solicita;
 use App\Ldap\Group as LdapGroup;
 use App\Ldap\User as LdapUser;
 
-use Adldap\Laravel\Facades\Adldap;
+use LdapRecord\Models\ActiveDirectory\Computer;
 use Carbon\Carbon;
 
 class SolicitaController extends Controller
@@ -18,22 +18,24 @@ class SolicitaController extends Controller
      */
     public function create(Request $request)
     {
+        // menu "Solicitação de Conta de Administrador"
+
         $this->authorize('user');
 
         // a url ativa não está funcionando com menu dinâmico issue #98
         \UspTheme::activeUrl('solicita');
 
         $user = Auth::user();
-        $ldap_computers = Adldap::search()->computers()->sortBy('cn')->get();
+        $ldap_computers = Computer::orderBy('cn')->get();
         $computers = [];
 
         foreach($ldap_computers as $computer){
             // Mostrar apenas as máquinas com login nos últimos 120 dias
-            $carbon = Carbon::createFromTimestamp($computer->getLastLogonTimestamp()/10000000  - 11644473600);
-            if(!is_null($computer->getOperatingSystem()) & $carbon->diffInDays(Carbon::now()) < 120 ) {
+            $carbon = Carbon::createFromTimestamp(($computer->lastlogontimestamp[0] ?? 0)/10000000  - 11644473600);
+            if(!is_null($computer->operatingsystem[0] ?? null) && $carbon->diffInDays(Carbon::now()) < 120 ) {
             array_push($computers,[
-                'computer' => $computer->getName(),
-                'os'       => $computer->getOperatingSystem(),
+                'computer' => $computer->cn[0],
+                'os'       => $computer->operatingsystem[0],
                 'lastLogon'       => $carbon->format('d/m/Y H:i:s')
                 ]);
             }
@@ -44,6 +46,8 @@ class SolicitaController extends Controller
     }
 
     public function store(Request $request){
+
+        // menu "Solicitação de Conta de Administrador" -> botão "Enviar"
 
         $this->authorize('user');
 
@@ -74,9 +78,8 @@ class SolicitaController extends Controller
         $groupname = config('web-ldap-admin.localAdminGroupLdap');
         $group = LdapGroup::createOrUpdate($groupname);
 
-        if(!$user->inGroup($groupname)){
-            $group->addMember($user);
-            $group->save();
+        if(!$user->groups()->exists($group)){
+            $group->members()->attach($user);
         }
 
         request()->session()->flash('alert-info',
