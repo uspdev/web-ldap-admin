@@ -29,7 +29,7 @@ class LdapUserController extends Controller
    */
   public function index(Request $request)
   {
-    $this->authorize('admin');
+    $this->authorize('manager');
     \UspTheme::activeUrl('ldapusers');
 
     //vamos validar os campos??
@@ -116,7 +116,7 @@ class LdapUserController extends Controller
    */
   public function create(Request $request)
   {
-    $this->authorize('admin');
+    $this->authorize('manager');
     \UspTheme::activeUrl('ldapusers/create');
 
     return view('ldapusers.create');
@@ -130,7 +130,7 @@ class LdapUserController extends Controller
    */
   public function store(Request $request)
   {
-    $this->authorize('admin');
+    $this->authorize('manager');
 
     if (isset($request->acao) && $request->acao == 'criar-por-codpes') {
       $request->validate([
@@ -187,7 +187,7 @@ class LdapUserController extends Controller
    */
   public function show(Request $request, $username)
   {
-    $this->authorize('admin');
+    $this->authorize('manager');
     \UspTheme::activeUrl('ldapusers');
 
     $user = LdapUser::obterUserPorUsername($username);
@@ -272,7 +272,7 @@ class LdapUserController extends Controller
       return redirect()->back();
     }
 
-    $this->authorize('admin');
+    $this->authorize('manager');
     // atualiza status
     if (!is_null($request->status)) {
 
@@ -309,7 +309,7 @@ class LdapUserController extends Controller
    */
   public function destroy(Request $request, $username)
   {
-    $this->authorize('admin');
+    $this->authorize('manager');
 
     $attr = LdapUser::delete($username);
 
@@ -319,7 +319,7 @@ class LdapUserController extends Controller
 
   public function syncReplicadoForm(Request $request)
   {
-    $this->authorize('admin');
+    $this->authorize('manager');
 
     $vinculos = Pessoa::listarTiposVinculoExtenso();
     foreach ($vinculos as &$vinculo) {
@@ -333,7 +333,7 @@ class LdapUserController extends Controller
 
   public function syncReplicado(Request $request)
   {
-    $this->authorize('admin');
+    $this->authorize('manager');
     $this->validate($request, [
       'type' => 'required',
     ]);
@@ -345,7 +345,7 @@ class LdapUserController extends Controller
 
   public function addGroup(Request $request)
   {
-    $this->authorize('admin');
+    $this->authorize('manager');
     // Validações
     $request->validate([
       'username' => ['required'],
