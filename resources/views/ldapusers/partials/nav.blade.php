@@ -2,7 +2,7 @@
   <ul class="pagination justify-content-center">
 
     <li class="page-item disabled">
-      <span class="page-link ">Total de registros: <strong>{{ count($ldapusers) }}</strong></span>
+      <span class="page-link ">Total de registros: <strong>{{ $nav['total'] }}</strong></span>
     </li>
     <li lass="page-item">&nbsp; &nbsp;</li>
 

@@ -2,8 +2,6 @@
 
 namespace App\Ldap;
 
-use Adldap\Laravel\Facades\Adldap;
-use Adldap\Models\Attributes\AccountControl;
 use App\Ldap\Group as LdapGroup;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Gate;
@@ -11,7 +9,12 @@ use Uspdev\Replicado\Graduacao;
 use Uspdev\Replicado\Estrutura;
 use Uspdev\Replicado\Pessoa;
 use Uspdev\Utils\Generic as Utils;
-use \Adldap\Models\User as LdapUser;
+
+use LdapRecord\Models\ActiveDirectory\Container;
+use LdapRecord\Models\ActiveDirectory\Group as LdapGroupModel;
+use LdapRecord\Models\ActiveDirectory\OrganizationalUnit;
+use LdapRecord\Models\ActiveDirectory\User as LdapUser;
+use LdapRecord\Models\Attributes\AccountControl;
 
 class User
 {
@@ -30,81 +33,87 @@ class User
      **/
     public static function createOrUpdate(string $username, array $attr, array $groups = [], $password = null)
     {
+        // invocado por:
+        //     no login (LoginListener::handle -> User::criarOuAtualizarPorArray)
+        //     menu "Criar usuário" -> botão "Enviar Dados" (LdapUserController::store)
+        //     menu "Criar usuário" -> botão "Enviar Dados" (LdapUserController::store -> User::criarOuAtualizarPorArray)
+        //     menu "Sincronizar ..." -> botão "Sincronizar com replicado" -> botão "Sincronizar" (SincronizaReplicado::handle::sync -> User::criarOuAtualizarPorArray)
+
         // vamos ver se o usuário já existe
         $user = SELF::obterUserPorUsername($username);
 
         # Novo usuário
         if (is_null($user) or $user == false) {
-            $user = Adldap::make()->user();
-
+            $user = new LdapUser();
+            
             // define DN para esse user
-            $user->setDn('cn=' . $username . ',cn=Users,' . $user->getDnBuilder());
+            $baseDn = $user->getConnection()->getConfiguration()->get('base_dn');
+            $user->setDn("CN={$username},CN=Users,{$baseDn}");
 
             // se não for fornecido senha vamos gerar aleatório forte
-            $user->setPassword($password ?? Utils::senhaAleatoria());
+            $user->unicodepwd = $password ?? Utils::senhaAleatoria();
 
             // Trocar a senha no próximo logon
             if (config('web-ldap-admin.obrigaTrocarSenhaNoWindows')) {
-                $user->setAttribute('pwdlastset', 0);
+                $user->pwdlastset = 0;
             }
 
             // Enable the new user (using user account control).
-            $user->setUserAccountControl(AccountControl::NORMAL_ACCOUNT);
+            $user->useraccountcontrol = AccountControl::NORMAL_ACCOUNT;
 
             // vamos expirar senha conforme config
-            $user->setAccountExpiry(SELF::getExpiryDays());
+            $user->accountExpires = SELF::getExpiryDays();
         }
 
         // login no windows
-        $user->setAccountName($username);
-
+        $user->samaccountname = $username;
         // nome de exibição
-        $user->setDisplayName($attr['nome']);
+        $user->displayname = $attr['nome'];
 
         // atribuindo nome e sobrenome
         $nome_array = explode(' ', $attr['nome']);
         if (count($nome_array) > 1) {
-            $user->setFirstName(trim($nome_array[0]));
+            $user->givenname = trim($nome_array[0]);
             unset($nome_array[0]);
-            $user->setLastName(implode(' ', $nome_array));
+            $user->sn = implode(' ', $nome_array);
         } else {
-            $user->setFirstName(trim($nome_array[0]));
+            $user->givenname = trim($nome_array[0]);
         }
 
         if (!empty($attr['email'])) {
-            $user->setEmail($attr['email']);
+            $user->mail = $attr['email'];
         }
 
         // caso o codpes venha no employeenumber
         if (!empty($attr['employeeNumber'])) {
-            $user->setEmployeeNumber($attr['employeeNumber']);
+            $user->employeeNumber = $attr['employeeNumber'];
         }
 
         // Departamento
         if (!empty($attr['setor'])) {
-            $user->setDepartment($attr['setor']);
+            $user->department = $attr['setor'];
         }
 
         // Descrição, informa se a conta foi criada a partir da sincronização
         if (!empty($attr['descricao'])) {
-            $user->setDescription($attr['descricao']);
+            $user->description = $attr['descricao'];
         }
 
         // Atributos para Linux
         $username_integer = (int) $username;
-        if(config('web-ldap-admin.usarAtributosLinux') & $username_integer!=0) {  
+        if(config('web-ldap-admin.usarAtributosLinux') && $username_integer!=0) {  
             
-            $user->setAttribute('uid', config('web-ldap-admin.prefixo_linux') . $username);
-            $user->setAttribute('uidNumber', $username);
-            $user->setAttribute('gidNumber', config('web-ldap-admin.gid_linux'));
-            $user->setAttribute('loginShell', '/bin/bash');
-            $user->setAttribute('userPrincipalName', $username.'@'.config('web-ldap-admin.ldap_domain'));
-            $user->setAttribute('unixHomeDirectory', '/home/'. config('web-ldap-admin.prefixo_linux') . $username);
+            $user->uid = config('web-ldap-admin.prefixo_linux') . $username;
+            $user->uidNumber = $username;
+            $user->gidNumber = config('web-ldap-admin.gid_linux');
+            $user->loginShell = '/bin/bash';
+            $user->userPrincipalName = $username . '@' . config('web-ldap-admin.ldap_domain');
+            $user->unixHomeDirectory = '/home/' . config('web-ldap-admin.prefixo_linux') . $username;
         }
 
         $user->save();
 
-        $user->setDepartment($attr['setor']);
+        $user->department = $attr['setor'];
 
         // Adiciona a um ou mais grupo
         LdapGroup::addMember($user, $groups);
@@ -112,7 +121,7 @@ class User
         // Busca a OU padrão informada no .env
         // Se vazio, não é necessário alterar nada, pois o default é a raiz (Thiago)
         if(config('web-ldap-admin.ouDefault') != ''){
-            $ou = Adldap::search()->ous()->find(config('web-ldap-admin.ouDefault'));
+            $ou = OrganizationalUnit::findBy('ou', config('web-ldap-admin.ouDefault'));
 
             // Move o usuário para a OU padrão somente se ela existir,
             // do contrário deixa o usuário na raiz
@@ -129,10 +138,16 @@ class User
      */
     public static function getExpiryDays()
     {
+        // invocado por:
+        //     no login (LoginListener::handle -> User::criarOuAtualizarPorArray -> User::createOrUpdate)
+        //     menu "Criar usuário" -> botão "Enviar Dados" (LdapUserController::store -> User::createOrUpdate)
+        //     menu "Criar usuário" -> botão "Enviar Dados" (LdapUserController::store -> User::criarOuAtualizarPorArray -> User::createOrUpdate)
+        //     menu "Sincronizar ..." -> botão "Sincronizar com replicado" -> botão "Sincronizar" (SincronizaReplicado::handle::sync -> User::criarOuAtualizarPorArray -> User::createOrUpdate)
+
         if (config('web-ldap-admin.expirarEm') == 0) {
             return null;
         } else {
-            return now()->addDays(config('web-ldap-admin.expirarEm'))->timestamp;
+            return now()->addDays((int) config('web-ldap-admin.expirarEm'));
         }
     }
 
@@ -141,12 +156,15 @@ class User
      */
     public static function expirarSenha($username, $expiry)
     {
+        // invocado por:
+        //     menu "Usuários Ldap" -> algum usuário Ldap, menu "Minha Conta (trocar senha da rede)" -> alguma opção do menu de expiração de conta, alguma opção do menu de habilitar/desabilitar, botão "Alterar" (LdapUserController::update)
+
         $user = SELF::obterUserPorUsername($username);
         if ($user) {
             if ($expiry) {
-                $user->setAccountExpiry(now()->addDays($expiry)->timestamp);
+                $user->accountExpires = now()->addDays((int) $expiry);
             } else {
-                $user->setAccountExpiry(null);
+                $user->accountExpires = 0;
             }
             $user->save();
             return true;
@@ -158,15 +176,19 @@ class User
      * Obtém uma instância de usuário com busca pelo codpes
      *
      * @param Int $codpes
-     * @return \Adldap\Models\User
+     * @return LdapRecord\Models\ActiveDirectory\User
      */
     public static function obterUserPorCodpes($codpes)
     {
-        $user = Adldap::search()->users()->findBy(config('web-ldap-admin.campoCodpes'), $codpes);
+        // invocado por:
+        //     menu "Minha Conta (trocar senha da rede)" (LdapUserController::my)
+        //     menu "Criar usuário" -> botão "Enviar Dados" (LdapUserController::store)
+
+        $user = LdapUser::findBy(config('web-ldap-admin.campoCodpes'), $codpes);
 
         // não vai encontrar se for pelo username, nesse caso vamos usar o CN
         if (is_null($user)) {
-            $user = Adldap::search()->users()->where('cn', '=', $codpes)->first();
+            $user = LdapUser::where('cn', '=', $codpes)->first();
         }
 
         return $user;
@@ -176,59 +198,78 @@ class User
      * Obtém uma instância de usuário com busca pelo username
      *
      * @param String $username
-     * @return \Adldap\Models\User
+     * @return LdapRecord\Models\ActiveDirectory\User
      */
     public static function obterUserPorUsername($username)
     {
-        return Adldap::search()->users()->where('cn', '=', $username)->first();
+        // invocado por:
+        //     no login (LoginListener::handle -> User::criarOuAtualizarPorArray -> User::createOrUpdate)
+        //     menu "Solicitação de Conta de Administrador" -> botão "Enviar" (SolicitaController::store)
+        //     menu "Usuários Ldap" -> algum usuário Ldap (LdapUserController::show)
+        //     menu "Usuários Ldap" -> algum usuário Ldap, menu "Minha Conta (trocar senha da rede)" -> botão "Grupo" -> botão "Salvar" (LdapUserController::addGroup)
+        //     menu "Usuários Ldap" -> algum usuário Ldap, menu "Minha Conta (trocar senha da rede)" -> alguma opção do menu de expiração de conta, alguma opção do menu de habilitar/desabilitar, botão "Alterar" (LdapUserController::update -> User::expirarSenha)
+        //     menu "Usuários Ldap" -> algum usuário Ldap, menu "Minha Conta (trocar senha da rede)" -> alguma opção do menu de expiração de conta, alguma opção do menu de habilitar/desabilitar, botão "Alterar" (LdapUserController::update -> User::enable)
+        //     menu "Usuários Ldap" -> algum usuário Ldap, menu "Minha Conta (trocar senha da rede)" -> alguma opção do menu de expiração de conta, alguma opção do menu de habilitar/desabilitar, botão "Alterar" (LdapUserController::update -> User::disable)
+        //     menu "Usuários Ldap" -> algum usuário Ldap, menu "Minha Conta (trocar senha da rede)" -> alguma opção do menu de expiração de conta, alguma opção do menu de habilitar/desabilitar, botão "Alterar" (LdapUserController::update -> User::changePassword)
+        //     menu "Usuários Ldap" -> algum usuário Ldap, menu "Minha Conta (trocar senha da rede)" -> botão "Excluir" (LdapUserController::destroy -> User::delete)
+        //     menu "Criar usuário" -> botão "Enviar Dados" (LdapUserController::store -> User::createOrUpdate)
+        //     menu "Criar usuário" -> botão "Enviar Dados" (LdapUserController::store -> User::criarOuAtualizarPorArray -> User::createOrUpdate)
+        //     menu "Sincronizar ..." -> botão "Sincronizar com replicado" -> botão "Sincronizar" (SincronizaReplicado::handle::sync -> User::criarOuAtualizarPorArray -> User::createOrUpdate)
+        //     menu "Sincronizar ..." -> botão "Sincronizar com replicado" -> botão "Sincronizar" (SincronizaReplicado::handle::sync -> User::desativarUsers)
+        //     menu "Sincronizar ..." -> botão "Sincronizar com replicado" -> botão "Sincronizar" (SincronizaReplicado::handle::sync -> User::desativarUsers -> User::disable)
+
+        return LdapUser::where('cn', '=', $username)->first();
     }
 
     /**
      * Coleta atributos do usuário para serem mostrados
      *
-     * @param \Adldap\Models\User $user
+     * @param LdapRecord\Models\ActiveDirectory\User $user
      * @return Array
      */
     public static function show(LdapUser $user)
     {
+        // invocado por:
+        //     menu "Usuários Ldap" -> algum usuário Ldap, menu "Minha Conta (trocar senha da rede)" (LdapUserController::show, my)
+
         $attr = [];
 
         // Nome e email
-        $attr['username'] = $user->getAccountName();
-        $attr['display_name'] = $user->getDisplayName();
-        $attr['email'] = $user->getEmail();
-        $attr['description'] = $user->getDescription();
+        $attr['username'] = $user->getFirstAttribute('samaccountname');
+        $attr['display_name'] = $user->getFirstAttribute('displayname');
+        $attr['email'] = $user->getFirstAttribute('mail');
+        $attr['description'] = $user->getFirstAttribute('description');
         $attr['codpes'] = SELF::obterCodpes($user);
 
         // Data da criação da conta
-        $ativacao = $user->whencreated[0];
+        $ativacao = ldapToCarbon($user, 'whencreated');
         if (!is_null($ativacao)) {
             // vamos subtrair 3 horas para bater com o TZ local. TODO: alguma forma de melhorar isso?
-            $ativacao = Carbon::createFromFormat('YmdHis\.0\Z', $ativacao)->subHours(3)->format('d/m/Y H:i:s');
+            $ativacao = $ativacao->subHours(3)->format('d/m/Y H:i:s');
         }
         $attr['ativacao'] = $ativacao;
 
         // data da última senha alterada
-        $last = $user->getPasswordLastSetDate();
+        $last = ldapToCarbon($user, 'pwdlastset');
         if (!is_null($last)) {
-            $last = Carbon::createFromFormat('Y-m-d H:i:s', $last)->format('d/m/Y H:i:s');
+            $last = $last->format('d/m/Y H:i:s');
         }
         $attr['senha_alterada_em'] = $last;
 
         // Data da expiração da conta
-        $expira = $user->expirationDate();
+        $expira = ldapToCarbon($user, 'accountexpires');
         if (!is_null($expira)) {
-            $expira = Carbon::instance($expira)->format('d/m/Y');
+            $expira = $expira->format('d/m/Y');
         }
         $attr['expira'] = $expira;
 
         // Grupos: vamos ocultar o grupo "Domain Users"
-        $grupos = array_diff($user->getGroupNames(), ['Domain Users']);
+        $grupos = array_diff($user->groups()->get()->pluck('cn')->flatten()->toArray(), ['Domain Users']);
         sort($grupos);
         $attr['grupos'] = implode(', ', $grupos);
 
         // Department
-        $attr['department'] = $user->getDepartment();
+        $attr['department'] = $user->getFirstAttribute('department');
 
         return $attr;
     }
@@ -242,24 +283,29 @@ class User
      *
      * Se não retornar codpes o status pode ser qualquer
      *
-     * @param \Adldap\Models\User $user
+     * @param LdapRecord\Models\ActiveDirectory\User $user
      * @param $status Se true retorna se o codpes veio do campo correto ou não, segundo o config
      * @return Int|Array|Null
      */
     public static function obterCodpes(LdapUser $user, Bool $status = false)
     {
+        // invocado por:
+        //     menu "Usuários Ldap" (LdapUserController::index -> ldapusers.index)
+        //     menu "Usuários Ldap" -> algum usuário Ldap, menu "Minha Conta (trocar senha da rede)" (LdapUserController::show, my)
+        //     menu "Usuários Ldap" -> algum usuário Ldap, menu "Minha Conta (trocar senha da rede)" (LdapUserController::show, my -> User::show)
+
         $valido = true;
         switch (strtolower(config('web-ldap-admin.campoCodpes'))) {
             case 'employeenumber':
-                if (!is_numeric($codpes = $user->getEmployeeNumber())) {
-                    $codpes = $user->getAccountName();
+                if (!is_numeric($codpes = $user->getFirstAttribute('employeenumber'))) {
+                    $codpes = $user->getFirstAttribute('samaccountname');
                     $valido = false;
                 }
                 break;
             case 'username':
             default:
-                if (!is_numeric($codpes = $user->getAccountName())) {
-                    $codpes = $user->getEmployeeNumber();
+                if (!is_numeric($codpes = $user->getFirstAttribute('samaccountname'))) {
+                    $codpes = $user->getFirstAttribute('employeenumber');
                     $valido = false;
                 }
                 break;
@@ -273,6 +319,9 @@ class User
 
     public static function delete(String $username)
     {
+        // invocado por:
+        //     menu "Usuários Ldap" -> algum usuário Ldap, menu "Minha Conta (trocar senha da rede)" -> botão "Excluir" (LdapUserController::destroy)
+
         $user = SELF::obterUserPorUsername($username);
         if (!is_null($user)) {
             $user->delete();
@@ -283,10 +332,14 @@ class User
 
     public static function disable(String $username)
     {
+        // invocado por:
+        //     menu "Usuários Ldap" -> algum usuário Ldap, menu "Minha Conta (trocar senha da rede)" -> alguma opção do menu de expiração de conta, alguma opção do menu de habilitar/desabilitar, botão "Alterar" (LdapUserController::update)
+        //     menu "Sincronizar ..." -> botão "Sincronizar com replicado" -> botão "Sincronizar" (SincronizaReplicado::handle::sync -> User::desativarUsers)
+
         $user = SELF::obterUserPorUsername($username);
         if (!is_null($user)) {
             # https://support.microsoft.com/pt-br/help/305144/how-to-use-the-useraccountcontrol-flags-to-manipulate-user-account-pro
-            $user->setUserAccountControl(AccountControl::ACCOUNTDISABLE);
+            $user->useraccountcontrol = AccountControl::ACCOUNTDISABLE;
             $user->save();
             return true;
         }
@@ -295,11 +348,14 @@ class User
 
     public static function enable(String $username)
     {
+        // invocado por:
+        //     menu "Usuários Ldap" -> algum usuário Ldap, menu "Minha Conta (trocar senha da rede)" -> alguma opção do menu de expiração de conta, alguma opção do menu de habilitar/desabilitar, botão "Alterar" (LdapUserController::update)
+
         $user = SELF::obterUserPorUsername($username);
 
         if (!is_null($user)) {
             # https://support.microsoft.com/pt-br/help/305144/how-to-use-the-useraccountcontrol-flags-to-manipulate-user-account-pro
-            $user->setUserAccountControl(AccountControl::NORMAL_ACCOUNT);
+            $user->useraccountcontrol = AccountControl::NORMAL_ACCOUNT;
             $user->save();
             return true;
         }
@@ -308,23 +364,26 @@ class User
 
     public static function changePassword($username, String $password, $must_change_pwd = null): bool
     {
+        // invocado por:
+        //     menu "Usuários Ldap" -> algum usuário Ldap, menu "Minha Conta (trocar senha da rede)" -> alguma opção do menu de expiração de conta, alguma opção do menu de habilitar/desabilitar, botão "Alterar" (LdapUserController::update)
+
         $user = SELF::obterUserPorUsername($username);
         if (is_null($user)) {
             return false;
         }
 
-        $user->setPassword($password);
+        $user->unicodepwd = $password;
         // Leonardo Ruiz: Alteracao de senha nao deve alterar validade da conta
         //$user->setAccountExpiry(SELF::getExpiryDays());
 
         if ($must_change_pwd) {
-            $user->setEnableForcePasswordChange();
+            $user->pwdlastset = 0;
         }
 
         try {
             $user->save();
             $result = true;
-        } catch (\ErrorException $e) {
+        } catch (\Exception $e) {
             echo (Gate::check('gerente')) ? $e->getMessage() : null;
             $result = false;
         }
@@ -333,16 +392,20 @@ class User
 
     public static function getUsersGroup($grupo)
     {
+        // invocado por:
+        //     menu "Sincronizar ..." -> botão "Sincronizar com replicado" (LdapUserController::syncReplicadoForm)
+        //     menu "Sincronizar ..." -> botão "Sincronizar com replicado" -> botão "Sincronizar" (SincronizaReplicado::handle::sync)
+        
         $ldapusers = [];
-        $group = Adldap::search()->groups()->find($grupo);
+        $group = LdapGroupModel::findBy('cn', $grupo);
         if ($group != false) {
-            $ldapusers = Adldap::search()->users();
-            $ldapusers = $ldapusers->where('memberof', '=', $group->getDnBuilder()->get());
+            $ldapusers = LdapUser::query();
+            $ldapusers = $ldapusers->where('memberof', '=', $group->getDn());
             foreach (config('web-ldap-admin.ocultarUsuarios') as $ocultar) {
                 $ldapusers = $ldapusers->where('samaccountname', '!=', $ocultar);
             }
-            $ldapusers = $ldapusers->sortBy('displayname', 'asc');
-            $ldapusers = $ldapusers->paginate(config('web-ldap-admin.registrosPorPagina'))->getResults();
+            $ldapusers = $ldapusers->orderBy('displayname', 'asc');
+            $ldapusers = $ldapusers->paginate(config('web-ldap-admin.registrosPorPagina'));
         }
 
         return $ldapusers;
@@ -350,14 +413,17 @@ class User
 
     public static function desativarUsers($desligados)
     {
+        // invocado por:
+        //     menu "Sincronizar ..." -> botão "Sincronizar com replicado" -> botão "Sincronizar" (SincronizaReplicado::handle::sync)
+
         foreach ($desligados as $desligado) {
             // remover dos grupos
             $user = SELF::obterUserPorUsername($desligado);
-            $groups = $user->getGroups();
+            $groups = $user->groups()->get();
 
             foreach ($groups as $group) {
                 echo "{$desligado}: <br />";
-                $group->removeMember($user);
+                $group->members()->detach($user);
             }
 
             // adicionar ao grupo Desativados
@@ -378,6 +444,11 @@ class User
      */
     public static function criarOuAtualizarPorArray($pessoa, $metodo = '')
     {
+        // invocado por:
+        //     no login (LoginListener::handle)
+        //     menu "Criar usuário" -> botão "Enviar Dados" (LdapUserController::store)
+        //     menu "Sincronizar ..." -> botão "Sincronizar com replicado" -> botão "Sincronizar" (SincronizaReplicado::handle::sync)
+
         // setando username e codpes (similar loginListener)
         switch (strtolower(config('web-ldap-admin.campoCodpes'))) {
             case 'employeenumber':
@@ -479,5 +550,39 @@ class User
         //if ((array_filter(config('web-ldap-admin.vinculos_autorizados')) === []) ||             // quando a variável não foi configurada, permitimos todos os usuários (como sempre havia sido)
         //    !empty(array_intersect($grupos, config('web-ldap-admin.vinculos_autorizados'))))    // só permite se o usuário for de um dos vínculos autorizados
             return self::createOrUpdate($username, $attr, $grupos, $password);
+    }
+
+    /**
+     * Verifica se a conta está expirada (Retorna true/false)
+     */
+    public static function getIsExpired($user)
+    {
+        // invocado por:
+        //     menu "Usuários Ldap" (LdapUserController::index -> ldapusers.partials.expiry)
+
+        $expira = ldapToCarbon($user, 'accountexpires');
+        return $expira ? $expira->isPast() : false;
+    }
+
+    /**
+     * Retorna a data de expiração como objeto Carbon ou null
+     */
+    public static function getExpirationDate($user)
+    {
+        // invocado por:
+        //     menu "Usuários Ldap" (LdapUserController::index -> ldapusers.partials.expiry)
+
+        return ldapToCarbon($user, 'accountexpires');
+    }
+
+    /**
+     * Retorna um array com os nomes (CN) dos grupos do usuário
+     */
+    public static function getGroupNames($user)
+    {
+        // invocado por:
+        //     menu "Usuários Ldap" (LdapUserController::index -> ldapusers.index)
+
+        return $user->groups()->get()->pluck('cn')->flatten()->toArray();
     }
 }

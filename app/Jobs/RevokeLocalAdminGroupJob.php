@@ -10,7 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Solicita;
 use App\Ldap\Group as LdapGroup;
-use Adldap\Laravel\Facades\Adldap;
+use LdapRecord\Models\ActiveDirectory\User;
 
 class RevokeLocalAdminGroupJob implements ShouldQueue
 {
@@ -41,12 +41,11 @@ class RevokeLocalAdminGroupJob implements ShouldQueue
             $groupname = config('web-ldap-admin.localAdminGroupLdap');
             $group = LdapGroup::createOrUpdate($groupname);
 
-            $ldapuser = Adldap::search()->users()->where('cn', '=', $solicitation->user->username)->first();
+            $ldapuser = User::where('cn', '=', $solicitation->user->username)->first();
 
             if(!is_null($ldapuser) and !empty($ldapuser) and isset($ldapuser)){
-                if($ldapuser->inGroup($groupname)){
-                    $ldapuser->removeGroup($group);
-                    $ldapuser->save();
+                if($ldapuser->groups()->exists($group)){
+                    $ldapuser->groups()->detach($group);
                     
                     $solicitation->expired = true;
                     $solicitation->save();

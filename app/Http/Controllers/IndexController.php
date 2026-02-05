@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use Adldap\Laravel\Facades\Adldap;
 use Carbon\Carbon;
 
 class IndexController extends Controller
