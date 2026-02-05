@@ -1,4 +1,4 @@
-FROM php:8.5-apache
+FROM php:8.3-apache
 
 COPY dokku-deploy/ldap.conf /etc/ldap/ldap.conf
 
