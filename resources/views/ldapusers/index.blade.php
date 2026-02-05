@@ -84,14 +84,14 @@
         @foreach ($ldapusers as $user)
           <tr>
             <td>
-              <a href="ldapusers/{{ $user->getAccountName() }}"> {{ $user->getAccountName() }}</a>
+              <a href="ldapusers/{{ $user->getFirstAttribute('samaccountname') }}"> {{ $user->getFirstAttribute('samaccountname') }}</a>
             </td>
             <td> {{ App\Ldap\User::obterCodpes($user) }} </td>
-            <td> {{ $user->getDisplayName() }} </td>
-            <td> {{ $user->getEmail() }} </td>
-            <td> {{ $user->getDescription() }} </td>
+            <td> {{ $user->getFirstAttribute('displayname') }} </td>
+            <td> {{ $user->getFirstAttribute('mail') }} </td>
+            <td> {{ $user->getFirstAttribute('description') }} </td>
             <td>
-              {{ implode(', ', array_diff($user->getGroupNames(), ['Domain Users'])) }}
+              {{ implode(', ', array_diff(\App\Ldap\User::getGroupNames($user), ['Domain Users'])) }}
             </td>
             <td class="text-center">
               @include('ldapusers.partials.expiry')

@@ -56,9 +56,7 @@ Caso não queira inserir automaticamente a pessoa, esse recurso pode ser desabil
 
 ## Dependências php
 
-    version='7.4'
-    sudo curl -sS https://getcomposer.org/download/1.10.26/composer.phar -o /usr/bin/composer # usa o composer v1.10 compatível com o PHP 7.4
-    sudo chmod +x /usr/bin/composer                                                           # dá permissão de execução
+    version='8.3'
 
 ## Instalação
 
@@ -194,9 +192,9 @@ Ativar toda base de usuários:
 
     php artisan tinker
     
-    $users = \Adldap\Laravel\Facades\Adldap::search()->users()->get();
+    $users = LdapRecord\Models\ActiveDirectory\User::all();
     foreach($users as $user) {
-        $user->setUserAccountControl(AccountControl::NORMAL_ACCOUNT);
+        $user->accountControl()->setNormalAccount();
         $user->save();
     }
 

@@ -34,6 +34,9 @@ class AuthServiceProvider extends ServiceProvider
             $vinculos = Pessoa::obterSiglasVinculosAtivos(Auth::user()->codpes);
             if($vinculos == null) $vinculos = [];
 
+            // correção de bug prévio à atualização para Laravel 12: para funcionar corretamente, faltava aplicar o trim aqui
+            $vinculos = array_map('trim', $vinculos);
+
             return in_array('SERVIDOR', $vinculos);
         });
     }

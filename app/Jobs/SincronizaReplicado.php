@@ -36,6 +36,8 @@ class SincronizaReplicado implements ShouldQueue
      */
     public function handle()
     {
+        // menu "Sincronizar ..." -> botão "Sincronizar com replicado" -> botão "Sincronizar"
+        
         foreach ($this->type as $type) {
             foreach (Pessoa::tiposVinculos($this->unidade) as $vinculo) {
                 if ($type == $vinculo['tipvinext']) {
@@ -47,6 +49,8 @@ class SincronizaReplicado implements ShouldQueue
 
     public function sync($pessoas)
     {
+        // menu "Sincronizar ..." -> botão "Sincronizar com replicado" -> botão "Sincronizar"
+        
         if ($pessoas) {
             // No .env foi configurado para desativar os desligados?
             if (config('web-ldap-admin.desativarDesligados') == true) {
@@ -70,7 +74,7 @@ class SincronizaReplicado implements ShouldQueue
                 $contasAD = [];
                 $ldapusers = LdapUser::getUsersGroup($grupoPrincipal);
                 foreach ($ldapusers as $ldapuser) {
-                    array_push($contasAD, $ldapuser->getAccountName());
+                    array_push($contasAD, $ldapuser->getFirstAttribute('samaccountname'));
                 }
                 // Verifica se alguma conta no AD não existe no replicado e guarda no array de desligados
                 $desligados = array_values(array_diff($contasAD, $replicadoUsers));
