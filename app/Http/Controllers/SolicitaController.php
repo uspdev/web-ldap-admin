@@ -29,15 +29,22 @@ class SolicitaController extends Controller
         $ldap_computers = Computer::orderBy('cn')->get();
         $computers = [];
 
-        foreach($ldap_computers as $computer){
-            // Mostrar apenas as máquinas com login nos últimos 120 dias
-            $carbon = Carbon::createFromTimestamp(($computer->lastlogontimestamp[0] ?? 0)/10000000  - 11644473600);
-            if(!is_null($computer->operatingsystem[0] ?? null) && $carbon->diffInDays(Carbon::now()) < 120 ) {
-            array_push($computers,[
-                'computer' => $computer->cn[0],
-                'os'       => $computer->operatingsystem[0],
-                'lastLogon'       => $carbon->format('d/m/Y H:i:s')
-                ]);
+        foreach ($ldap_computers as $computer) {
+
+            $lastLogon = $computer->getFirstAttribute('lastlogontimestamp');
+            $os = $computer->getFirstAttribute('operatingsystem');
+
+            if ($lastLogon && $os) {
+                $seconds = ((float)$lastLogon / 10000000) - 11644473600;
+                $carbon = Carbon::createFromTimestamp($seconds);
+
+                if ($carbon->diffInDays(Carbon::now()) < 120) {
+                    array_push($computers, [
+                        'computer' => $computer->getFirstAttribute('cn'),
+                        'os' => $os,
+                        'lastLogon' => $carbon->format('d/m/Y H:i:s')
+                    ]);
+                }
             }
         }
         return view('solicita.create',[
