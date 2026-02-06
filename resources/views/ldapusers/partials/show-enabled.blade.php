@@ -8,7 +8,7 @@
       Conta desabilitada <i class="fas fa-user-slash ml-1"></i>
     </button>
   @endif
-  @can('gerente')
+  @can('manager')
     <button type="button" class="btn btn-sm dropdown-toggle {{ $user->isEnabled() ? 'btn-success' : 'btn-warning' }}"
       id="dropdownMenuLink" data-toggle="dropdown"></button>
     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
