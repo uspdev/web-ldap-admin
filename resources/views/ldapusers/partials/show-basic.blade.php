@@ -13,7 +13,7 @@
       <td> <b> Grupos </b> </td>
       <td>
         {{ $attr['grupos'] ?? '' }}
-        @can('gerente')
+        @can('manager')
         <button type="button" class="btn btn-success btn-sm ml-2" data-toggle="modal" data-target="#addGroup" data-backdrop="static"
           data-whatever="{{ $attr['username'] }} {{ $attr['display_name'] }}" data-keyboard="false" title="Adicionar ao(s) grupo(s)">
           <i class="fas fa-users" aria-hidden="true"></i> Grupo

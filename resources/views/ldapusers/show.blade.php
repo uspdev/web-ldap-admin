@@ -8,21 +8,21 @@
     Username: {{ $attr['username'] ?? '' }}
     <span class="badge">@include('ldapusers.partials.show-expiry')</span>
     <span class="badge">@include('ldapusers.partials.show-enabled')</span>
-    <span class="badge">@includeWhen(Gate::check('gerente'), 'ldapusers.partials.show-delete')</span>
+    <span class="badge">@includeWhen(Gate::check('manager'), 'ldapusers.partials.show-delete')</span>
   </div>
 
   <div class="row">
     <div class="col-md-12">
 
       {{-- mensagem para o aluno informando sobre conta desabilitada --}}
-      @if (!Gate::check('gerente') && $user->isDisabled())
+      @if (!Gate::check('manager') && $user->isDisabled())
         <div class="alert alert-danger" role="alert">
           Sua conta está desabilitada. Entre em contato com o administeador da rede para habilitar a conta.
         </div>
       @endif
 
-      {{-- mensagem para o gerente avisando sobre conta ldap não vinculada ao aluno --}}
-      @if (Gate::check('gerente') && $attr['codpes'] && !$codpesValido)
+      {{-- mensagem para o manager avisando sobre conta ldap não vinculada ao aluno --}}
+      @if (Gate::check('manager') && $attr['codpes'] && !$codpesValido)
         <div class="alert alert-warning" role="alert">
           O número USP está presente mas não no campo indicado pelo config
           (campoCodpes={{ config('web-ldap-admin.campoCodpes') }}).
@@ -38,8 +38,8 @@
       @include('ldapusers.partials.show-basic')
     </div>
     <div class="col-md-5">
-      @includeWhen(Gate::check('gerente'), 'ldapusers.partials.show-vinculos')
-      @includeWhen(Gate::check('gerente'), 'ldapusers.partials.show-new-password')
+      @includeWhen(Gate::check('manager'), 'ldapusers.partials.show-vinculos')
+      @includeWhen(Gate::check('manager'), 'ldapusers.partials.show-new-password')
       @includeWhen($user->isEnabled(), 'ldapusers.partials.show-pwd-form')
     </div>
     <div class="col-md-2">

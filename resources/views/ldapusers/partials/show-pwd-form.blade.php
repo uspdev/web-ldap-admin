@@ -20,7 +20,7 @@
 
       <div id="senha_confirmation"></div>
 
-      @if (Gate::check('gerente'))
+      @if (Gate::check('manager'))
         <div class="form-group form-check">
           <input type="checkbox" class="form-check-input" name="must_change_pwd" value="1">
           <label for="usr">Usuário deve alterar a senha no próximo logon</label>

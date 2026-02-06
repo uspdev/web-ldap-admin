@@ -12,7 +12,7 @@
     @endif
   </button>
 
-  @if (Gate::check('gerente'))
+  @if (Gate::check('manager'))
     <button type="button" class="btn btn-sm dropdown-toggle {{ $user_isExpired ? 'btn-warning' : 'btn-success' }}"
       id="dropdownMenuLink" data-toggle="dropdown"></button>
     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
