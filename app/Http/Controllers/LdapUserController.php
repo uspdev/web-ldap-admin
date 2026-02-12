@@ -366,7 +366,7 @@ class LdapUserController extends Controller
         $this->authorize('manager');
         \UspTheme::activeUrl('configs');
 
-        $vinculos = Pessoa::tiposVinculos(config('web-ldap-admin.replicado_unidade'));
+        $vinculos = Pessoa::listarTiposVinculoExtenso();
         foreach ($vinculos as &$vinculo) {
             $vinculo['countReplicado'] = Pessoa::ativosVinculo($vinculo['tipvinext'], config('web-ldap-admin.replicado_unidade'), 1)[0]['total'];
             $vinculo['countAD'] = count(LdapUser::getUsersGroup($vinculo['tipvinext']));

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Gate;
 use Uspdev\Replicado\Graduacao;
 use Uspdev\Replicado\Estrutura;
 use Uspdev\Replicado\Pessoa;
+use App\Replicado\Pessoa as LdapPessoa;
 use Uspdev\Utils\Generic as Utils;
 
 use LdapRecord\Models\ActiveDirectory\Container;
@@ -490,12 +491,12 @@ class User
             if ($pessoa['tipvinext'] == 'Aluno de Graduação') {
                 if (empty(config('web-ldap-admin.grCursoSetor'))) {
                     try {
-                        $nomabvset = Graduacao::setorAluno($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'))['nomabvset'];
+                        $nomabvset = Graduacao::obterSetorAluno($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'))['nomabvset'];
                     } catch (\Exception $e) {
                         $nomabvset = 'Sem departamento';
                     }
                 } else {
-                    $curso = Graduacao::curso($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'));
+                    $curso = Graduacao::obterCursoAtivo($pessoa['codpes']);
                     $codcur = $curso['codcur'];
                     $codhab = $curso['codhab'];
                     foreach (config('web-ldap-admin.grCursoSetor') as $grCursoSetor) {
@@ -517,7 +518,7 @@ class User
 
         if ($pessoa['tipvinext'] != 'Externo') {
             if (config('web-ldap-admin.tipoNomesGrupos') == 'extenso') {
-                $vinculosSetores = Pessoa::vinculosSetores($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'));
+                $vinculosSetores = LdapPessoa::listarVinculosSetores($pessoa['codpes'], config('web-ldap-admin.replicado_unidade'));
                 foreach ($vinculosSetores as $key => $value) {
                     if ($value == 'Aluno de Graduação' && isset($nomabvset)) {
                         $vinculosSetores[1] = 'Aluno de Graduação ' . $nomabvset;

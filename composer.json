@@ -7,7 +7,7 @@
     "repositories": {
         "replicado": {
             "type": "git",
-            "url": "https://github.com/uspdev/replicado.git"
+            "url": "https://github.com/leandroramos/replicado.git"
         }
     },
     "require": {
@@ -20,6 +20,7 @@
         "laravel/ui": "^4.5",
         "select2/select2": "^4.0",
         "uspdev/laravel-replicado": "^1.0",
+        "uspdev/replicado": "dev-issue_594 as 1.999",
         "uspdev/laravel-usp-theme": "^2.0",
         "uspdev/senhaunica-socialite": "^4.0",
         "uspdev/utils": "^1.0",
