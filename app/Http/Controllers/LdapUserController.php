@@ -288,58 +288,59 @@ class LdapUserController extends Controller
   public function update(Request $request, $username)
   {
     // menu "Usuários Ldap" -> algum usuário Ldap, menu "Minha Conta (trocar senha da rede)" -> alguma opção do menu de expiração de conta, alguma opção do menu de habilitar/desabilitar, botão "Alterar"
-
     $this->authorize('user');
 
     // troca de senha
     if (!is_null($request->senha)) {
-      $request->validate([
-        // TODO: 04/07/2022 - ECAdev @alecosta: Parametrizar
-        // 'senha' => ['required', 'confirmed', 'min:8'], # Sem complexidade
-        'senha' => ['required', 'confirmed', 'min:8', 'max:20', 'regex:/[0-9]/', 'regex:/[A-Z]/', 'regex:/[!@#\$%\^&\*()_]/'], # Com complexidade
-        'must_change_pwd' => ['nullable', 'in:1'],
-      ]);
+        $request->validate([
+            // TODO: 04/07/2022 - ECAdev @alecosta: Parametrizar
+            // 'senha' => ['required', 'confirmed', 'min:8'], # Sem complexidade
+            'senha' => ['required', 'confirmed', 'min:8|max:20', 'regex:/[0-9]/', 'regex:/[A-Z]/', 'regex:/[!@#\$%\^&\*()_]/'], # Com complexidade
+            'must_change_pwd' => ['nullable', 'in:1'],
+        ]);
 
-      if (LdapUser::changePassword($username, $request->senha, $request->must_change_pwd)) {
-        $request->session()->flash('alert-success', 'Senha alterada com sucesso!');
-      } else {
-        $request->session()->flash(
-          'alert-danger',
-          'Não foi possível alterar a senha da sua conta! Consulte a política de senha de seu servidor.'
-        );
-      }
+        if (LdapUser::changePassword($username, $request->senha, $request->must_change_pwd)) {
+            $request->session()->flash('alert-success', 'Senha alterada com sucesso!');
+        } else {
+            $request->session()->flash('alert-danger',
+                'Não foi possível alterar a senha da sua conta! Consulte a política de senha de seu servidor.');
+        }
 
-      return redirect()->back();
+        return redirect()->back();
     }
 
     $this->authorize('manager');
     // atualiza status
     if (!is_null($request->status)) {
 
-      if ($request->status == 'disable') {
-        LdapUser::disable($username);
-        $request->session()->flash('alert-success', "Usuário $username desabilitado!");
-        return redirect()->back();
-      }
+        if ($request->status == 'disable') {
+            LdapUser::disable($username);
+            $request->session()->flash('alert-success', "Usuário $username desabilitado!");
+            return redirect()->back();
+        }
 
-      if ($request->status == 'enable') {
-        LdapUser::enable($username);
-        $request->session()->flash('alert-success', "Usuário $username habilitado!");
-        return redirect()->back();
-      }
+        if ($request->status == 'enable') {
+            LdapUser::enable($username);
+            $request->session()->flash('alert-success', "Usuário $username habilitado!");
+            return redirect()->back();
+        }
     }
 
     // atualiza data de expiração
     if (!is_null($request->expiry)) {
-      $request->validate([
-        'expiry' => ['required', Rule::in([7, 30, 365, 0, -1])],
-      ]);
+        $request->validate([
+            'expiry' => ['required', Rule::in([7, 30, 365, 0, -1])],
+        ]);
 
-      LdapUser::expirarSenha($username, $request->expiry);
-      $request->session()->flash('alert-success', "Usuário $username: alterado expiração da senha!");
-      return redirect()->back();
+        LdapUser::expirarSenha($username, $request->expiry);
+        $request->session()->flash('alert-success', "Usuário $username: alterado expiração da senha!");
+        return redirect()->back();
     }
-  }
+
+    // evita que caia em tela vazia caso nada tenha sido alterado pelo usuário
+    $request->session()->flash('alert-success', "Nenhuma operação realizada.");
+    return redirect()->back();
+}
 
   /**
    * Remove the specified resource from storage.
