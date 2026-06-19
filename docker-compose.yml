@@ -23,8 +23,6 @@ services:
       MYSQL_USER: web-ldap-admin
       MYSQL_PASSWORD: web-ldap-admin
       MYSQL_ROOT_PASSWORD: web-ldap-admin
-    volumes:
-      - mariadb_data:/var/lib/mysql
     networks:
       - web-ldap-admin-network
 
@@ -37,8 +35,17 @@ services:
       - web-ldap-admin-network
     shm_size: 2gb
 
+  senhaunica-faker:
+    image: uspdev/senhaunica-faker
+    container_name: web-ldap-admin_senhaunica-faker
+    ports:
+      - "3141:3141"
+    environment:
+          - APP_URL=http://auth.local:3141
+    networks:
+      web-ldap-admin-network:
+        aliases:
+          - auth.local
+
 networks:
   web-ldap-admin-network:
-
-volumes:
-  mariadb_data:

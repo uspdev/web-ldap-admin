@@ -34,3 +34,5 @@ php.ini
 # DDEV
 /.ddev
 core.*
+
+.phpunit.cache/
