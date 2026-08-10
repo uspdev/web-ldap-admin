@@ -1,6 +1,7 @@
 services:
   web-ldap-admin:
     build: .
+    image: web-ldap-admin:latest
     container_name: web-ldap-admin
     ports:
       - "8000:80"
@@ -23,6 +24,24 @@ services:
       MYSQL_USER: web-ldap-admin
       MYSQL_PASSWORD: web-ldap-admin
       MYSQL_ROOT_PASSWORD: web-ldap-admin
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - web-ldap-admin-network
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: web-ldap-admin_phpmyadmin
+    restart: always
+    depends_on:
+      - mariadb
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: web-ldap-admin
     networks:
       - web-ldap-admin-network
 
@@ -30,11 +49,13 @@ services:
     image: selenium/standalone-chrome
     container_name: web-ldap-admin_selenium
     ports:
-      - "7900:7900" # VNC (pra ver o browser rodando)
+      - "7900:7900"
     networks:
       - web-ldap-admin-network
     shm_size: 2gb
 
+  # No /etc/hosts do seu computador colocar a linha `127.0.0.1 auth.local`
+  # particularidades do protocolo oAuth1 usado na USP
   senhaunica-faker:
     image: uspdev/senhaunica-faker
     container_name: web-ldap-admin_senhaunica-faker
@@ -47,5 +68,17 @@ services:
         aliases:
           - auth.local
 
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: web-ldap-admin_mailpit
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Interface Web
+    networks:
+      - web-ldap-admin-network
+
 networks:
   web-ldap-admin-network:
+
+volumes:
+  mariadb_data:
