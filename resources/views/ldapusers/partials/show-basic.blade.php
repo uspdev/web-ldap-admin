@@ -12,7 +12,21 @@
     <tr>
       <td> <b> Grupos </b> </td>
       <td>
-        {{ $attr['grupos'] ?? '' }}
+        @foreach ($attr['grupos'] as $group)
+          {{ $group }}
+          <form action="ldapusers/{{ $attr['username'] }}/{{ $group }}" method="post" style="display: inline-block">
+            @csrf
+            @method('delete')
+            <button
+              class="btn btn-sm btn-danger delete-item mb-1"
+              type="submit"
+              data-toggle="tooltip"
+              data-placement="top"
+              title="Excluir grupo {{ $group }} do usuário">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </form>
+        @endforeach
         @can('manager')
         <button type="button" class="btn btn-success btn-sm ml-2" data-toggle="modal" data-target="#addGroup" data-backdrop="static"
           data-whatever="{{ $attr['username'] }} {{ $attr['display_name'] }}" data-keyboard="false" title="Adicionar ao(s) grupo(s)">

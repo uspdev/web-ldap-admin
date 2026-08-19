@@ -40,7 +40,7 @@ class SolicitaController extends Controller
 
                 if ($carbon->diffInDays(Carbon::now()) < 120) {
                     array_push($computers, [
-                        'computer' => $computer->getFirstAttribute('cn'),
+                        'computer' => $computer->getFirstAttribute('name'),
                         'os' => $os,
                         'lastLogon' => $carbon->format('d/m/Y H:i:s')
                     ]);

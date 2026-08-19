@@ -44,7 +44,7 @@
 
                     <div class="form-group">
                         <label for="computer">Em computador deseja a liberação de acesso administrativo?</label>
-                        <select name="computer" class="form-control">
+                        <select name="computer" class="form-select select2">
                             <option value="" selected="">-- Selecione --</option>
                             @foreach($computers as $computer)
                                 <option value="{{ $computer['computer'] }}">
@@ -62,4 +62,12 @@
         </div>
     </div>
 
+@stop
+
+@section('javascripts_bottom')
+<script>
+  $(document).ready(function() {
+    $('.select2').select2();
+  });
+</script>
 @stop

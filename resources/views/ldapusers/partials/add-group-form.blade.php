@@ -15,7 +15,7 @@
                     <label for="grupos">Selecione o(s) grupo(s) ou digite o(s) nome(s) de novo(s) grupo(s)</label>
                     <select class="select2 form-control" id="grupos" name="grupos[]" multiple="multiple" required>
                         @foreach (\App\Ldap\Group::listaGrupos() as $grupo)
-                            @if (!in_array($grupo, explode(', ', $attr['grupos'])))
+                            @if (!in_array($grupo, $attr['grupos']))
                                 <option value="{{ $grupo }}">{{ $grupo }}</option>
                             @endif
                         @endforeach
