@@ -4,6 +4,7 @@ namespace App\Replicado;
 
 use Uspdev\Replicado\DB;
 use Uspdev\Replicado\Pessoa as ReplicadoPessoa;
+use Uspdev\Replicado\Graduacao as Graduacao;
 
 class Pessoa extends ReplicadoPessoa
 {
@@ -51,7 +52,7 @@ class Pessoa extends ReplicadoPessoa
                  AND codundclg IN ({$codundclg})";
         $param['codpes'] = $codpes;
         $result = DB::fetchAll($query, $param);
-        dd($result);
+        //dd($result);
         // Inicializa o array de vínculos e setores
         $vinculosSetores = array();
         foreach ($result as $row) {
@@ -62,7 +63,7 @@ class Pessoa extends ReplicadoPessoa
                 // Adiciona o departamento quando também for Aluno de Graduação
                 if (trim($row['tipvinext']) == 'Aluno de Graduação') {
                     // Considerando o primeiro código de unidade
-                    $setorGraduacao = Graduacao::setorAluno($row['codpes'], $arrCodUnidades[0])['nomabvset'];
+                    $setorGraduacao = Graduacao::obterSetorAluno($row['codpes'], $arrCodUnidades[0])['nomabvset'];
                     array_push($vinculosSetores, $row['tipvinext'] . ' ' . $setorGraduacao);
                 }
             }
@@ -81,6 +82,4 @@ class Pessoa extends ReplicadoPessoa
         sort($vinculosSetores);
         return $vinculosSetores;
     }
-
-
 }

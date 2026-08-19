@@ -37,9 +37,9 @@ class SincronizaReplicado implements ShouldQueue
     public function handle()
     {
         // menu "Sincronizar ..." -> botão "Sincronizar com replicado" -> botão "Sincronizar"
-        
+
         foreach ($this->type as $type) {
-            foreach (Pessoa::tiposVinculos($this->unidade) as $vinculo) {
+            foreach (Pessoa::listarTiposVinculoExtenso() as $vinculo) {
                 if ($type == $vinculo['tipvinext']) {
                     $this->sync(Pessoa::ativosVinculo($vinculo['tipvinext'], $this->unidade));
                 }
@@ -50,7 +50,7 @@ class SincronizaReplicado implements ShouldQueue
     public function sync($pessoas)
     {
         // menu "Sincronizar ..." -> botão "Sincronizar com replicado" -> botão "Sincronizar"
-        
+
         if ($pessoas) {
             // No .env foi configurado para desativar os desligados?
             if (config('web-ldap-admin.desativarDesligados') == true) {
