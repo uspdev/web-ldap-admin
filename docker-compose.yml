@@ -77,6 +77,19 @@ services:
     networks:
       - web-ldap-admin-network
 
+  smblds:
+      image: smblds/smblds:latest
+      container_name: web-ldap-admin_smblds
+      environment:
+        - REALM=USPDEV.LOCAL
+        - DOMAIN=USPDEV
+        - ADMINPASS=SenhaForte123!
+        - INSECURE_PASSWORDSETTINGS=true # Desativa regras complexas de senha para facilitar
+      networks:
+        web-ldap-admin-network:
+          aliases:
+            - dc.uspdev.local # para samba
+
 networks:
   web-ldap-admin-network:
 
