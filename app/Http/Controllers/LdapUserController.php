@@ -256,6 +256,9 @@ class LdapUserController extends Controller
         // menu "Usuários Ldap" -> algum usuário Ldap, menu "Minha Conta (trocar senha da rede)"
 
         $attr = LdapUser::show($user);
+        // o blade espera um array de grupos
+        $attr['grupos'] = explode(',', $attr['grupos']);
+
         $vinculos = [];
         // o $codpesValido serve para informar se o codpes extraído veio do campo indicado no config
         list($codpes, $codpesValido) = LdapUser::obterCodpes($user, true);
