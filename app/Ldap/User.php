@@ -267,7 +267,7 @@ class User
         // Grupos: vamos ocultar o grupo "Domain Users"
         $grupos = array_diff($user->groups()->get()->pluck('cn')->flatten()->toArray(), ['Domain Users']);
         sort($grupos);
-        $attr['grupos'] = implode(', ', $grupos);
+        $attr['grupos'] = $grupos;
 
         // Department
         $attr['department'] = $user->getFirstAttribute('department');

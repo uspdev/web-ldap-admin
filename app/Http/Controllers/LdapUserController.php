@@ -409,4 +409,17 @@ class LdapUserController extends Controller
         $request->session()->flash('alert-success', 'Grupo(s) adicionado(s) com sucesso.');
         return redirect("/ldapusers/$request->username");
     }
+
+    public function deleteUserGroup(Request $request, $username, $group)
+    {
+        $this->authorize('manager');
+        $user = LdapUser::obterUserPorUsername($username);
+        $group = Group::where('cn', '=', $group)->first();
+        if ( $user->groups()->exists($group) ) {
+            $user->groups()->detach($group);
+            $request->session()->flash('alert-success', 'Grupo ' . $group['name'][0] . ' removido com sucesso.');
+        }
+        return redirect()->back();
+    }
+
 }
