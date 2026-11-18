@@ -90,6 +90,12 @@ services:
           aliases:
             - dc.uspdev.local # para samba
 
+  memcached:
+    image: memcached:1.6-alpine
+    container_name: web-ldap-admin_memcached
+    networks:
+      - web-ldap-admin-network
+
 networks:
   web-ldap-admin-network:
 
